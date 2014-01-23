@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <color name="DarkPurple">#72156C</color>
+    <color name="LtPurple">#92358C</color>
+    <color name="GreyHeader">#2F3336</color>
+    <color name="GreyBackground">#24282B</color>
+    <color name="GreenLogout">#17B489</color>
+    <color name="SeaGreen">#18bd9b</color>
+    <color name="SeaGreenAlpha">#9918bd9b</color>
+    <color name="GreyItem">#2F3336</color>
+    <color name="LtGreyHeader">#393D40</color>
+    <color name="GreyLogout">#4b5155</color>
+    <color name="GreyLogoutHighlight">#8b9195</color>
+    <color name="GreySelectedItem">#34383B</color>
+    <color name="White">#fff</color>
+    <color name="SilverButton">#AAAAAA</color>
+    <color name="Dimmer">#77000000</color>
+    <color name="Brighter">#f0ffffff</color>
+    <color name="NavigationMenuFontDefaultColor">#a5a6a8</color>
+    <color name="NavigationMenuFontSelectedColor">#fff</color>
+    <color name="NavigationMenuBackgroundDefaultColor">#00000000</color>
+    <color name="NavigationMenuBackgroundSelectedColor">#33000000</color>
+    <color name="CraveShareButton">#AAAAAA</color>
+    <color name="CraveSaveButtonNormal">#bb000000</color>
+    <color name="CraveSaveButtonPressed">#bbde3b75</color>
+    <color name="CraveShareButtonNormal">#bb000000</color>
+    <color name="CraveShareButtonPressed">#bb5097d4</color>
+    <color name="CraveBorderColor">#cdcdcd</color>
+    <color name="SharedCravesFriendRavesBackground">#e2eef8</color>
+    <color name="NavigationMenuDivider">#454545</color>
+    <color name="FriendsListDivider">#000</color>
+	<color name="FriendsListHeaderText">#c1c1c1</color>
+	<color name="FriendsListItemText">#939495</color>
+</resources>

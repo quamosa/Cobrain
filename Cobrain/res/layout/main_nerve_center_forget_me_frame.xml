@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White"
+    >
+
+    <RelativeLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+        android:layout_margin="20dp"
+	    >
+    
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_alignParentTop="true"
+	        android:text="Delete everything about me. You can always register again, but you will need to re-teach your Cobrain."
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <Button
+	        android:id="@+id/forgetme"
+	        android:layout_below="@+id/textView1"
+	        style="@style/purple_button"
+	        android:text="FORGET ME" />
+	    
+	 </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+     >
+
+  <RelativeLayout
+        android:id="@+id/main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/crave_border"
+        android:layout_margin="@dimen/crave_padding"
+	>
+       
+    <RelativeLayout
+        android:id="@+id/main_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/item_info_footer"
+        android:paddingTop="@dimen/crave_padding"
+        android:paddingLeft="@dimen/crave_padding"
+        android:paddingRight="@dimen/crave_padding"
+        android:paddingBottom="0dp" >
+
+       <Button
+           android:id="@+id/see_why_button"
+           style="@style/see_why_button"
+           android:layout_width="wrap_content"
+	       android:layout_marginBottom="10dp"
+	       android:visibility="invisible"
+           android:layout_alignParentRight="true"
+           android:layout_alignParentTop="true" />
+	
+	    <ImageView
+	        android:id="@+id/item_image"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_alignParentBottom="true"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@id/see_why_button"
+	        android:src="@drawable/ic_launcher" />
+
+	      <RelativeLayout
+	        android:id="@+id/border_for_image"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignTop="@+id/item_image"
+	        android:layout_alignLeft="@+id/item_image"
+	        android:layout_alignRight="@+id/item_image"
+	        android:layout_alignBottom="@+id/item_image"
+	        android:background="@drawable/crave_border"
+			/>
+	    	    	    
+	    <RelativeLayout
+	        android:id="@+id/crave_info_header"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@+id/item_image"
+	        android:layout_alignTop="@+id/item_image"
+	        android:background="@color/DarkPurple"
+	        android:gravity="center"
+	        android:padding="@dimen/crave_padding" >
+
+	        <TextView
+	            android:id="@+id/crave_popup_label"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentLeft="true"
+	            android:layout_alignParentTop="true"
+	            android:layout_gravity="center"
+	            android:gravity="center"
+	            android:text="ADDED TO\nFRIENDS CAN SEE"
+	            android:textAppearance="?android:attr/textAppearanceMedium"
+	            android:textColor="@color/White"
+	            android:textStyle="bold" />
+
+	    </RelativeLayout>
+
+   		<ImageView
+   		    android:id="@+id/item_sale_icon"
+   		    android:layout_width="wrap_content"
+   		    android:layout_height="wrap_content"
+   		    android:layout_alignRight="@+id/item_image"
+   		    android:layout_alignTop="@+id/item_image"
+   		    android:visibility="invisible"
+   		    android:src="@drawable/ic_onsale" />
+
+   		<ImageView
+   		    android:id="@+id/item_rave_icon"
+   		    android:layout_width="wrap_content"
+   		    android:layout_height="wrap_content"
+   		    android:layout_alignRight="@+id/item_image"
+   		    android:layout_alignTop="@+id/item_image"
+   		    android:visibility="visible"
+   		    android:src="@drawable/crave_rave_button" />
+   			    	    
+	    <TextView
+	        android:id="@+id/rank_for_you_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignBottom="@+id/see_why_button"
+	        android:layout_alignLeft="@+id/item_image"
+	        android:visibility="invisible"
+	        android:text="#1 RANK FOR YOU"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	    <TextView
+	        android:id="@+id/shared_craves_index_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignBaseline="@+id/see_why_button"
+	        android:layout_alignLeft="@+id/item_image"
+	        android:text="1 of 30 Shared Craves"
+	        android:textSize="15sp" />
+	    	
+    <LinearLayout
+        android:id="@+id/bottom_buttons"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
+        
+        <ImageButton
+            android:id="@+id/just_for_me_button"
+            style="@style/crave_save_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
+
+        <ImageButton
+            android:id="@+id/friends_can_see_button"
+            style="@style/crave_share_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <View 
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000"/>
+    </LinearLayout>
+
+    
+		<TextView 
+		    android:id="@+id/rave_info"
+	        android:layout_width="match_parent"
+	        android:layout_height="35dp"
+	        android:layout_alignParentBottom="true"
+	        android:text="3 FRIENDS RAVED THIS"
+	        android:gravity="center"
+	        android:background="#6ba8dd" 
+	        android:textColor="@color/White"
+		    />
+				
+  		<TextView 
+		    android:id="@+id/rave_new"
+	        android:layout_width="wrap_content"
+	        android:layout_height="35dp"
+	        android:layout_alignParentBottom="true"
+	        android:text=" NEW "
+	        android:textSize="19sp"
+	        android:padding="5dp"
+	        android:background="#000"
+	        android:gravity="center"
+	        android:textColor="@color/White"
+		    />
+    	
+    <TextView
+        android:id="@+id/item_sale_pct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/item_image"
+        android:layout_alignTop="@+id/item_image"
+        android:padding="5dp"
+        android:gravity="right"
+        android:text="30%\noff"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        android:textColor="@color/White"
+        android:textStyle="bold" />
+
+    
+        </RelativeLayout>
+    
+    
+    	    <RelativeLayout
+	        android:id="@+id/item_info_footer"
+	        style="@style/crave_item_info"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:padding="@dimen/crave_padding" >
+
+	        <TextView
+	            android:id="@+id/item_retailer"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentLeft="true"
+	            android:layout_toLeftOf="@+id/item_price"
+  	            android:ellipsize="end"
+	            android:text="MACY&apos;S"
+	            android:textAppearance="?android:attr/textAppearanceSmall"
+	            android:textColor="#000"
+	            android:textStyle="bold" />
+
+  	        <TextView
+  	            android:id="@+id/item_description"
+  	            android:layout_width="match_parent"
+  	            android:layout_height="wrap_content"
+  	            android:layout_alignParentLeft="true"
+  	            android:layout_below="@+id/item_retailer"
+  	            android:padding="0dp"
+  	            android:layout_toLeftOf="@+id/item_price"
+  	            android:ellipsize="end"
+  	            android:lines="2"
+  	            android:text="Nautica Men&apos;s Sleepwear, Anchor Pajama Shorts"
+  	            android:textAppearance="?android:attr/textAppearanceSmall"
+  	            android:textColor="#000" />
+
+	        <TextView
+	            android:id="@+id/item_sale_regular_price"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentRight="true"
+	            android:textAppearance="?android:attr/textAppearanceSmall"
+	            android:text="$20.99" />
+
+  		    <TextView
+	            android:id="@+id/item_price"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_alignParentRight="true"
+	            android:layout_marginRight="0dp"
+	            android:layout_below="@+id/item_sale_regular_price"
+	            android:gravity="right"
+	            android:text="$30.00"
+	            android:visibility="visible"
+	            android:textAppearance="?android:attr/textAppearanceLarge"
+	            android:textColor="#000"
+	            android:textStyle="bold" />
+  	        
+  	        
+  	        <RelativeLayout
+  	            android:id="@+id/item_sale_layout"
+  	            android:layout_width="wrap_content"
+  	            android:layout_height="wrap_content"
+	            android:visibility="visible"
+  	            android:layout_alignBottom="@+id/item_description"
+  	            android:layout_alignParentRight="true"
+  	            android:layout_alignTop="@+id/item_retailer" >
+
+  		        	            
+		        <!-- TextView
+		            android:id="@+id/item_sale_price"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentRight="true"
+		            android:layout_below="@+id/item_sale_regular_price"
+		            android:text="$30.00"
+		            android:textAppearance="?android:attr/textAppearanceLarge"
+		            android:textColor="#f4a427"
+		            android:textStyle="bold" /-->
+	
+  	        </RelativeLayout>
+	        
+	    </RelativeLayout>
+    
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+    
+   </RelativeLayout>    
+    
+</RelativeLayout>

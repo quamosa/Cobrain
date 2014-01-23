@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+        <RelativeLayout
+            android:id="@+id/main_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/bottom_buttons"
+            android:layout_alignParentLeft="true"
+            android:padding="@dimen/crave_padding" >
+
+            <Button
+                android:id="@+id/see_why_button"
+                style="@style/see_why_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/crave_pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/see_why_button"
+                android:layout_marginTop="@dimen/crave_padding" >
+            </android.support.v4.view.ViewPager>
+
+            <TextView
+                android:id="@+id/rank_for_you_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/see_why_button"
+                android:layout_alignLeft="@+id/crave_pager"
+                android:text="#1 RANK FOR YOU"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        </RelativeLayout>
+    
+</RelativeLayout>

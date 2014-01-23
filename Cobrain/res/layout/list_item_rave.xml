@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.cobrain.android.views.StateFullView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/navigation_menu_item_padding" 
+    android:paddingBottom="@dimen/navigation_menu_item_padding" 
+    android:gravity="center_vertical" >
+
+   <!-- ImageView
+       android:id="@+id/friend_delete"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_centerVertical="true"
+       android:layout_marginRight="22dp"
+       android:scaleType="centerCrop"
+       android:src="@drawable/ic_friend_delete" /-->
+
+   
+   <TextView
+       android:id="@+id/friend_name"
+       style="@style/navigation_menu_font"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_centerVertical="true"
+       android:drawableLeft="@drawable/ic_rave_star"
+       android:drawablePadding="10dp"
+       android:layout_marginLeft="@dimen/raves_list_item_marginLeft"
+       android:textColor="@color/FriendsListItemText"
+       android:text="My friend" />
+
+   <!-- RelativeLayout 
+       android:layout_centerVertical="true"
+       android:layout_width="30dp"
+       android:layout_height="30dp"
+       android:layout_toLeftOf="@+id/friend_delete"
+       android:background="#5097d4"
+       android:layout_marginRight="15dp"
+       >
+	   <TextView
+	       android:id="@+id/friend_updates"
+	       style="@style/navigation_menu_font"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_centerInParent="true"
+	       android:text="1"
+	       android:textColor="@color/White"
+	       android:textSize="15sp" />
+   </RelativeLayout-->
+   
+
+</com.cobrain.android.views.StateFullView>

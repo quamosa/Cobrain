@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff" 
+    android:orientation="vertical">
+        
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" 
+	    android:gravity="center_horizontal"
+	    android:paddingTop="10dp"
+	    android:paddingBottom="10dp"
+	    android:background="#5097d4"
+	    android:orientation="vertical">
+	    
+	    <TextView
+	        android:gravity="center"
+	        android:id="@+id/textView1"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="You&apos;re Invited"
+	        android:textColor="#fff"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	    <TextView
+	        android:id="@+id/textView2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Tastemaker Beta"
+	        android:textColor="#fff"
+	        android:textSize="27sp"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	</LinearLayout>
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" 
+	    android:gravity="center_horizontal"
+	    android:paddingTop="10dp"
+	    android:paddingBottom="10dp"
+	    android:background="#78afde"
+	    android:orientation="horizontal">
+	    
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="limited to "
+	        android:textColor="#fff"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	    <TextView
+	        android:id="@+id/textView2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="10,000"
+	        android:textColor="#fff"
+	        android:textSize="25sp"
+	        android:textStyle="bold"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text=" Members"
+	        android:textColor="#fff"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+	    	    
+	</LinearLayout>
+
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="#fff"
+	    android:paddingBottom="10dp"
+	    android:paddingTop="10dp" >
+
+	    <ImageView
+	        android:id="@+id/imageView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerHorizontal="true"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/ic_tastemaker_friends_money" />
+
+	    <TextView
+	        android:id="@+id/textView3"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@+id/imageView1"
+	        android:layout_alignTop="@+id/imageView1"
+	        android:layout_marginLeft="12dp"
+	        android:layout_marginTop="20dp"
+	        android:text="5 Friends"
+	        android:textSize="28sp"
+	        android:textStyle="bold"
+	        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	    <TextView
+	        android:id="@+id/textView4"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerVertical="true"
+	        android:layout_marginLeft="20dp"
+	        android:layout_toRightOf="@+id/textView3"
+	        android:text="="
+	        android:textSize="28sp"
+	        android:textStyle="bold"
+	        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	    <TextView
+	        android:id="@+id/textView5"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_toRightOf="@+id/textView4"
+	        android:layout_marginTop="28dp"
+	        android:layout_marginLeft="30dp"
+	        android:text="$5"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:textColor="#fff"
+	        android:textSize="33sp" />
+
+	</RelativeLayout>
+
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+	   >
+	   	    <TextView
+	        android:id="@+id/textView6"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginBottom="7dp"
+	        android:text="and instantly be promoted to"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:textColor="#000"
+	        android:textSize="15sp" /> 
+
+	   	    <TextView
+	        android:id="@+id/textView6"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Tastemaker"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:textColor="#5097d4"
+	        android:textStyle="bold"
+	        android:textSize="18sp" /> 
+	   	    
+	</LinearLayout>
+	
+	<View 
+	    android:layout_height="1dp"
+	    android:layout_width="match_parent"
+	    android:layout_margin="10dp"
+	    android:background="#5097d4"
+	    />
+	
+	
+	<LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	     >
+	    
+		<RelativeLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+		   >
+		   	    <TextView
+		        android:id="@+id/textView6"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_centerVertical="true"
+		        android:text="10 Friends = "
+		        android:textAppearance="?android:attr/textAppearanceLarge"
+		        android:textColor="#000"
+		        android:textStyle="bold"
+		        android:textSize="22sp" /> 
+	
+		   	    <ImageView
+		        android:id="@+id/imageView6"
+		        android:layout_centerVertical="true"
+		        android:layout_toRightOf="@+id/textView6"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/ic_tastemaker_money_circle"/>
+	
+	  	   	    <TextView
+	  	   	        android:id="@+id/textView7"
+	  	   	        android:layout_width="wrap_content"
+	  	   	        android:layout_height="wrap_content"
+	  	   	        android:text="$12"
+	  	   	        android:layout_marginLeft="138dp"
+	  	   	        android:layout_marginTop="11dp"
+	  	   	        android:textColor="#fff"
+	  	   	        android:textSize="18sp" />
+		   	    	   	    
+		</RelativeLayout>
+	</LinearLayout>
+	
+	<View 
+	    android:layout_height="1dp"
+	    android:layout_width="match_parent"
+	    android:layout_margin="10dp"
+	    android:background="#5097d4"
+	    />
+
+	<TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Hurry, start adding friends now!\nThe Beta is filling up fast."
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#000"
+        android:textSize="15sp" />
+
+	<TextView
+	    android:id="@+id/tastemaker_rules_link"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="20dp"
+	    android:layout_marginBottom="20dp"
+	    android:layout_gravity="center_horizontal"
+	    android:text="@string/tastemaker_beta_program_rules_link"
+	    android:textSize="10sp"
+	    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+	<Button
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:id="@+id/tastemaker_next"
+	    android:text="NEXT"
+	    android:textColor="@drawable/sel_tastemaker_button_text"
+	    android:background="@drawable/sel_tastemaker_button_back"
+	    />
+</LinearLayout>

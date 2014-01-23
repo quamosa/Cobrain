@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Cobrain</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="username"></string>
+    <string name="password"></string>
+    <!-- string name="username">walter@cobrain.com</string>
+    <string name="password">walterwalter</string-->
+    <string name="forgot_password_link"><small><u><B>Forgot Password?</B></u></small></string>
+    <string name="rank_for_you"><big><big><small>#</small><b>%1$d</b></big></big><small> of %1$s Craves for You</small></string>
+    <string name="item_out_of_num_items">out of %1$,d apparel items</string>
+    <string name="item_out_of_num_item">out of 1 apparel item</string>
+    <string name="craves_found"><![CDATA[<b><font color="#00BE9B">%1$d</font> Craves Found</b>]]></string>
+    
+    <!-- urls for qa and prd -->
+    <string name="url_cobrain_api_qa">https://qa.api.cobrain.com</string>
+    <string name="url_cobrain_api_prd">https://api.cobrain.com</string>
+    <string name="url_cobrain_app_qa">https://qa.cobrain.com</string>
+    <string name="url_cobrain_app_prd">https://cobrain.com</string>
+    <string name="sms_invite_validation_number_qa">+1(443)5397345</string>
+    <string name="sms_invite_validation_number_prd">+1(202)4994992</string>
+    <!--  -->
+    
+    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_prd</item>
+    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_prd</item>
+    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_prd</item>
+    
+    <string name="url_logout_get">%1$s/logout</string>
+    <string name="url_login_post">%1$s/account/login</string>
+    <string name="url_account_post">%1$s/account</string>
+    <string name="url_profile_get">%1$s/v1/profile</string>
+    <string name="url_profile_delete">%1$s/v1/profile</string>
+    <string name="url_profile_put">%1$s/v1/profile</string>
+    <string name="url_password_reset_get">%1$s/account/password/new</string>
+    <string name="url_password_reset_post">%1$s/account/password</string>
+    <string name="url_recommendations_get">%1$s/v1/recommendations</string>
+    <string name="url_trainings_post">%1$s/v1/trainings</string>
+    <string name="url_trainings_answers_post">%1$s/v1/trainings/%2$d/answers</string>
+    <string name="url_trainings_skip_post">%1$s/v1/trainings/%2$d/skip</string>
+    <string name="url_invitations_post">%1$s/v1/invitations</string>
+    <string name="url_profile_invitations_get">%1$s/v1/profile/invitations</string>
+    <string name="url_lists_get">%1$s/v1/lists</string>
+    <string name="url_lists_unsubscribe_delete">%1$s/v1/lists/%2$s/subscriptions/%3$s</string>
+    <string name="url_lists_subscribe_put">%1$s/v1/lists/%2$s/subscriptions/%3$s</string>
+    <string name="url_list_get">%1$s/v1/lists/%2$s</string>
+    <string name="url_lists_items_post">%1$s/v1/lists/%2$s/items</string>
+    <string name="url_lists_item_publish_put">%1$s/v1/lists/%2$s/items/%3$s</string>
+    <string name="url_lists_item_del">%1$s/v1/lists/%2$s/items/%3$s</string>
+    <string name="url_category_get">%1$s/v1/categories/%2$s</string>
+    <string name="url_lists_rave_post">%1$s/v1/lists/%2$s/items/%3$s/raves</string>
+    <string name="url_lists_rave_delete">%1$s/v1/lists/%2$s/items/%3$s/raves/%4$s</string>
+    <string name="url_hashed_phone_post">%1$s/account/phone</string>
+    <string name="url_invite">%1$s/mobile/download?phone=%2$s&amp;inviter=%3$s</string>
+    <string name="bit_ly_access_token">cec181fe7d7e98f7dce6d00ebc603ea4b50801b2</string>
+    
+    <string name="url_tastemaker_beta_program_rules">%1$s/campaign/tastemaker</string>
+    <string name="tastemaker_beta_program_rules_link"><![CDATA[<a href=\"%1$s\">Tastemaker Beta Program Rules</a>]]></string>
+    
+</resources>

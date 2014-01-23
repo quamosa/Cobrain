@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.cobrain.android.views.StateFullView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:background="@color/White">
+
+<include layout="@layout/list_item_saved_and_share_slide_behind" />
+    
+<RelativeLayout
+    android:id="@+id/front"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/saved_and_shared_item_height"
+    android:background="@color/White" >    
+
+    <ImageView
+        android:id="@+id/slide_left_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_slide_left" />
+    
+   <RelativeLayout
+        android:id="@+id/crave_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/slide_left_icon"
+        android:layout_toRightOf="@+id/item_image" >
+
+        <TextView
+            android:id="@+id/item_retailer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="MACY&apos;S"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/item_retailer"
+            android:text="MONROE SWEATER KNIT CARDIGAN IN GRANITE"
+            android:textSize="13sp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/item_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="$30.00"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        
+
+
+        
+        
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/item_image"
+        android:layout_width="95dp"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_launcher" />
+
+</RelativeLayout>
+    
+</com.cobrain.android.views.StateFullView>

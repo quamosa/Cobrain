@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#949"
+    >
+<RelativeLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#949" >
+
+    <include
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_login_save_account_frame" />
+
+    <RelativeLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/header"
+        android:layout_margin="20dp"
+        android:background="@drawable/drop_shadow" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff3ff"
+            android:padding="20dp"
+            android:paddingTop="25dp" >
+
+            <ImageView
+                android:id="@+id/cobrain_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="25dp"
+                android:src="@drawable/logo_cobrain" />
+
+            <TextView
+                android:id="@+id/intro_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cobrain_logo"
+                android:layout_marginBottom="10dp"
+                android:text="We need some information before you start using your Cobrain." />
+
+            <TextView
+                android:id="@+id/name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/intro_text"
+                android:layout_marginBottom="10dp"
+                android:text="What is your name?" />
+
+            <EditText
+                android:id="@+id/name"
+                style="@style/edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/name_label" />
+
+            <TextView
+                android:id="@+id/zipcode_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/name"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:text="What is your zipcode?" />
+
+            <EditText
+                android:id="@+id/zipcode"
+                style="@style/edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/zipcode_label" />
+
+            <TextView
+                android:id="@+id/gender_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/zipcode"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:text="Do you prefer clothing designed for Men or for Women?" />
+
+            <RadioGroup
+                android:id="@+id/gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/gender_label"
+                android:orientation="horizontal" >
+
+                <RadioButton
+                    android:id="@+id/male"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Male"
+                    android:textColor="#000" />
+
+                <RadioButton
+                    android:id="@+id/female"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Female"
+                    android:textColor="#000" />
+
+                <RadioButton
+                    android:id="@+id/none"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="None"
+                    android:textColor="#000" />
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/verify_invite_button"
+                style="@style/verify_invite_button"
+                android:layout_below="@+id/gender"
+                android:text="VERIFY INVITATION" />
+            
+            <Button
+                android:id="@+id/save_account_button"
+                style="@style/login_button"
+                android:layout_below="@+id/verify_invite_button"
+                android:text="SAVE" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
+</ScrollView>

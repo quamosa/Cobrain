@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.cobrain.android.views.StateFullView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/craves_category_menu_item_padding" 
+    android:paddingBottom="@dimen/craves_category_menu_item_padding"
+    android:background="@drawable/sel_craves_category_menu"
+    android:gravity="center_vertical" >
+
+    <RelativeLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_toRightOf="@+id/navigation_menu_icon"
+    	android:layout_centerVertical="true" >
+        
+    <TextView
+       android:id="@+id/navigation_menu_caption"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:paddingTop="0dp"
+       android:paddingBottom="0dp"
+       android:layout_marginTop="0dp"
+       android:layout_marginBottom="0dp"
+       android:text="Navigation"
+       android:textColor="#000"
+       style="@style/category_menu_font"
+		 />
+    </RelativeLayout>
+
+   <ImageView
+       android:id="@+id/navigation_menu_icon"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_centerVertical="true"
+       android:layout_marginLeft="@dimen/navigation_menu_item_padding"
+       android:layout_marginRight="12dp"
+       android:src="@drawable/ic_launcher" />
+    
+</com.cobrain.android.views.StateFullView>

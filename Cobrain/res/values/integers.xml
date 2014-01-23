@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="default_category_id">6</integer> <!-- 6 is Apparel -->
+</resources>

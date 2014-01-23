@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White"
+    >
+
+    <RelativeLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+        android:layout_margin="20dp">
+    
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_alignParentTop="true"
+	        android:text="Invite your friends to see what they love and make your Cobrain smarter."
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <EditText
+	        android:id="@+id/invitation_url"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@+id/textView1"
+	        android:layout_below="@+id/textView1"
+	        android:layout_marginTop="19dp"
+	        style="@style/edit_text"
+			android:inputType="none"
+	        android:text="https://cobrain.com/invitations/ad5"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+    </RelativeLayout>
+</RelativeLayout>

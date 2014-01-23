@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.cobrain.android.views.StateFullView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/filter_menu_item_padding" 
+    android:paddingBottom="@dimen/filter_menu_item_padding" 
+    android:gravity="center_vertical" >
+
+   <TextView
+       android:id="@+id/caption"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_centerVertical="true"
+       android:paddingLeft="@dimen/filter_menu_item_leftpadding"
+       android:paddingRight="@dimen/filter_menu_item_leftpadding"
+       android:textSize="23sp"
+       android:textColor="#fff"
+		 />
+
+</com.cobrain.android.views.StateFullView>

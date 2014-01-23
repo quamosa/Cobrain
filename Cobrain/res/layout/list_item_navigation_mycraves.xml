@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.cobrain.android.views.StateFullView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/navigation_menu_item_padding" 
+    android:paddingBottom="@dimen/navigation_menu_item_padding" 
+    android:background="@drawable/navigation_menu_background_selector"
+    android:gravity="center_vertical" >
+
+   <TextView
+       android:id="@+id/navigation_menu_caption"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerVertical="true"
+       android:layout_toRightOf="@+id/navigation_menu_icon"
+       android:text="Navigation"
+       style="@style/navigation_menu_font"
+		 />
+
+   <ImageView
+       android:id="@+id/navigation_menu_icon"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_centerVertical="true"
+       android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
+       android:layout_marginRight="12dp"
+       android:src="@drawable/ic_launcher" />
+</com.cobrain.android.views.StateFullView>

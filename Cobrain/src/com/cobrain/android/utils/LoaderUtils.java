@@ -1,0 +1,163 @@
+package com.cobrain.android.utils;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.widget.TextView;
+
+import com.cobrain.android.R;
+
+public class LoaderUtils {
+	private View loadingFrame;
+	private TextView loadingText;
+	private View emptyFrame;
+	private TextView emptyText;
+	private int loading;
+	private int empty;
+
+	public void initialize(ViewGroup v) {
+		LayoutInflater inflater = (LayoutInflater) v.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View lv = inflater.inflate(R.layout.loading_frame, null);
+		View ev = inflater.inflate(R.layout.empty_frame, null); 
+
+		v.addView(lv, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		v.addView(ev, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		
+		loadingFrame = v.findViewById(R.id.loading_panel);
+		loadingText = (TextView) loadingFrame.findViewById(R.id.loading_text);
+		emptyFrame = v.findViewById(R.id.empty_panel);
+		emptyText = (TextView) emptyFrame.findViewById(R.id.empty_text);
+		loadingFrame.setVisibility(View.GONE);
+		emptyFrame.setVisibility(View.GONE);
+		loadingFrame.setClickable(true);
+		emptyFrame.setClickable(true);
+	}
+	
+	public void showLoading(CharSequence message) {
+		loading++;
+		dismissEmpty();
+		loadingFrame.setVisibility(View.VISIBLE);
+		String msg = null;
+		if (message != null) {
+			msg = message.toString().toUpperCase();
+		}
+		loadingText.setText(msg);
+	}
+
+	public void showEmpty(CharSequence message) {
+		empty++;
+		dismissLoading();
+		emptyFrame.setVisibility(View.VISIBLE);
+		emptyText.setText(message);
+	}
+
+	public void dismissLoading() {
+		loading--;
+		if (loading <= 0) {
+			loading = 0;
+			HelperUtils.runOnUiThread(new Runnable() {
+				public void run() {
+					loadingFrame.setVisibility(View.GONE);				
+				}
+			});
+		}
+	}
+
+	public void dismissEmpty() {
+		empty--;
+		if (empty <= 0) {
+			empty = 0;
+			HelperUtils.runOnUiThread(new Runnable() {
+				public void run() {
+					emptyFrame.setVisibility(View.GONE);
+				}
+			});
+		}
+	}
+
+	public void dispose() {
+		setOnClickListener(null);
+		loadingFrame = null;
+		loadingText = null;
+		emptyFrame = null;
+		emptyText = null;
+	}
+
+	public void dismiss() {
+		loading = 0;
+		empty = 0;
+		dismissLoading();
+		dismissEmpty();
+	}
+
+	public void setOnClickListener(OnClickListener l) {
+		emptyText.setOnClickListener(l);
+		loadingText.setOnClickListener(l);
+	}
+
+	public void show(final View v) {
+		if (v.getVisibility() == View.VISIBLE) return;
+		
+		Animation ca = v.getAnimation();
+		if (ca != null) ca.cancel();
+		AlphaAnimation a = new AlphaAnimation(0, 1);
+		a.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				v.setVisibility(View.VISIBLE);
+			}
+		});
+		a.setDuration(500);
+		v.startAnimation(a);
+	}
+	
+	public void hide(View v) {
+		hide(v, true);
+	}
+	public void hide(final View v, boolean animate) {
+		if (v.getVisibility() != View.VISIBLE) return;
+		
+		Animation ca = v.getAnimation();
+		if (ca != null) ca.cancel();
+		
+		if (!animate) {
+			v.setVisibility(View.INVISIBLE);
+			return;
+		}
+		
+		AlphaAnimation a = new AlphaAnimation(1, 0);
+		a.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				v.setVisibility(View.INVISIBLE);
+			}
+		});
+		a.setDuration(250);
+		v.startAnimation(a);
+	}
+
+}

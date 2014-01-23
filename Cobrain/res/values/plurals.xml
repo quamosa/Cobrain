@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals
+        name="item_out_of_num_items">
+        <item quantity="zero">out of 0 apparel items</item>
+        <item quantity="one">out of one apparel item</item>
+        <item quantity="other">out of %d apparel items</item>
+    </plurals>
+</resources>

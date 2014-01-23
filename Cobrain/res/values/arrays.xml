@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<array name="navigation_menu_items">
+
+	    <item type="string">Home</item>
+	    <item>@drawable/ic_navigation_menu_home</item>
+   	    <item type="integer">0</item>
+	    
+	    <item type="string">Teach My Cobrain</item>
+   	    <item>@drawable/ic_navigation_menu_teach</item>
+   	    <item type="integer">1</item>
+
+	    <item type="string">My Saved Craves</item>
+	    <item>@drawable/ic_navigation_menu_saved_craves</item>
+   	    <item type="integer">2</item>
+	    
+   	    <item type="string">My Shared Craves</item>
+   	    <item>@drawable/ic_navigation_menu_share_and_rave</item>
+   	    <item type="integer">3</item>
+   	    
+	</array>
+
+	<array name="navigation_bottom_menu_items">
+
+	    <item type="string">Nerve Center</item>
+	    <item>@drawable/ic_navigation_menu_nerve_center</item>
+   	    <item type="integer">4</item>
+	    
+	    <item type="string">Feedback</item>
+   	    <item>@drawable/ic_navigation_menu_feedback</item>
+   	    <item type="integer">-5</item>
+
+	    <item type="string">Help</item>
+	    <item>@drawable/ic_navigation_menu_help</item>
+   	    <item type="integer">-6</item>
+	    
+	</array>
+
+	<array name="friends_menu_mycraves_menu_items">
+	    <item type="string">My Saved Craves</item>
+   	    <item>@drawable/ic_menu_saved_craves</item>
+   	    <item type="integer">2</item>
+   	    <item type="string">My Shared Craves</item>
+   	    <item>@drawable/ic_navigation_menu_share_and_rave</item>
+   	    <item type="integer">3</item>
+   	</array>
+	
+	<array name="craves_category_menu_items">
+        <item type="string"><![CDATA[<font color="#a0a0a0"><small>Personalized</small></font><br>Apparel]]></item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">6</item>
+	    <item type="string">Apparel</item>
+
+        <item type="string"><![CDATA[<font color="#a0a0a0"><small>Personalized</small></font><br>On Sale]]></item>
+   	    <item>@drawable/ic_category_menu_onsale</item>
+   	    <item type="integer">-6</item>
+	    <item type="string">On Sale</item>
+   	    
+        <item type="string"><![CDATA[<font color="#a0a0a0"><small>See What\'s</small></font><br>Coming Soon]]></item>
+	    <item>@drawable/ic_category_menu_comingsoon</item>
+   	    <item type="integer">-1</item>
+	    <item type="string">Coming Soon</item>
+	</array>
+		
+	<array name="craves_filter_menu_items">
+	    <item type="string">Tops</item>
+	    <item type="string">Bottoms</item>
+	    <item type="string">Accessories</item>
+	    <item type="string">Footwear</item>
+	    <item type="string">Underwear</item>
+	</array>
+</resources>
