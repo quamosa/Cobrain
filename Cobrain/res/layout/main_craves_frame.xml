@@ -37,11 +37,19 @@
         android:layout_above="@id/bottom_buttons"
         android:layout_alignParentTop="true" >
 
+        <ListView 
+            android:id="@+id/crave_strip_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        
+        <!-- 
         <android.support.v4.view.ViewPager
             android:id="@+id/crave_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </android.support.v4.view.ViewPager>
+         -->
     </RelativeLayout>
     
 
