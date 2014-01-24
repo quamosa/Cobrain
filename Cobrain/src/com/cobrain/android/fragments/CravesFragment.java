@@ -1,7 +1,6 @@
 package com.cobrain.android.fragments;
 
 import java.util.ArrayList;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -22,6 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -31,6 +31,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.CravePagerAdapter;
+import com.cobrain.android.adapters.CraveStripListAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.loaders.CraveFilterLoader;
@@ -38,13 +39,13 @@ import com.cobrain.android.loaders.CraveLoader;
 import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.model.Category;
 import com.cobrain.android.model.CategoryTree;
+import com.cobrain.android.model.CraveStrip;
 import com.cobrain.android.model.RecommendationsResults;
 import com.cobrain.android.utils.HelperUtils;
 
 public class CravesFragment extends BaseCobrainFragment implements OnLoadListener<RecommendationsResults>, OnPageChangeListener, OnItemClickListener, OnNavigationListener {
 	public static final String TAG = "CravesFragment";
 
-	ViewPager cravePager;
 	CravePagerAdapter craveAdapter;
 	CraveLoader craveLoader = new CraveLoader();
 	CraveFilterLoader craveFilterLoader = new CraveFilterLoader();
@@ -58,6 +59,9 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	SavedState savedState = new SavedState();
 	View comingsoon;
 	Menu menu;
+	ListView craveStripList;
+	CraveStripListAdapter craveStripListAdapter;
+	
 
 	public class SavedState {
 		boolean saved;
@@ -110,15 +114,16 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		setHasOptionsMenu(true);
 		
 		View v = inflater.inflate(R.layout.main_craves_frame, null);
-		cravePager = (ViewPager) v.findViewById(R.id.crave_pager);
 		craveAdapter = new CravePagerAdapter(getChildFragmentManager(), this);
-		cravePager.setAdapter(craveAdapter);
 		craveLoader.initialize(controller, craveAdapter);
 		craveLoader.setOnLoadListener(this);
-		cravePager.setOnPageChangeListener(this);
 
 		setTitle(null);
 		
+		if (!savedState.isSaved())
+			savedState.categoryId = getResources().getInteger(R.integer.default_category_id);
+
+		setupCraveStrips(v);
 		setupCategoryNavigationMenu();
 		setupFilterMenu(inflater);
 		setupComingSoonView(v);
@@ -126,6 +131,53 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		return v;
 	}
 
+	void setupCraveStrips(View v) {
+		craveStripList = (ListView) v.findViewById(R.id.crave_strip_list);
+		
+		final CraveFilterLoader loader = new CraveFilterLoader();
+		loader.initialize(controller);
+		loader.setOnLoadListener(new OnLoadListener<CategoryTree>() {
+
+			@Override
+			public void onLoadStarted() {
+			}
+
+			@Override
+			public void onLoadCompleted(CategoryTree r) {
+				loader.dispose();
+
+				ArrayList<CraveStrip> list = new ArrayList<CraveStrip>();
+				craveStripListAdapter = new CraveStripListAdapter(getActivity().getApplicationContext(), R.id.caption, list, CravesFragment.this);
+				
+				for (Category c : r.getChildren()) {
+					CraveStrip strip = new CraveStrip();
+
+					CravePagerAdapter adapter = new CravePagerAdapter(getChildFragmentManager(), CravesFragment.this);
+					CraveLoader loader = new CraveLoader();
+					loader.initialize(controller, adapter);
+
+					strip.caption = HelperUtils.Strings.wordCase(c.getName())
+						+ " you might like based on your cobrain connections";
+					strip.categoryId = c.getId();
+					strip.adapter = adapter;
+					strip.loader = loader;
+					strip.pager = new ViewPager(getActivity().getApplicationContext());
+					strip.container = new RelativeLayout(getActivity().getApplicationContext());
+					strip.pager.setId(strip.categoryId);
+					strip.container.setId(strip.categoryId + 0x1000);
+					strip.container.addView(strip.pager);
+
+					list.add(strip);
+				}
+				
+				craveStripList.setAdapter(craveStripListAdapter);
+			}
+			
+		});
+		
+		loader.load(savedState.categoryId);
+	}
+	
 	void setupComingSoonView(View v) {
 		comingsoon = View.inflate(getActivity().getApplicationContext(), R.layout.view_coming_soon, null);
 		ViewGroup vg = (ViewGroup) v;
@@ -253,9 +305,6 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 
 	void setupCategoryNavigationMenu() {
-		if (!savedState.isSaved())
-			savedState.categoryId = getResources().getInteger(R.integer.default_category_id);
-
 		ArrayList<NavigationMenuItem> menuItems = new ArrayList<NavigationMenuItem>();
 		Context c = getActivity().getApplicationContext(); // actionBar.getThemedContext();// 
 		Resources res = c.getResources();
@@ -315,17 +364,21 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 	@Override
 	public void onDestroyView() {
+		craveStripList.setAdapter(null);
+		if (craveStripListAdapter != null) {
+			craveStripListAdapter.clear();
+			craveStripListAdapter = null;
+		}
+		craveStripList = null;
+		
 		savedState.categoryId = craveLoader.getCategoryId();
-		savedState.position = cravePager.getCurrentItem();
+		//savedState.position = cravePager.getCurrentItem();
 		savedState.page = getCurrentCravesPage(savedState.position);
 		savedState.selectedCategoryNavigationPosition = actionBar.getSelectedNavigationIndex();
 		savedState.save();
 		
 		craveAdapter.dispose();
 		craveAdapter = null;
-
-		cravePager.setAdapter(null);
-		cravePager = null;
 
 		if (craveFilterAdapter != null) {
 			craveFilterAdapter.clear();
@@ -374,7 +427,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 			loaderUtils.dismissLoading();
 
 			if (savedState.isSaved()) {
-				cravePager.setCurrentItem(savedState.position, false);
+				//cravePager.setCurrentItem(savedState.position, false);
 				savedState.restored();
 			}
 			
@@ -475,7 +528,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 				else {
 					savedState.clear();
 					craveLoader.loadPage(1);
-					cravePager.setCurrentItem(0, false);
+					//cravePager.setCurrentItem(0, false);
 				}
 				return true;
 			}
@@ -494,7 +547,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	}
 
 	public void showBrowser(String url, String merchant) {
-		cravePager.setId(View.NO_ID); //so we don't save the pager state automatically; i want to do this myself
+		//cravePager.setId(View.NO_ID); //so we don't save the pager state automatically; i want to do this myself
 		controller.showBrowser(url, R.id.content_frame, merchant);
 	}
 	
