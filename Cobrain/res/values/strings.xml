@@ -9,7 +9,7 @@
     <!-- string name="username">walter@cobrain.com</string>
     <string name="password">walterwalter</string-->
     <string name="forgot_password_link"><small><u><B>Forgot Password?</B></u></small></string>
-    <string name="rank_for_you"><big><big><small>#</small><b>%1$d</b></big></big><small> of %1$s Craves for You</small></string>
+    <string name="rank_for_you"><![CDATA[<small>#%1$d of %2$d Craves for You (<font color="#000"><small>Teach for More</small></font>)</small>]]></string>
     <string name="item_out_of_num_items">out of %1$,d apparel items</string>
     <string name="item_out_of_num_item">out of 1 apparel item</string>
     <string name="craves_found"><![CDATA[<b><font color="#00BE9B">%1$d</font> Craves Found</b>]]></string>
@@ -53,6 +53,7 @@
     <string name="url_lists_rave_delete">%1$s/v1/lists/%2$s/items/%3$s/raves/%4$s</string>
     <string name="url_hashed_phone_post">%1$s/account/phone</string>
     <string name="url_invite">%1$s/mobile/download?phone=%2$s&amp;inviter=%3$s</string>
+    <string name="url_invite_email">%1$s/favorites/exchange/%2$s</string>
     <string name="bit_ly_access_token">cec181fe7d7e98f7dce6d00ebc603ea4b50801b2</string>
     
     <string name="url_tastemaker_beta_program_rules">%1$s/campaign/tastemaker</string>

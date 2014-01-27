@@ -65,7 +65,17 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		int categoryId;
 		int position;
 		int page;
+		
+		boolean initial = true;
 
+		public boolean isInitial() {
+			if (initial) {
+				initial = false;
+				return true;
+			}
+			else return false;
+		}
+		
 		public void save() {
 			saved = true;
 		}
@@ -88,7 +98,9 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		this.menu = menu;
-		inflater.inflate(R.menu.crave_filter, menu);
+		//if (menu.findItem(R.id.menu_filter) == null) {
+			inflater.inflate(R.menu.crave_filter, menu);
+		//}
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -171,6 +183,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 				boolean show = false;
 				NavigationMenuItem mi = getSelectedCategoryMenuItem();
 				String pCatName = mi.labelCopy.toString(); //craveFilterLoader.getParentCategoryName();
+				CharSequence selectedCatName = null;
 
 				if (r != null) {
 					ArrayList<NavigationMenuItem> items = new ArrayList<NavigationMenuItem>();
@@ -181,6 +194,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 						item.id = c.getId();
 						item.label = item.caption;
 						items.add(item);
+						if (c.getId() == savedState.categoryId) selectedCatName = item.caption;
 					}
 					
 					if (items.size() == 0) {
@@ -199,12 +213,14 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 					
 					filterMenuListView.setAdapter(craveFilterAdapter);
 					
-					show = (craveFilterLoader.getParentCategoryId() != r.getId());
-					rGetName = HelperUtils.Strings.wordCase(r.getName());
+					//show = (craveFilterLoader.getParentCategoryId() != r.getId());
+					//rGetName = HelperUtils.Strings.wordCase(r.getName());
+					show = true;
+					if (selectedCatName != null) rGetName = selectedCatName.toString();
 				}
 				else rGetName = pCatName;
 
-				craveFilterHeader.setText(rGetName);
+				//craveFilterHeader.setText(rGetName);
 				craveFilterHeader.setCompoundDrawablesWithIntrinsicBounds(mi.icon, null, null, null);
 
 				if (show) {
@@ -436,7 +452,11 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		if (savedState.isSaved()) {
 			setCategoryId(savedState.categoryId);
 		}
-		else setCategoryId((int)itemId);
+		else if (savedState.isInitial()) {
+			setCategoryId(savedState.categoryId);
+		}
+		else
+			setCategoryId((int)itemId);
 		return true;
 	}
 
@@ -459,6 +479,11 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 			break;
 			
 		default:
+			//on sale is -6
+			if (id == -6) id = -savedState.categoryId;
+			//apparel is 6, tops = 5 so we default to tops.. never the top level apparel
+			if (id == 6) id = 5;
+			
 			showFilterMenu(true);
 			comingsoon.setVisibility(View.GONE);
 
@@ -469,7 +494,9 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 			
 			if (craveLoader.setCategoryId(id) | craveLoader.setOnSaleRecommendationsOnly(onSale)) {
 				savedState.categoryId = id;
-				craveFilterLoader.load(id);
+				//lets only load the top level apparel: id = 6
+				//craveFilterLoader.load(id);
+				craveFilterLoader.load(6);
 				if (restore)
 					craveLoader.loadPage(savedState.page);
 				else {

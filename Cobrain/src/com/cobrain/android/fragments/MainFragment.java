@@ -1,6 +1,7 @@
 package com.cobrain.android.fragments;
 
 import com.cobrain.android.R;
+import com.cobrain.android.service.Cobrain.CobrainController;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.os.Bundle;
@@ -11,7 +12,7 @@ import android.view.ViewGroup;
 public class MainFragment extends BaseCobrainFragment {
 
 	public static final String TAG = "MainFragment";
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -27,7 +28,7 @@ public class MainFragment extends BaseCobrainFragment {
 			getFragmentManager()
 			.beginTransaction()
 			.replace(R.id.menu_frame, new NavigationMenuFragment(), NavigationMenuFragment.TAG)
-			.commit();
+			.commitAllowingStateLoss();
 
 			/*getFragmentManager()
 			.beginTransaction()
@@ -37,16 +38,26 @@ public class MainFragment extends BaseCobrainFragment {
 			getFragmentManager()
 			.beginTransaction()
 			.replace(R.id.menu_frame_two, new FriendsListFragment(), FriendsListFragment.TAG)
-			.commit();
+			.commitAllowingStateLoss();
 
 		}
 		
 		actionBar.show();
+
+		int defaultView = getArguments().getInt("defaultView");
 		
 		//show default cobrain view
-		controller.showHome();
-
-		controller.processIntents();
+		switch(defaultView) {
+		case CobrainController.VIEW_TEACH:
+			controller.showTeachMyCobrain();
+			break;
+		case CobrainController.VIEW_FRIENDS_MENU:
+			controller.showHome();
+			controller.showFriendsMenu();
+			break;
+		default:
+			controller.showHome();
+		}
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -91,7 +102,7 @@ public class MainFragment extends BaseCobrainFragment {
 		}
 
 		FriendsListFragment f = (FriendsListFragment) getFragmentManager().findFragmentByTag(FriendsListFragment.TAG);
-		if (f != null) f.update();
+		//if (f != null) f.update();
 		
 		return f;
 	}

@@ -68,7 +68,8 @@
     </style>
     
     <style name="signup_button" parent="login_button">
-	</style>
+        <item name="android:background">@drawable/green_button_highlight</item>
+    </style>
 
     <style name="cancel_button" parent="login_button">
         <item name="android:background">@drawable/green_button_highlight</item>

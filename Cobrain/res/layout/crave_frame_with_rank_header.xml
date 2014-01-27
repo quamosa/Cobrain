@@ -19,18 +19,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_above="@+id/item_info_footer"
-        android:paddingTop="@dimen/crave_padding"
+        android:paddingTop="0dp"
         android:paddingLeft="@dimen/crave_padding"
         android:paddingRight="@dimen/crave_padding"
         android:paddingBottom="0dp" >
 
-       <Button
-           android:id="@+id/see_why_button"
-           style="@style/see_why_button"
-           android:layout_width="wrap_content"
-	       android:layout_marginBottom="10dp"
-           android:layout_alignParentRight="true"
-           android:layout_alignParentTop="true" />
 	
 	    <ImageView
 	        android:id="@+id/item_image"
@@ -38,7 +31,7 @@
 	        android:layout_height="match_parent"
 	        android:layout_alignParentBottom="true"
 	        android:layout_alignParentLeft="true"
-	        android:layout_below="@id/see_why_button"
+	        android:layout_below="@+id/rank_for_you_label"
 	        android:src="@drawable/ic_launcher" />
 
 	      <RelativeLayout
@@ -88,10 +81,13 @@
 	    	    
 	    <TextView
 	        android:id="@+id/rank_for_you_label"
-	        android:layout_width="wrap_content"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
+	        android:gravity="center_horizontal"
 	        android:layout_alignBottom="@+id/see_why_button"
 	        android:layout_alignLeft="@+id/item_image"
+	        android:paddingTop="5dp"
+	        android:paddingBottom="10dp"
 	        android:text="#1 RANK FOR YOU"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
 

@@ -91,6 +91,7 @@ public class BrowserFragment extends BaseCobrainFragment {
 
 	@Override
 	public void onDestroyView() {
+		webView.stopLoading();
 		webView.setWebViewClient(null);
 		webView = null;
 		webViewParent = null;

@@ -1,5 +1,6 @@
 package com.cobrain.android.fragments;
 
+import java.util.List;
 import java.util.Locale;
 
 import com.cobrain.android.R;
@@ -14,14 +15,23 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.HelperUtils;
 
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -74,6 +84,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	private String raveId;
 	private int position;
 	private int totalCraves;
+	private List<WishListItem> wishListItems;
 
 	public CraveFragment() {
 	}
@@ -170,9 +181,10 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		update();
 	}
 
-	public void setWishListItem(WishList results, WishListItem item, int position, int total) {
+	public void setWishListItem(WishList results, List<WishListItem> listItems, WishListItem item, int position, int total) {
 		wishList = results;
 		wishListItem = item;
+		wishListItems = listItems;
 		this.position = position;
 		this.totalCraves = total;
 		recommendation = item.getProduct();
@@ -218,9 +230,39 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			if (results != null) {
 				int totalCraves = results.getTotal();
 				
-				CharSequence cs = getText(R.string.rank_for_you);
-				cs = TextUtils.replace(cs, new String[] {"%1$d", "%1$s"}, new CharSequence[] {String.valueOf(recommendation.getRank()), String.valueOf(totalCraves) });
-				rankForYouLabel.setText(cs);
+				String s = getString(R.string.rank_for_you,
+						recommendation.getRank(), 
+						totalCraves
+						);
+
+				final TextView txt = rankForYouLabel;
+				txt.setText(Html.fromHtml(s));
+				txt.setMovementMethod(LinkMovementMethod.getInstance());
+				
+				Spannable buf = (Spannable) txt.getText();
+				
+				ForegroundColorSpan[] spans = buf.getSpans(0, txt.length(), ForegroundColorSpan.class);
+				int start = buf.getSpanStart(spans[0]);
+				int end = buf.getSpanEnd(spans[0]);
+				final int linkColor = getResources().getColor(R.color.SeaGreen);
+				
+				ClickableSpan cs = new ClickableSpan() {
+					@Override
+					public void onClick(View widget) {
+						parent.controller.showTeachMyCobrain();
+					}
+
+					@Override
+					public void updateDrawState(TextPaint ds) {
+						ds.linkColor = linkColor;
+						super.updateDrawState(ds);
+						ds.setUnderlineText(false);
+						ds.setFakeBoldText(true);
+					}
+				};
+				
+				buf.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+				
 			}
 			
 			if (recommendation.getMerchant() != null) {
@@ -348,6 +390,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		
 		wishList = null;
 		wishListItem = null;
+		wishListItems = null;
 		wishListParent = null;
 		craveIndexLabel = null;
 		if (raveIcon != null) {
@@ -449,6 +492,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		for (WishListItem item : wishList.getItems()) {
 			if (item.getId().equals(itemId)) {
 				wishListItem = item;
+				wishListItems.set(position-1, wishListItem);
 				_iRavedThis = null;
 				break;
 			}

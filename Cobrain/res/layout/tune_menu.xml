@@ -139,39 +139,59 @@
         android:layout_height="@dimen/navigation_menu_divider_height"
         android:layout_below="@+id/friend_header"
         android:background="@android:color/black" />
-    
-	<RelativeLayout
-        android:id="@+id/invite_button_layout"
+
+    <LinearLayout
+        android:id="@+id/invite_button_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:clickable="true"
-        android:background="@drawable/invite_button_highlight"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:layout_margin="15dp" >
-		   
-        <TextView
-            android:id="@+id/invite_button"
-            style="@style/invite_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_friend_invite"
-            android:drawablePadding="10dp"
-            android:clickable="false"
-            android:text="INVITE MORE FRIENDS"
-            />
+		android:layout_margin="15dp"
+		android:orientation="vertical"
+        >
 
-    </RelativeLayout>
+	    <Button
+	    android:id="@+id/verify_invite_button"
+	    style="@style/verify_invite_button"
+	    android:layout_marginTop="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+		android:layout_marginBottom="15dp"
+	    android:text="SEND VERIFICATION CODE SO I CAN RECEIVE INVITES" />
+	    
+      	<RelativeLayout
+	        android:id="@+id/invite_button_layout"
+	        android:gravity="center"
+	        android:clickable="true"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/invite_button_highlight"
+	        android:layout_alignParentBottom="true"
+	        android:paddingTop="10dp"
+	        android:paddingBottom="10dp"
+	         >
+			   
+	        <TextView
+	            android:id="@+id/invite_button"
+	            style="@style/invite_button"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:drawableLeft="@drawable/ic_friend_invite"
+	            android:drawablePadding="10dp"
+	            android:clickable="false"
+	            android:text="INVITE MORE FRIENDS"
+	            />
+	
+	    </RelativeLayout>
 
+      		    
+    </LinearLayout>
 
     <View
         android:visibility="invisible"
         android:id="@+id/footer_divider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/navigation_menu_divider_height"
-        android:layout_above="@id/invite_button_layout"
+        android:layout_above="@id/invite_button_parent"
         android:background="@android:color/black" />
     
     <com.fortysevendeg.swipelistview.SwipeListView

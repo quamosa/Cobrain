@@ -70,7 +70,7 @@
         android:id="@+id/item_image"
         android:layout_width="95dp"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
+        android:scaleType="center"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:src="@drawable/ic_launcher" />

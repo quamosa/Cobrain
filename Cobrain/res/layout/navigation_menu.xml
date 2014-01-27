@@ -35,7 +35,14 @@
 
     </RelativeLayout>
 
-
+    <View
+        android:visibility="visible"
+        android:id="@+id/footer_divider_bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/navigation_menu_divider_height"
+        android:layout_above="@+id/navigation_menu_listview_bottom"
+        android:background="@color/NavigationMenuDivider" />
+	
     <View
         android:visibility="visible"
         android:id="@+id/footer_divider"
@@ -49,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_above="@+id/navigation_menu_listview_bottom"
+        android:layout_above="@+id/footer_divider_bottom_menu"
         android:layout_alignParentTop="true"
         android:listSelector="@drawable/navigation_menu_selector"
         android:divider="@color/NavigationMenuDivider"

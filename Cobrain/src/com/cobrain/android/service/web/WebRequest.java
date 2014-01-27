@@ -18,10 +18,16 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
 import android.os.AsyncTask;
 
 public class WebRequest extends AsyncTask<Void, Void, Integer> {
@@ -37,9 +43,13 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	private String response;
 	private Header[] headers;
     static HttpClient httpclient = new DefaultHttpClient();
+    static {
+		httpclient.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
+    }
     OnResponseListener responseListener;
     private String body;
     private String contentType;
+	private int timeout = 0;
     
     //504 Gateway Timeout
     
@@ -92,6 +102,11 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		return this;
 	}
 
+	public WebRequest setTimeout(int timeout) {
+		this.timeout  = timeout;
+		return this;
+	}
+
 	public String getResponse() {
 		return response;
 	}
@@ -101,7 +116,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	}
 	public int go(boolean async) {
 		int responseCode = 0;
-		
+
 		if (async) {
 			execute();
 		}
@@ -160,6 +175,14 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
 	   	try {
         	request.setHeaders(headerFieldsToHeaders());
+        	
+        	if (timeout > 0) {
+	        	HttpParams params = new BasicHttpParams();
+	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
+	        	HttpConnectionParams.setSoTimeout(params, timeout);
+	        	request.setParams(params);
+        	}
+
         	HttpResponse response =  httpclient.execute(request);
 
         	InputStream s = response.getEntity().getContent();
@@ -167,8 +190,10 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 			this.headers = response.getAllHeaders();
 			
 			return response.getStatusLine().getStatusCode();
-			
+		
 		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (ConnectTimeoutException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();

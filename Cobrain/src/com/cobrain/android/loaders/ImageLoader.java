@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.cobrain.android.utils.HelperUtils;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -122,7 +124,8 @@ public class ImageLoader {
 
 	            is = url.openStream();
 	            Bitmap temp = BitmapFactory.decodeStream(is, null, opts);
-	            bitmap = Bitmap.createScaledBitmap(temp, width, height, true);
+	            //bitmap = Bitmap.createScaledBitmap(temp, width, height, true);
+	            bitmap = HelperUtils.Bitmaps.scaleToFill(temp, width, height, true);
 	            if (temp != bitmap) temp.recycle();
             }
             else {

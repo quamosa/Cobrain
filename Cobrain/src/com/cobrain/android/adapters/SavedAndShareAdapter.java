@@ -3,6 +3,7 @@ package com.cobrain.android.adapters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import com.cobrain.android.R;
@@ -18,9 +19,13 @@ import com.cobrain.android.utils.LoaderUtils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,9 +36,10 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 	private final String RAVE_INFO = "<font color='#9ec5e7'>%s</font> RAVED THIS";
 	private final String RAVE_INFO_WITH_FRIENDS = "<font color='#9ec5e7'>%s</font> AND <font color='#9ec5e7'>%s FRIEND%s</font> RAVED THIS";
 	
-	ArrayList<WishListItem> items = new ArrayList<WishListItem>();
+	//ArrayList<WishListItem> items = new ArrayList<WishListItem>();
 	LoaderUtils loader = new LoaderUtils();
 	SavedAndShareFragment parent;
+	AbsListView.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
 	public SavedAndShareAdapter(Context context, int resource, SavedAndShareFragment parent) {
 		super(context, resource);
@@ -55,23 +61,44 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		parent = null;
 	}
 	
-	@Override
+	/*@Override
 	public WishListItem getItem(int position) {
 		if (items.size() > position) {
 			return items.get(position);
 		}
 		return super.getItem(position);
-	}
+	}*/
 	
 	@Override
 	public long getItemId(int position) {
 		return getItem(position).getProduct().getId();
 	}
 
+	HashMap<Integer, WishListItem> test = new HashMap<Integer, WishListItem>();
+	HashMap<Integer, Integer> test2 = new HashMap<Integer, Integer>();
+	
 	@Override
 	public int getItemViewType(int position) {
-		return (items.get(position).getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES :
-			VIEWTYPE_SAVED_AND_SHARE;
+		WishListItem item = getItem(position);
+		
+		if (test.get(position) != null) {
+			if (test.get(position) != item) {
+				Log.i("hmmm", "hmm");
+			}
+		}
+
+		if (test2.get(position) != null) {
+			if (test2.get(position) != item.getRaves().size()) {
+				Log.i("arg", "argh");
+			}
+		}
+		
+		test.put(position, item);
+		test2.put(position, item.getRaves().size());
+		
+		int typ = (item.getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES : VIEWTYPE_SAVED_AND_SHARE;
+		
+		return typ;
 	}
 
 	@Override
@@ -82,7 +109,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 	@Override
 	public void notifyDataSetChanged() {
 		//do sorting here I suppose
-		doSort();
+		//doSort();
 		super.notifyDataSetChanged();
 	}
 	
@@ -94,7 +121,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				}
 			};
 	
-	void doSort() {
+	/*void doSort() {
 		items.clear();
 
 		for (int i = 0; i < getCount(); i++) {
@@ -102,7 +129,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		}
 
 		Collections.sort(items, comparer);
-	}
+	}*/
 
 	private class ViewHolder implements OnClickListener {
 		int position;
@@ -120,16 +147,16 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		public void onClick(View v) {
 			switch(v.getId()) {
 			case R.id.share_layout:
-				parent.shareRecommendation(items.get(position), true, shareListener);
+				parent.shareRecommendation(getItem(position), true, shareListener);
 				break;
 			case R.id.private_layout:
-				parent.shareRecommendation(items.get(position), false, privateListener);
+				parent.shareRecommendation(getItem(position), false, privateListener);
 				break;
 			case R.id.remove_layout:
-				parent.saveRecommendation(items.get(position), false, removeListener);
+				parent.saveRecommendation(getItem(position), false, removeListener);
 				break;
 			case R.id.raves_layout:
-				parent.showRavesUserList(items.get(position).getId());
+				parent.showRavesUserList(getItem(position).getId());
 			}
 		}
 
@@ -194,7 +221,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		View v = convertView;
 		ViewHolder vh;
 		int vtyp = getItemViewType(position);
-
+		
 		if (v == null) {
 			vh = new ViewHolder();
 			switch(vtyp) {
@@ -207,6 +234,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				vh.ravesLayout.setOnClickListener(vh);
 				break;
 			}
+			v.setId(vtyp);
 			vh.image = (ImageView) v.findViewById(R.id.item_image);
 			vh.info = (TextView) v.findViewById(R.id.item_info);
 			vh.merchant = (TextView) v.findViewById(R.id.item_retailer);
@@ -219,8 +247,15 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 			vh.privateLayout.setOnClickListener(vh);
 			vh.removeLayout.setOnClickListener(vh);
 			v.setTag(vh);
+
+			v.setLayoutParams(lp);
+			v.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 		}
 		else vh = (ViewHolder) v.getTag();
+
+		if (v.getId() != vtyp) {
+			Log.i("hmm", "hmm");
+		}
 
 		//showProgress(true);
 		
@@ -254,8 +289,10 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 			vh.rave.setText(raveInfo);
 		}
 		
-		if (p.getImageURL() != null) {
-			ImageLoader.load(p.getImageURL(), vh.image, new OnImageLoadListener() {
+		if (p.getImageURL() != null) { 
+			int w = vh.image.getMeasuredWidth();
+			int h = vh.image.getMeasuredHeight();
+			ImageLoader.load(p.getImageURL(), vh.image, w, h, new OnImageLoadListener() {
 				@Override
 				public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
 					//showProgress(false);
@@ -271,14 +308,13 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				}
 			});
 		}
-		else vh.image.setVisibility(View.INVISIBLE);
 
 		return v;
 	}
 
 	private CharSequence getRaveInfo(int position) {
 		String raveInfo;
-		ArrayList<Rave> raves = items.get(position).getRaves();
+		ArrayList<Rave> raves = getItem(position).getRaves();
 		String name = raves.get(0).getUser().getName().toUpperCase(Locale.US);
 		int otherRaves = raves.size() - 1;
 		
@@ -293,7 +329,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 
 	public void remove(int position) {
 		setNotifyOnChange(false);
-		this.remove(items.get(position));
+		this.remove(getItem(position));
 		setNotifyOnChange(true);
 	}
 

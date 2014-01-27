@@ -10,7 +10,7 @@
    	    <item>@drawable/ic_navigation_menu_teach</item>
    	    <item type="integer">1</item>
 
-	    <item type="string">My Saved Craves</item>
+	    <item type="string">My Private Craves</item>
 	    <item>@drawable/ic_navigation_menu_saved_craves</item>
    	    <item type="integer">2</item>
 	    
@@ -37,7 +37,7 @@
 	</array>
 
 	<array name="friends_menu_mycraves_menu_items">
-	    <item type="string">My Saved Craves</item>
+	    <item type="string">My Private Craves</item>
    	    <item>@drawable/ic_menu_saved_craves</item>
    	    <item type="integer">2</item>
    	    <item type="string">My Shared Craves</item>

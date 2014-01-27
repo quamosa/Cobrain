@@ -1,6 +1,7 @@
 package com.cobrain.android.fragments;
 
 import com.cobrain.android.R;
+import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.service.Cobrain.CobrainView;
 
 import android.os.AsyncTask;
@@ -107,7 +108,7 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 						protected void onPostExecute(Boolean result) {
 							controller.dismissDialog();
 							if (result) {
-								controller.showMain();
+								controller.showMain(CobrainController.VIEW_HOME);
 							}
 						}
 					}.execute();

@@ -97,7 +97,7 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 	public Fragment getItem(int position) {
 		CraveFragment f = new CraveFragment(parentFragment);
 
-		f.setWishListItem(results, listItems.get(position), position + 1, listItems.size());
+		f.setWishListItem(results, listItems, listItems.get(position), position + 1, listItems.size());
 		
 		return f;
 	}

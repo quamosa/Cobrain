@@ -59,7 +59,7 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 		
 		switch(v.getId()) {
 		case R.id.cancel_button:
-			controller.showLogin();
+			controller.showLogin(null);
 			break;
 		case R.id.reset_button:
 
@@ -84,7 +84,7 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 					                new DialogInterface.OnClickListener() {
 					            public void onClick(DialogInterface dialog, int id) {
 					                dialog.cancel();
-					                controller.showLogin();
+					                controller.showLogin(null);
 					            }
 					        });
 					

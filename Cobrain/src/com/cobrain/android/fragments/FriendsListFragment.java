@@ -20,10 +20,10 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.WishList;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
+import com.cobrain.android.utils.HelperUtils.Timing;
 import com.cobrain.anroid.dialogs.FriendAcceptDialog;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
-
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -31,6 +31,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -39,6 +40,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -54,7 +56,9 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	private ImageView edit;
 	ProgressBar progress;
 	View invite;
+	Button verify;
 	ContactLoader contacts = new ContactLoader();
+	Timing.Timer timer = new Timing.Timer();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,6 +69,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		friends = (SwipeListView) v.findViewById(R.id.friends_list);
 		progress = (ProgressBar) v.findViewById(R.id.friends_list_progress);
 		myCraves = (ListView) v.findViewById(R.id.my_craves_list);
+		verify = (Button) v.findViewById(R.id.verify_invite_button);
+		verify.setOnClickListener(this);
 		adapter = new FriendsListAdapter(container.getContext(), R.id.friend_name, loader.getItems(), this);
 		friends.setAdapter(adapter);
 		
@@ -142,7 +148,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
         });
 		
         setupMyCravesList(myCraves);
-        
+
 		return v;
 	}
 
@@ -153,6 +159,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	}
 
 	public void update() {
+		verify.setVisibility((!controller.getCobrain().getUserInfo().areInvitesVerified()) ? View.VISIBLE : View.GONE);
 		loader.loadFriendList();
 	}
 	
@@ -177,6 +184,10 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	
 	@Override
 	public void onDestroyView() {
+		timer.dispose();
+		loader.dispose();
+		verify.setOnClickListener(null);
+		verify = null;
 		contacts.dispose();
 		invite.setOnClickListener(null);
 		invite = null;
@@ -200,11 +211,36 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		case R.id.friend_edit:
 			adapter.toggleEditMode();
 			break;
+		case R.id.verify_invite_button:
+			verifyInvites();
+			break;
 		case R.id.invite_button_layout:
 			showContactList();
 		}
 	}
 
+	void verifyInvites() {
+		verify.setEnabled(false);
+		verify.setPressed(true);
+		
+		new AsyncTask<Void, Void, Boolean>() {
+
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				controller.getCobrain().getUserInfo().validateInvitation();
+				return true;
+			}
+
+			@Override
+			protected void onPostExecute(Boolean result) {
+				verify.setEnabled(true);
+				verify.setPressed(false);
+				update();
+			}
+			
+		}.execute();
+	}
+	
 	public void showContactList() {
 		//controller.showContactList(this);
 		contacts.showContactPicker(this);
@@ -224,22 +260,40 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	//}
 	
 	void generateInvitationSMS(final ContactInfo contact) {
-		String phone = contact.number;
-		phone = phone.replaceAll("[^0-9]", "");
-		if (phone.getBytes()[0] == '1') {
-			phone = "+" + phone;
-		}
-		else phone = "+1" + phone;
+		final int SEND_SMS = 1;
+		final int SEND_EMAIL = 2;
+
+		int send = 0;
 		
-		byte[] hash = getHash(phone);
-		String hashedPhone = bin2hex(hash);
-		
-		String link = getString(R.string.url_invite,
-				getString(R.string.url_cobrain_app),
-				hashedPhone, controller.getCobrain().getUserInfo().getUserId());
-		
-		try {
-			String encodedLink = URLEncoder.encode(link, "UTF-8");
+		if (contact.number != null) send = SEND_SMS;
+		else if (contact.email != null) send = SEND_EMAIL;
+
+		switch(send) {
+		case SEND_SMS:
+
+			String phone = contact.number;
+
+			phone = phone.replaceAll("[^0-9]", "");
+			if (phone.getBytes()[0] == '1') {
+				phone = "+" + phone;
+			}
+			else phone = "+1" + phone;
+			
+			byte[] hash = getHash(phone);
+			String hashedPhone = bin2hex(hash);
+
+			final String link = getString(R.string.url_invite,
+					getString(R.string.url_cobrain_app),
+					hashedPhone, controller.getCobrain().getUserInfo().getUserId());
+			
+			String encodedLink = link;
+			
+			try {
+				encodedLink = URLEncoder.encode(encodedLink, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+
 			String bitly = String.format("https://api-ssl.bit.ly/v3/shorten?access_token=%s&longUrl=%s&format=txt", 
 					getActivity().getString(R.string.bit_ly_access_token), encodedLink);
 			
@@ -248,6 +302,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			invite.setEnabled(false);
 
 			new WebRequest().get(bitly)
+					.setTimeout(3000)
 					.setOnResponseListener(new OnResponseListener() {
 
 						String cobrainUrl;
@@ -263,7 +318,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 								cobrainUrl = cobrainUrl.replaceAll("[\\s\\n]", "");
 							}
 							else {
-								controller.getCobrain().getUserInfo().reportError("We had a problem creating your text message. Please try again.");
+								//controller.getCobrain().getUserInfo().reportError("We had a problem creating your text message. Please try again.");
+								cobrainUrl = link;
 							}
 						}
 						
@@ -281,11 +337,25 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 							}
 						}
 					}).go(true);
+			break;
+
+		case SEND_EMAIL:
+			invite.setPressed(true);
+			invite.setEnabled(false);
+
+			final String emailLink = getString(R.string.url_invite_email,
+					getString(R.string.url_cobrain_app),
+					controller.getCobrain().getUserInfo().getWishListId());
+			String message = String.format("I sent you a Cobrain Crave. Click here to view it: %s", emailLink);
+			startEmailIntent(contact.email, "Join me at Cobrain!", message);
+
+			invite.setPressed(false);
+			invite.setEnabled(true);
+
+			break;
+		default:
 			
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
 		}
-		
 	}
 
 	public byte[] getHash(String password) {
@@ -324,7 +394,22 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
         	controller.getCobrain().getUserInfo().reportError("We weren't able to find a supported text messaging application on your phone. Please try to send your invite again once you get one installed.");
         }
 	}
+
+	void startEmailIntent(String email, String subject, String message) {
+		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+	            "mailto", email, null));
+		
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+		emailIntent.putExtra(Intent.EXTRA_TEXT, message);
 	
+        try {
+    		startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        }
+        catch (ActivityNotFoundException e) {
+        	controller.getCobrain().getUserInfo().reportError("We weren't able to find a supported email application on your phone. Please try to send your invite again once you get one installed.");
+        }
+	}
+
 	public void removeFriend(final int position/*, final OnLoadListener<Boolean> listener*/) {
 		//loaderUtils.showLoading("Unsubscribing to your friend's craves...");
 		//listener.onLoadStarted();
@@ -436,4 +521,32 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	public void onLoadCompleted(ArrayList<WishList> r) {
 		progress.setVisibility(View.GONE);
 	}
+
+	
+	@Override
+	public void onSlidingMenuOpened() {
+		startUpdateTimer(true);
+	}
+
+	@Override
+	public void onSlidingMenuClosed() {
+		startUpdateTimer(false);
+	}
+	
+	void startUpdateTimer(boolean start) {
+		if (start) {
+			timer.start(updater, 10*1000);
+		}
+		else {
+			timer.stop(updater);
+		}
+	}
+	
+	Runnable updater = new Runnable() {
+		public void run() {
+			update();
+		}
+	};
+	
+	
 }

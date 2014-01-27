@@ -1,6 +1,7 @@
 package com.cobrain.android.fragments;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -16,7 +17,7 @@ public class BaseCobrainListFragment extends SherlockListFragment implements OnC
 	LoaderUtils loaderUtils = new LoaderUtils();
 	ActionBar actionBar;
 	View abHide;
-
+	
 	@Override
 	public void onAttach(Activity activity) {
 		controller = (CobrainController) activity;
@@ -78,6 +79,14 @@ public class BaseCobrainListFragment extends SherlockListFragment implements OnC
 //			controller.showFriendsMenu();
 //			break;
 //		}
+	}
+
+	@Override
+	public void onSlidingMenuOpened() {
+	}
+
+	@Override
+	public void onSlidingMenuClosed() {
 	}
 
 }

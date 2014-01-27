@@ -65,8 +65,8 @@ public class SavedAndShareLoader {
 
 			@Override
 			protected void onPostExecute(ArrayList<WishListItem> result) {
-				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				adapter.addAll(result);
+				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				currentRequest = null;
 			}
 

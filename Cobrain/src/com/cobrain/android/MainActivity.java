@@ -5,7 +5,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
@@ -41,9 +43,13 @@ import com.cobrain.android.service.Cobrain.CobrainView;
 import com.cobrain.android.service.Cobrain.OnLoggedInListener;
 import com.cobrain.android.utils.HelperUtils;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.ExceptionParser;
+import com.google.analytics.tracking.android.ExceptionReporter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 
-public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController {
+public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController, OnOpenedListener, OnClosedListener {
 
     static final String TAG = MainActivity.class.toString();
 	Cobrain cobrain;
@@ -54,12 +60,20 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
     IntentLoader intentLoader = new IntentLoader();
 	View menuSelected;
 	int menuItemSelected = -1;
+	boolean letMeLeave;
+	private boolean isDestroying;
+	Handler handler = new Handler();
 	
 	@Override
-	public void showLogin() {
+	public void showLogin(String loginUrl) {
 		getSupportActionBar().hide();
 		
+		Bundle args = new Bundle();
+		args.putString("loginUrl", loginUrl);
+		
         LoginFragment login = new LoginFragment();
+        login.setArguments(args);
+        
         //int id = (homeFragment == null) ? android.R.id.content : R.id.content_frame;
         int id = android.R.id.content;
         cobrainView = login;
@@ -70,9 +84,6 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         	.commitAllowingStateLoss();
 	}
 
-	boolean letMeLeave;
-	private boolean isDestroying;
-	
 	@Override
 	public void onBackPressed() {
 		if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
@@ -104,8 +115,32 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
     }
 	
 	@Override
-	public void showMain() {
+	public void showMain(int defaultView) {
+        
+        //we only ever show main on log in and sign up
+        if (defaultView != VIEW_FRIENDS_MENU && cobrain.getUserInfo().getSignInCount() <= 1)
+        	defaultView = VIEW_TEACH;
+
+        homeFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
+        if (homeFragment != null) {
+        	switch(defaultView) {
+        	case VIEW_FRIENDS_MENU:
+        		showFriendsMenu();
+        		break;
+        	case VIEW_TEACH:
+        		showTeachMyCobrain();
+        		break;
+        	case VIEW_HOME:
+        		showHome();
+        		break;
+        	}
+        	return;
+        }
+        
         MainFragment main = new MainFragment();
+        Bundle args = new Bundle();
+        args.putInt("defaultView", defaultView);
+        main.setArguments(args);
         cobrainView = main;
         homeFragment = main;
         getSupportFragmentManager()
@@ -113,8 +148,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         	.replace(android.R.id.content, main, MainFragment.TAG)
         	.commitAllowingStateLoss();
 	}
-	
-	
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,11 +210,19 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		getSlidingMenu().getMenu().setPadding(0, pad, 0, 0);
 		getSlidingMenu().getSecondaryMenu().setPadding(0, pad, 0, 0);
 		// ***************
-	    
-		cobrain.restoreLogin();
-		
-		if (!cobrain.isLoggedIn())
-        	showLogin();
+
+        getSlidingMenu().setOnOpenedListener(this);
+        getSlidingMenu().setOnClosedListener(this);
+
+		if (!processIntents()) {
+			cobrain.restoreLogin(new Runnable() {
+				public void run() {
+					if (!cobrain.isLoggedIn())
+			        	showLogin(null);
+					else showMain(CobrainController.VIEW_HOME);
+				}
+			});
+		}
 
     }
 
@@ -200,33 +242,44 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		}
 		return false;
 	}
-
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 		case android.R.id.home:
-			showNavigationMenu();
+			handler.post(showNavigationMenu);
 			break;
 		case R.id.menu_friends:
-			TasteMakerLoader.show(this);
-			showFriendsMenu();
+			handler.post(showFriendsMenu);
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
+	Runnable showNavigationMenu = new Runnable() {
+		public void run() {
+			showNavigationMenu();
+		}
+	};
+
+	Runnable showFriendsMenu = new Runnable() {
+		public void run() {
+			TasteMakerLoader.show(MainActivity.this);
+			showFriendsMenu();
+		}
+	};
+
 	@Override
 	public void onLoggedIn(UserInfo ui) {
 		dismissDialog(); //dismiss an indeterminate progress dialog if we have one open
-		showMain();
+		showMain(VIEW_HOME);
 	}
 
 	@Override
 	public void onLoggedOut(UserInfo ui) {
 		if (!checkForDestroy()) {
 			dismissDialog(); //dismiss an indeterminate progress dialog if we have one open
-			showLogin();
+			showLogin(null);
 			closeMenu(true);
 		}
 	}
@@ -268,6 +321,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		getSlidingMenu().setOnClosedListener(null);
+        getSlidingMenu().setOnOpenedListener(null);
 		intentLoader.dispose();
 		cobrainView = null;
 		homeFragment = null;
@@ -352,7 +407,25 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	protected void onStart() {
 	    super.onStart();
+	    startGoogleAnalytics();
+	}
+
+	void startGoogleAnalytics() {
 	    EasyTracker.getInstance(this).activityStart(this);
+
+	    // Change uncaught exception parser...
+	    // Note: Checking uncaughtExceptionHandler type can be useful if clearing ga_trackingId during development to disable analytics - avoid NullPointerException.
+	    Thread.UncaughtExceptionHandler uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+	    if (uncaughtExceptionHandler instanceof ExceptionReporter) {
+	      ExceptionReporter exceptionReporter = (ExceptionReporter) uncaughtExceptionHandler;
+	      exceptionReporter.setExceptionParser(new ExceptionParser() {
+			
+			@Override
+			public String getDescription(String arg0, Throwable arg1) {
+				return "Thread: " + arg0 + ", Exception: " + Log.getStackTraceString(arg1);
+			}
+	      });
+	    }
 	}
 	
 	@Override
@@ -432,17 +505,38 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showTeachMyCobrain() {
 		//this displays within MainFragment in the main content area
+		//showView = new Runnable() {
+		//	public void run() {
+				if (getSupportFragmentManager().findFragmentByTag(TrainingFragment.TAG) == null) {
+					
+			        TrainingFragment training = new TrainingFragment();
+			        cobrainView = training;
+			        getSupportFragmentManager()
+			        	.beginTransaction()
+			        	.replace(R.id.content_frame, training, TrainingFragment.TAG)
+			        	.commitAllowingStateLoss();
+			        
+			        //getSupportFragmentManager().executePendingTransactions();
+		        
+				}
+		//	}
+		//};
 		
-        TrainingFragment training = new TrainingFragment();
-        cobrainView = training;
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(R.id.content_frame, training, TrainingFragment.TAG)
-        	.commitAllowingStateLoss();
-        
-        //getSupportFragmentManager().executePendingTransactions();
-		closeMenu(true);
+		//if (isMenuOpen()) {
+			closeMenu(true);
+		//}
+		//else {
+		//	showView.run();
+		//	showView = null;
+		//}
 	}
+	
+	public boolean isMenuOpen() {
+        return (getSlidingMenu().isMenuShowing() ||
+               getSlidingMenu().isSecondaryMenuShowing());
+	}
+	
+	Runnable showView;
 
 	@Override
 	public void showNerveCenter() {
@@ -458,8 +552,13 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showSignup() {
+	public void showSignup(String signupUrl) {
+		Bundle args = new Bundle();
+		args.putString("signupUrl", signupUrl);
+		
 		SignupFragment training = new SignupFragment();
+		training.setArguments(args);
+		
         cobrainView = training;
         getSupportFragmentManager()
         	.beginTransaction()
@@ -561,8 +660,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void processIntents() {
-		intentLoader.processAnyIntents(this);
+	public boolean processIntents() {
+		return intentLoader.processAnyIntents(this);
 	}
 
 	@Override
@@ -597,6 +696,20 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		}
 		
 		menuSelected = menu;
+	}
+
+	@Override
+	public void onOpened() {
+		if (cobrainView != null) cobrainView.onSlidingMenuOpened();
+	}
+
+	@Override
+	public void onClosed() {
+		if (showView != null) {
+			showView.run();
+			showView = null;
+		}
+		if (cobrainView != null) cobrainView.onSlidingMenuClosed();
 	}
 
 }
