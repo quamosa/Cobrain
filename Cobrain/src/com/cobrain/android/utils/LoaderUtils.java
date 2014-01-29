@@ -40,7 +40,10 @@ public class LoaderUtils {
 	}
 	
 	public void showLoading(CharSequence message) {
-		loading++;
+		showLoading(message, false);
+	}
+	public void showLoading(CharSequence message, boolean pushToStack) {
+		if (pushToStack) loading++;
 		dismissEmpty();
 		loadingFrame.setVisibility(View.VISIBLE);
 		String msg = null;

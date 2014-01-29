@@ -23,13 +23,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -156,7 +150,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		itemSalePercent = (TextView) v.findViewById(R.id.item_sale_pct);
 		
 		showCravePopup(false, null);
-		showProgress(true);
+		showProgress(true, false);
 		
 		return v;
 	}
@@ -234,13 +228,13 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 
 			updateSaveAndShareState();
 
-			showProgress(true);
+			showProgress(true, false);
 			
 			if (recommendation.getImageURL() != null) {
 				ImageLoader.load(recommendation.getImageURL(), itemImage, new OnImageLoadListener() {
 					@Override
 					public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
-						showProgress(false);
+						showProgress(false, !fromCache);
 					}
 		
 					@Override
@@ -308,15 +302,15 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		cravePopupLabel.setText(message);
 	}
 	
-	void showProgress(boolean show) {
+	void showProgress(boolean show, boolean animate) {
 		if (show) {
 			progress.setVisibility(View.VISIBLE);
 			itemImage.setVisibility(View.INVISIBLE);
 		}
 		else {
 			progress.setVisibility(View.GONE);
-			//itemImage.setVisibility(View.VISIBLE);
-			LoaderUtils.show(itemImage);
+			if (animate) LoaderUtils.show(itemImage);
+			else itemImage.setVisibility(View.VISIBLE);
 		}
 	}
 	

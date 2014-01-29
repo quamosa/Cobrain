@@ -159,6 +159,9 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		setupFilterMenu(inflater);
 		setupComingSoonView(v);
 
+		loaderUtils.initialize((ViewGroup) v);
+		loaderUtils.showLoading("Loading your craves...", false);
+
 		return v;
 	}
 
@@ -413,8 +416,6 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		//FIXME: update();
-		loaderUtils.initialize((ViewGroup) getView());
-
 		super.onActivityCreated(savedInstanceState);
 	}
 

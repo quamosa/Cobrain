@@ -141,6 +141,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 					);
 
 			final TextView txt = parentFragment.actionBarSubTitle;
+			txt.setVisibility(View.VISIBLE);
 			txt.setText(Html.fromHtml(s));
 			txt.setMovementMethod(LinkMovementMethod.getInstance());
 			
