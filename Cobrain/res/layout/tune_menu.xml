@@ -225,19 +225,25 @@
         tools:listitem="@layout/list_item_friend" >
     </com.fortysevendeg.swipelistview.SwipeListView>
     
+    <ScrollView
+        android:id="@+id/friends_list_empty_scrollview"
+        android:layout_above="@+id/footer_divider"
+        android:layout_below="@+id/header_divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
     <TextView 
         android:id="@+id/friends_list_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_margin="40dp"
         android:textSize="18sp"
+        android:padding="40dp"
         android:lineSpacingExtra="7dp"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/footer_divider"
-        android:layout_below="@+id/header_divider"
         android:textColor="@color/FriendsListItemText"
         android:text="Invite friends to see their Shared Craves and Rave about the ones you think are best for them. The more you interact with your friends, the smarter your Cobrain becomes!"
         />
-
+    </ScrollView>
+    
 </RelativeLayout>
