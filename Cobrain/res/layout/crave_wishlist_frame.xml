@@ -111,7 +111,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_alignBaseline="@+id/see_why_button"
-	        android:layout_alignLeft="@+id/item_image"
+	        android:layout_centerHorizontal="true"
 	        android:text="1 of 30 Shared Craves"
 	        android:textSize="15sp" />
 	    	

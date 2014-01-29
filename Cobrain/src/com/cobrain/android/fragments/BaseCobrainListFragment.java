@@ -93,4 +93,11 @@ public class BaseCobrainListFragment extends SherlockListFragment implements OnC
 		silentMode = silent;
 	}
 
+	public void setSubTitle(CharSequence title) {
+	}
+
+	public CobrainController getCobrainController() {
+		return null;
+	}
+
 }

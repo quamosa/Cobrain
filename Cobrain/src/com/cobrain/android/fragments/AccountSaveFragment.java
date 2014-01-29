@@ -154,5 +154,15 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 		return true;
 	}
 
+	public void setSubTitle(CharSequence title) {
+	}
+
+	public void setTitle(CharSequence title) {
+	}
+
+	public CobrainController getCobrainController() {
+		return null;
+	}
+
 }
 

@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
@@ -30,7 +29,6 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -49,7 +47,7 @@ import com.cobrain.android.utils.HelperUtils;
 public class CravesFragment extends BaseCobrainFragment implements OnLoadListener<RecommendationsResults>, OnPageChangeListener, OnItemClickListener, OnNavigationListener {
 	public static final String TAG = "CravesFragment";
 
-	ViewPager cravePager;
+	public ViewPager cravePager;
 	CravePagerAdapter craveAdapter;
 	CraveLoader craveLoader = new CraveLoader();
 	CraveFilterLoader craveFilterLoader = new CraveFilterLoader();
@@ -67,8 +65,6 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	ToggleButton categoryFilter;
 	Button priceFilter;
 	private boolean onSale;
-	private TextView actionBarTitle;
-	public TextView actionBarSubTitle;
 
 	public class SavedState {
 		boolean saved;
@@ -146,22 +142,26 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		categoryFilter.setOnClickListener(this);
 		priceFilter.setOnClickListener(this);
 		
-		setTitle(null);
-		actionBar.setDisplayShowCustomEnabled(true);
-		View abv = inflater.inflate(R.layout.actionbar_crave_frame, null);
-		actionBarTitle = (TextView) abv.findViewById(R.id.title);
-		actionBarSubTitle = (TextView) abv.findViewById(R.id.subtitle);
-		ActionBar.LayoutParams params = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT, Gravity.CENTER);
-		abv.setLayoutParams(params);
-		actionBar.setCustomView(abv);
-		
 		setupCategoryNavigationMenu();
 		setupFilterMenu(inflater);
 		setupComingSoonView(v);
 
 		loaderUtils.initialize((ViewGroup) v);
-		loaderUtils.showLoading("Loading your craves...", false);
+		//loaderUtils.showLoading("Loading your craves...", false);
 
+		//new Handler().post(new Runnable() {
+		//	public void run() {
+				int pos = 0;
+				
+				if (savedState.isSaved()) {
+					pos = savedState.selectedCategoryNavigationPosition;
+					onSale = savedState.onSale;
+				}
+				
+				setSelectedNavigationItem(pos);
+		//	}
+		//});
+		
 		return v;
 	}
 
@@ -289,7 +289,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 				}
 				else mi.label = mi.labelCopy;
 				
-				actionBarTitle.setText(mi.label);
+				controller.setTitle(mi.label);
 				
 				cravesCategoryAdapter.notifyDataSetChanged();
 
@@ -378,18 +378,6 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		cravesCategoryAdapter.notifyDataSetChanged();
 		setupPopupMenu(priceFilterMenu, list);
 		
-		new Handler().post(new Runnable() {
-			public void run() {
-				int pos = 0;
-				
-				if (savedState.isSaved()) {
-					pos = savedState.selectedCategoryNavigationPosition;
-					onSale = savedState.onSale;
-				}
-				
-				setSelectedNavigationItem(pos);
-			}
-		});
 	}
 
 	private void setSelectedNavigationItem(
@@ -436,11 +424,8 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 	@Override
 	public void onDestroyView() {
-		actionBarTitle = null;
-		actionBarSubTitle = null;
-		actionBar.setDisplayShowCustomEnabled(false);
-		actionBar.setCustomView(null);
-		
+	
+		setSubTitle(null);
 		savedState.categoryId = craveLoader.getCategoryId();
 		savedState.position = cravePager.getCurrentItem();
 		savedState.page = getCurrentCravesPage(savedState.position);

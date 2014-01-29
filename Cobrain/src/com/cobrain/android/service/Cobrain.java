@@ -10,6 +10,8 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.TextView;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
@@ -92,6 +94,10 @@ public class Cobrain {
 		public CobrainView getShown();
 		public void showRavesUserList(String itemId);
 		public void setMenuItemSelected(View v, int position, boolean selected);
+		public void setSubTitle(CharSequence title);
+		public void setTitle(CharSequence title);
+		public TextView getSubTitleView();
+		public TextView getTitleView();
 	}
 	
 	public interface CobrainView {
@@ -103,6 +109,11 @@ public class Cobrain {
 		public void onSlidingMenuOpened();
 		public void onSlidingMenuClosed();
 		public void setSilentMode(boolean silent);
+
+		public abstract void setSubTitle(CharSequence title);
+		public abstract void setTitle(CharSequence title);
+
+		public abstract CobrainController getCobrainController();
 
 		//public void showFilterMenu(View menuItem);
 	}

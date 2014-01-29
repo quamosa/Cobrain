@@ -61,6 +61,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	Button verify;
 	ContactLoader contacts = new ContactLoader();
 	Timing.Timer timer = new Timing.Timer();
+	TextView myname;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,12 +92,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		invite = v.findViewById(R.id.invite_button_layout);
 		invite.setOnClickListener(this);
 		
-		TextView myname = (TextView) v.findViewById(R.id.username);
-		myname.setText(controller.
-				getCobrain().
-				getUserInfo().
-				getEmail().
-				toUpperCase(Locale.US));
+		myname = (TextView) v.findViewById(R.id.username);
+		updateUsername();
 		
 		//v.findViewById(R.id.my_saved_craves).setOnClickListener(this);
 		//v.findViewById(R.id.my_shared_craves).setOnClickListener(this);
@@ -164,7 +161,14 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		super.onActivityCreated(savedInstanceState);
 	}
 
+	void updateUsername() {
+		String email = controller.getCobrain().getUserInfo().getEmail();
+		if (email != null) email = email.toUpperCase(Locale.US);
+		myname.setText(email);
+	}
+	
 	public void update() {
+		updateUsername();
 		verify.setVisibility((!controller.getCobrain().getUserInfo().areInvitesVerified()) ? View.VISIBLE : View.GONE);
 		loader.loadFriendList();
 	}
@@ -200,6 +204,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		edit.setOnClickListener(null);
 		edit = null;
 		progress = null;
+		myname = null;
 		myCraves.setAdapter(null);
 		myCraves = null;
 		myCravesAdapter.clear();

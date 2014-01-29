@@ -19,7 +19,7 @@
     <color name="NavigationMenuFontDefaultColor">#a5a6a8</color>
     <color name="NavigationMenuFontSelectedColor">#fff</color>
     <color name="NavigationMenuBackgroundDefaultColor">#00000000</color>
-    <color name="NavigationMenuBackgroundSelectedColor">#33000000</color>
+    <color name="NavigationMenuBackgroundSelectedColor">#55000000</color>
     <color name="CraveShareButton">#AAAAAA</color>
     <color name="CraveSaveButtonNormal">#bb000000</color>
     <color name="CraveSaveButtonPressed">#bbde3b75</color>

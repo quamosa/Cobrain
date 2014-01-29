@@ -31,7 +31,7 @@
    	    <item type="integer">-5</item-->
 
 	    <item type="string">About Us</item>
-	    <item>@drawable/ic_navigation_menu_help</item>
+	    <item>@drawable/ic_about_us</item>
    	    <item type="integer">6</item>
 	    
 	</array>
@@ -61,12 +61,5 @@
    	    <item type="integer">-1</item>
 	    <item type="string">Coming Soon</item>
 	</array>
-		
-	<array name="craves_filter_menu_items">
-	    <item type="string">Tops</item>
-	    <item type="string">Bottoms</item>
-	    <item type="string">Accessories</item>
-	    <item type="string">Footwear</item>
-	    <item type="string">Underwear</item>
-	</array>
+
 </resources>

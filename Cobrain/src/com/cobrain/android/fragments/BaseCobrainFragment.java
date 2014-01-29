@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -21,7 +22,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	boolean updateRequested;
 	StateSaver state = new StateSaver();
 	boolean silentMode;
-	
+
 	public class StateSaver {
 		Bundle savedState = new Bundle();
 		
@@ -103,16 +104,22 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		if (loaderUtils != null) loaderUtils.dismiss();
 		if (!silentMode) if (controller != null) controller.showErrorDialog(message);
 	}
-
-	public void setTitle(CharSequence title) {
-		actionBar.setTitle(title);
-	}
-	public CharSequence getTitle() {
-		return actionBar.getTitle();
-	}
 	
 	public LoaderUtils getLoaderUtils() {
 		return loaderUtils;
+	}
+	
+	@Override
+	public void setTitle(CharSequence title) {
+		controller.setTitle(title);
+	}
+	@Override
+	public void setSubTitle(CharSequence title) {
+		controller.setSubTitle(title);
+	}
+	@Override
+	public CobrainController getCobrainController() {
+		return controller;
 	}
 	
 	void hideActionBar() {

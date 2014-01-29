@@ -4,11 +4,17 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.opengl.Visibility;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
 import android.widget.ListView;
@@ -49,7 +55,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 
-public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController, OnOpenedListener, OnClosedListener {
+public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController, OnOpenedListener, OnClosedListener, View.OnClickListener {
 
     static final String TAG = MainActivity.class.toString();
 	Cobrain cobrain;
@@ -63,7 +69,11 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	boolean letMeLeave;
 	private boolean isDestroying;
 	Handler handler = new Handler();
-	
+	private TextView actionBarTitle;
+	private TextView actionBarSubTitle;
+	private View actionBarView;
+	private View actionBarMenuOpenerView;
+
 	@Override
 	public void showLogin(String loginUrl) {
 		getSupportActionBar().hide();
@@ -148,6 +158,49 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         	.replace(android.R.id.content, main, MainFragment.TAG)
         	.commitAllowingStateLoss();
 	}
+	
+	void showDefaultActionBar() {
+		ActionBar ab = (ActionBar) getSupportActionBar();
+		ab.setDisplayShowTitleEnabled(false);
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setDisplayHomeAsUpEnabled(false);
+
+		View homeIcon = findViewById(
+		        Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
+		        android.R.id.home : R.id.abs__home);
+
+		View homeParent = ((View) homeIcon.getParent());
+		//homeParent.setVisibility(View.GONE);
+		//((View) homeIcon).setVisibility(View.GONE);
+		ViewGroup vg = (ViewGroup) homeParent;
+		vg = (ViewGroup) vg.getParent();
+		if (vg != null) vg.removeView(homeParent);
+		//FIXME: just get rid of these views completely so the space can be recovered... not sure how safe this will be going forward tho!
+
+		//set up default custom view
+		ab.setDisplayShowCustomEnabled(true);
+		if (actionBarView == null) {
+			actionBarView = View.inflate(getApplicationContext(), R.layout.ab_main_frame, null);
+			actionBarTitle = (TextView) actionBarView.findViewById(R.id.title);
+			actionBarSubTitle = (TextView) actionBarView.findViewById(R.id.subtitle);
+			ActionBar.LayoutParams params = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+			actionBarView.setLayoutParams(params);
+			actionBarMenuOpenerView = actionBarView.findViewById(R.id.app_icon_layout);
+			actionBarMenuOpenerView.setOnClickListener(this);
+		}
+		
+		ab.setCustomView(actionBarView);
+	}
+	
+	@Override
+	public void setTitle(CharSequence title) {
+		actionBarTitle.setText(title);
+	}
+	@Override
+	public void setSubTitle(CharSequence title) {
+		actionBarSubTitle.setVisibility((title == null) ? View.GONE : View.VISIBLE);
+		actionBarSubTitle.setText(title);
+	}
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -158,18 +211,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		
 		intentLoader.initialize(this);
 		
-		ActionBar ab = (ActionBar) getSupportActionBar();
-		ab.setIcon(getResources().getDrawable(R.drawable.ic_ab_cobrain_logo));
-		//ab.setLogo(getResources().getDrawable(R.drawable.ic_ab_cobrain_logo));
-		try {
-		ab.setHomeAsUpIndicator(R.drawable.ic_slideout_menu_up_indicator);
-		}
-		catch (NoSuchMethodError e) {
-			//FIXME: for andy's phone Ice cream sandwich? 
-		}
-		ab.setDisplayShowTitleEnabled(true);
-		ab.setDisplayHomeAsUpEnabled(true);
-
+		showDefaultActionBar();
+		
 		/*ActionBar ab = controller.getSupportActionBar();
 		ab.setCustomView(R.layout.actionbar_training_frame);
 		ImageButton ib = (ImageButton) controller.getSupportActionBar().getCustomView().findViewById(R.id.navigation_button);
@@ -198,8 +241,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		SlidingMenu sm = getSlidingMenu();
 		sm.setShadowWidthRes(R.dimen.menu_shadow_width);
 		sm.setShadowDrawable(R.drawable.shadow);
-		sm.setBehindOffsetRes(R.dimen.button_size);
-		sm.setAboveOffsetRes(R.dimen.button_size);
+		sm.setBehindOffsetRes(R.dimen.navigation_menu_hide_width);
+		sm.setAboveOffsetRes(R.dimen.friends_menu_hide_width);
 		sm.setFadeEnabled(true);
 		sm.setFadeDegree(.75f);
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
@@ -247,28 +290,16 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
-		case android.R.id.home:
-			handler.post(showNavigationMenu);
-			break;
+		//case android.R.id.home:
+		//	showNavigationMenu();
+		//	break;
 		case R.id.menu_friends:
-			handler.post(showFriendsMenu);
+			TasteMakerLoader.show(MainActivity.this);
+			showFriendsMenu();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	Runnable showNavigationMenu = new Runnable() {
-		public void run() {
-			showNavigationMenu();
-		}
-	};
-
-	Runnable showFriendsMenu = new Runnable() {
-		public void run() {
-			TasteMakerLoader.show(MainActivity.this);
-			showFriendsMenu();
-		}
-	};
 
 	@Override
 	public void onLoggedIn(UserInfo ui) {
@@ -322,6 +353,10 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		getSupportActionBar().setCustomView(null);
+		actionBarView = null;
+		actionBarTitle = null;
+		actionBarSubTitle = null;
 		getSlidingMenu().setOnClosedListener(null);
         getSlidingMenu().setOnOpenedListener(null);
 		intentLoader.dispose();
@@ -717,6 +752,24 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 			showView = null;
 		}
 		if (cobrainView != null) cobrainView.onSlidingMenuClosed();
+	}
+
+	@Override
+	public TextView getSubTitleView() {
+		return actionBarSubTitle;
+	}
+
+	@Override
+	public TextView getTitleView() {
+		return actionBarTitle;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()) {
+		case R.id.app_icon_layout:
+			showNavigationMenu();
+		}
 	}
 
 }

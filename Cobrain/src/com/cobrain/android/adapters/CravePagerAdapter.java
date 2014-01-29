@@ -125,7 +125,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 		
 		f.setRecommendation(results, recommendations.get(position));
 		
-		if (position == 0) updateTitle(position);
+		if (position == 0 && parentFragment.cravePager.getCurrentItem() == position) updateTitle(position);
 		
 		return f;
 	}
@@ -140,7 +140,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 					totalCraves
 					);
 
-			final TextView txt = parentFragment.actionBarSubTitle;
+			final TextView txt = parentFragment.getCobrainController().getSubTitleView();
 			txt.setVisibility(View.VISIBLE);
 			txt.setText(Html.fromHtml(s));
 			txt.setMovementMethod(LinkMovementMethod.getInstance());

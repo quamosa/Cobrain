@@ -12,16 +12,16 @@
         android:paddingBottom="@dimen/navigation_menu_header_item_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#191c1e"
+        android:background="#000"
         >
 	    <TextView
 	        android:id="@+id/username"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:text="someone@cobrain.com"
-	        android:textSize="15sp"
-	        android:paddingTop="8dp"
-	        android:paddingBottom="8dp"
+	        style="@style/navigation_menu_header_font"
+	        android:paddingTop="11dp"
+	        android:paddingBottom="11dp"
 	        android:textColor="@color/FriendsListHeaderText"
 	        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
 	         />
@@ -94,29 +94,28 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:layout_below="@+id/header_divider_3"
-		    android:paddingTop="@dimen/navigation_menu_header_item_padding" 
-		    android:paddingBottom="@dimen/navigation_menu_header_item_padding" 
-		    android:background="#191c1e"
+		    android:paddingTop="6dp" 
+		    android:paddingBottom="6dp" 
+		    android:background="#000"
 		    android:gravity="center_vertical" >
 		
 		   <TextView
 		       android:id="@+id/friend_name"
-		       style="@style/navigation_menu_font"
+		       style="@style/navigation_menu_header_font"
 		       android:layout_width="wrap_content"
 		       android:layout_height="wrap_content"
 		        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
 		       android:layout_alignParentLeft="true"
 		       android:layout_centerVertical="true"
-		       android:textSize="15sp"
 	           android:textColor="@color/FriendsListHeaderText"
 		       android:text="YOUR FRIENDS" />
 
 		   <ProgressBar 
 	        android:id="@+id/friends_list_progress"
-	        android:layout_width="20dp"
-	        android:layout_height="20dp"
+	        android:layout_width="15dp"
+	        android:layout_height="15dp"
 	        android:layout_marginLeft="5dp"
-	        android:layout_centerHorizontal="true"
+	        android:layout_centerVertical="true"
 	        android:layout_toRightOf="@+id/friend_name"
 	        android:visibility="visible"
 	        />
@@ -238,7 +237,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:textSize="18sp"
-        android:padding="40dp"
+        android:padding="25dp"
         android:lineSpacingExtra="7dp"
         android:layout_centerHorizontal="true"
         android:textColor="@color/FriendsListItemText"
