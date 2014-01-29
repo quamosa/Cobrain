@@ -150,6 +150,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 			loaderUtils.showEmpty("We had a problem loading your private craves. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
+					loaderUtils.dismissEmpty();
 					update();
 				}
 			});
@@ -157,7 +158,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		else if (r.size() == 0)
 			showEmpty();
 		else {
-			loaderUtils.dismissLoading();
+			loaderUtils.dismiss();
 			state.restore(saves, "saves");
 		}
 	}

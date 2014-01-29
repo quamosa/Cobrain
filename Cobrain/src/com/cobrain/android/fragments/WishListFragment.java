@@ -281,6 +281,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 			loaderUtils.showEmpty("We had a problem loading this Wish List. Click here to try loading it again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
+					loaderUtils.dismissEmpty();
 					update();
 				}
 			});
@@ -294,7 +295,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 			}
 		}
 		else
-			loaderUtils.dismissLoading();
+			loaderUtils.dismiss();
 	}
 
 	@Override

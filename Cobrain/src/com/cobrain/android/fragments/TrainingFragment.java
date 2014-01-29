@@ -45,8 +45,11 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 		save = (Button) v.findViewById(R.id.training_save_button);
 		save.setOnClickListener(this);
 		
+		String craves = getResources().getString(R.string.craves_found, 0);
+		cravesFound.setText(Html.fromHtml(craves));
+
 		LoaderUtils.hide(question, false, false);
-		LoaderUtils.hide(cravesFound, false, false);
+		//LoaderUtils.hide(cravesFound, false, false);
 		
 		setTitle("Teach My Cobrain");
 		
@@ -147,6 +150,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			loaderUtils.showEmpty("We had a problem loading your training choices. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
+					loaderUtils.dismissEmpty();
 					update();
 				}
 			});
@@ -158,7 +162,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			
 			if (score == null) score = 0;
 
-			loaderUtils.dismissLoading();
+			loaderUtils.dismiss();
 			trainingLoader.multiSelect = e.getActionType().equals(SELECT_ANY);
 			question.setText(e.getQuestionText());
 			

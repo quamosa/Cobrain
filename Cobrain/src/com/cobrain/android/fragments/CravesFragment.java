@@ -142,6 +142,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		categoryFilter.setOnClickListener(this);
 		priceFilter.setOnClickListener(this);
 		
+		setTitle("Home");
 		setupCategoryNavigationMenu();
 		setupFilterMenu(inflater);
 		setupComingSoonView(v);
@@ -489,6 +490,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 			loaderUtils.showEmpty("We had a problem loading your craves. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
+					loaderUtils.dismissEmpty();
 					update();
 				}
 			});
@@ -496,7 +498,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		else if (r.getTotal() == 0)
 			loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
 		else {
-			loaderUtils.dismissLoading();
+			loaderUtils.dismiss();
 
 			if (savedState.isSaved()) {
 				cravePager.setCurrentItem(savedState.position, false);
