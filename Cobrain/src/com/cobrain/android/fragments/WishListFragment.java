@@ -65,7 +65,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState) {
 
-		View v = inflater.inflate(R.layout.main_craves_frame, null);
+		View v = inflater.inflate(R.layout.main_wishlist_frame, null);
 		loaderUtils.initialize((ViewGroup) v);
 		cravePager = (ViewPager) v.findViewById(R.id.crave_pager);
 		craveAdapter = new WishListPagerAdapter(getFragmentManager(), this);
