@@ -74,10 +74,12 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		craveLoader.setOnLoadListener(this);
 		cravePager.setOnPageChangeListener(this);
 
-		if (wishList.getOwner().getId().equals(controller.getCobrain().getUserInfo().getUserId())) {
-			setTitle("My " + ((showMyPrivateWishList) ? "Saved" : "Shared") + " Craves");			
+		if (wishList != null) {
+			if (wishList.getOwner().getId().equals(controller.getCobrain().getUserInfo().getUserId())) {
+				setTitle("My " + ((showMyPrivateWishList) ? "Saved" : "Shared") + " Craves");			
+			}
+			else setTitle(wishList.getOwner().getName() + "'s Craves");
 		}
-		else setTitle(wishList.getOwner().getName() + "'s Craves");
 		
 		//setupCategoryNavigationMenu();
 		//setupFilterMenu(inflater);
@@ -236,7 +238,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 	public void update() {
 		controller.getCobrain().checkLogin();
 		loaderUtils.dismiss();
-		if (!setWishListId(wishList.getId())) {
+		if (wishList != null && !setWishListId(wishList.getId())) {
 			craveLoader.setPage(currentPage);
 		}
 	}
