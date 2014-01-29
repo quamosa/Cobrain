@@ -124,6 +124,7 @@ public class HelperUtils {
 				private int delay;
 				private Runnable run;
 				private boolean running;
+				private int runCount;
 				
 				public MyRunnable(Runnable r, int delay) {
 					this.run = r;
@@ -132,13 +133,16 @@ public class HelperUtils {
 				public void run() {
 					if (!cancel) {
 						running = true;
-						if (run != null)
+						if (run != null) {
+							runCount++;
 							run.run();
+						}
 						handler.postDelayed(this, delay);
 					}
 				}
 				public void start() {
 					if (!running) {
+						runCount = 0;
 						cancel = false;
 						run();
 					}
@@ -152,6 +156,10 @@ public class HelperUtils {
 					stop();
 					run = null;
 				}
+			}
+			
+			public int getRunCount(Runnable r) {
+				return runs.get(r).runCount;
 			}
 			
 			public void stop(Runnable r) {
@@ -180,4 +188,17 @@ public class HelperUtils {
 		}
 		
 	}
+	
+	public static class Storage {
+		public static class TempStore {
+			static HashMap<String, Object> store = new HashMap<String, Object>();
+			public static void push(String key, Object object) {
+				store.put(key, object);
+			}
+			public static Object pull(String key) {
+				return store.remove(key);
+			}
+		}
+	}
+
 }

@@ -10,6 +10,8 @@ import com.cobrain.android.loaders.TrainingLoader.TrainingItem;
 import com.cobrain.android.model.Training.Experiment;
 import com.cobrain.android.model.Training.Member;
 import com.cobrain.android.model.TrainingResult;
+import com.cobrain.android.utils.LoaderUtils;
+
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -43,8 +45,8 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 		save = (Button) v.findViewById(R.id.training_save_button);
 		save.setOnClickListener(this);
 		
-		loaderUtils.hide(question, false);
-		loaderUtils.hide(cravesFound, false);
+		LoaderUtils.hide(question, false, false);
+		LoaderUtils.hide(cravesFound, false, false);
 		
 		setTitle("Teach My Cobrain");
 		

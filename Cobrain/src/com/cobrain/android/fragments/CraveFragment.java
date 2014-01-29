@@ -14,10 +14,9 @@ import com.cobrain.android.model.RecommendationsResults;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.HelperUtils;
+import com.cobrain.android.utils.LoaderUtils;
 
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -31,7 +30,6 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -227,44 +225,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	boolean update() {
 		if (isVisible() && recommendation != null) {
 			
-			if (results != null) {
-				int totalCraves = results.getTotal();
-				
-				String s = getString(R.string.rank_for_you,
-						recommendation.getRank(), 
-						totalCraves
-						);
-
-				final TextView txt = rankForYouLabel;
-				txt.setText(Html.fromHtml(s));
-				txt.setMovementMethod(LinkMovementMethod.getInstance());
-				
-				Spannable buf = (Spannable) txt.getText();
-				
-				ForegroundColorSpan[] spans = buf.getSpans(0, txt.length(), ForegroundColorSpan.class);
-				int start = buf.getSpanStart(spans[0]);
-				int end = buf.getSpanEnd(spans[0]);
-				final int linkColor = getResources().getColor(R.color.SeaGreen);
-				
-				ClickableSpan cs = new ClickableSpan() {
-					@Override
-					public void onClick(View widget) {
-						parent.controller.showTeachMyCobrain();
-					}
-
-					@Override
-					public void updateDrawState(TextPaint ds) {
-						ds.linkColor = linkColor;
-						super.updateDrawState(ds);
-						ds.setUnderlineText(false);
-						ds.setFakeBoldText(true);
-					}
-				};
-				
-				buf.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-				
-			}
-			
 			if (recommendation.getMerchant() != null) {
 				itemRetailer.setText(recommendation.getMerchant().getName().toUpperCase(Locale.US));
 			}
@@ -355,7 +315,8 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		}
 		else {
 			progress.setVisibility(View.GONE);
-			itemImage.setVisibility(View.VISIBLE);
+			//itemImage.setVisibility(View.VISIBLE);
+			LoaderUtils.show(itemImage);
 		}
 	}
 	

@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import com.cobrain.android.adapters.SavedAndShareAdapter;
 import com.cobrain.android.model.WishListItem;
 import com.cobrain.android.model.WishList;
-import com.cobrain.android.model.WishList;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
@@ -53,7 +52,8 @@ public class SavedAndShareLoader {
 						//FIXME: Question?: what about shared lists.. ? im only showing my own!
 						if (lr.getOwner().getId().equals(u.getUserId())) {
 							WishList ml = u.getList(lr.getId());
-							items.addAll(ml.getItems());
+							for (WishListItem item : ml.getItems())
+								if (!item.isPublic()) items.add(item);
 						}
 					}
 					

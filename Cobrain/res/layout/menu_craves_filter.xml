@@ -2,44 +2,32 @@
 <com.cobrain.android.views.MyRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
-
-    <TextView
-        android:id="@+id/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#222222"
-        android:drawableLeft="@drawable/ic_menu_filter"
-        android:drawablePadding="13dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="@dimen/filter_menu_item_leftpadding"
-        android:paddingRight="@dimen/filter_menu_item_leftpadding"
-        android:text="Tune My Results"
-        android:textColor="#8d8d8d" />
+    android:layout_height="wrap_content"
+    android:background="#ccffffff" >
 
     <TextView
         android:id="@+id/category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/header"
-        android:background="#353535"
         android:drawablePadding="13dp"
         android:paddingTop="7dp"
         android:paddingBottom="7dp"
         android:paddingLeft="@dimen/filter_menu_item_leftpadding"
         android:paddingRight="@dimen/filter_menu_item_leftpadding"
         android:text="Apparel"
-        android:textColor="#8d8d8d" />
+        android:textSize="23sp"
+        android:textColor="#000" />
 
     <ListView
         android:id="@+id/menu_category_filter_listview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/category"
-        android:background="#222222"
-        android:divider="#525252"
-        android:dividerHeight="1dp"
+		android:cacheColorHint="#00000000"
+		android:listSelector="@android:color/transparent" 
+		android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
         tools:listitem="@layout/list_item_craves_filter" >
     </ListView>
 </com.cobrain.android.views.MyRelativeLayout>

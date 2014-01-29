@@ -19,6 +19,7 @@ import com.cobrain.android.model.TrainingResult;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
+import com.cobrain.android.utils.LoaderUtils;
 
 public class TrainingLoader {
 
@@ -65,7 +66,7 @@ public class TrainingLoader {
 				progress.setVisibility(View.VISIBLE);
 			}
 			else {
-				image.setVisibility(View.VISIBLE);
+				LoaderUtils.show(image);
 				progress.setVisibility(View.GONE);
 			}
 		}

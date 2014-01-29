@@ -128,7 +128,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         		showFriendsMenu();
         		break;
         	case VIEW_TEACH:
-        		showTeachMyCobrain();
+        		showTeachMyCobrain(false);
         		break;
         	case VIEW_HOME:
         		showHome();
@@ -215,13 +215,14 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         getSlidingMenu().setOnClosedListener(this);
 
 		if (!processIntents()) {
-			cobrain.restoreLogin(new Runnable() {
+			if (!cobrain.restoreLogin(new Runnable() {
 				public void run() {
 					if (!cobrain.isLoggedIn())
 			        	showLogin(null);
 					else showMain(CobrainController.VIEW_HOME);
 				}
-			});
+			}))
+				showLogin(null);
 		}
 
     }
@@ -503,7 +504,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showTeachMyCobrain() {
+	public void showTeachMyCobrain(boolean addToBackStack) {
 		//this displays within MainFragment in the main content area
 		//showView = new Runnable() {
 		//	public void run() {
@@ -511,9 +512,12 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 					
 			        TrainingFragment training = new TrainingFragment();
 			        cobrainView = training;
-			        getSupportFragmentManager()
-			        	.beginTransaction()
-			        	.replace(R.id.content_frame, training, TrainingFragment.TAG)
+			        FragmentTransaction t = getSupportFragmentManager()
+			        	.beginTransaction();
+
+			        if (addToBackStack) t.addToBackStack(null);
+			        
+			        t.replace(R.id.content_frame, training, TrainingFragment.TAG)
 			        	.commitAllowingStateLoss();
 			        
 			        //getSupportFragmentManager().executePendingTransactions();
@@ -601,18 +605,21 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showBrowser(String url, int containerId, String merchant) {
+	public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack) {
 		BrowserFragment browser = new BrowserFragment();
 		Bundle args = new Bundle();
+		
 		args.putString("merchant", merchant);
 		args.putString("url", url);
 		browser.setArguments(args);
         cobrainView = browser;
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(containerId, browser, BrowserFragment.TAG)
-        	.addToBackStack(null)
-        	.commitAllowingStateLoss();
+        
+        FragmentTransaction t = getSupportFragmentManager()
+        	.beginTransaction();
+        
+        t.replace(containerId, browser, BrowserFragment.TAG);
+        if (addToBackStack) t.addToBackStack(null);
+        t.commitAllowingStateLoss();
 	}
 
 	@Override

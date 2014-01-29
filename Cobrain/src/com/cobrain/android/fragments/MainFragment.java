@@ -5,6 +5,7 @@ import com.cobrain.android.service.Cobrain.CobrainController;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,11 +50,15 @@ public class MainFragment extends BaseCobrainFragment {
 		//show default cobrain view
 		switch(defaultView) {
 		case CobrainController.VIEW_TEACH:
-			controller.showTeachMyCobrain();
+			controller.showTeachMyCobrain(false);
 			break;
 		case CobrainController.VIEW_FRIENDS_MENU:
 			controller.showHome();
-			controller.showFriendsMenu();
+			new Handler().post(new Runnable() {
+				public void run() {
+					controller.showFriendsMenu();
+				}
+			});
 			break;
 		default:
 			controller.showHome();

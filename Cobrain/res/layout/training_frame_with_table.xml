@@ -33,20 +33,18 @@
  	        android:paddingRight="30dp"
  	        android:text="NONE OF THESE" />
 	
-	    <LinearLayout
+	    <TableLayout
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_above="@+id/training_save_button"
 	        android:layout_below="@+id/craves_found_info"
-	        android:orientation="vertical"
-	        >
+	        android:stretchColumns="*" >
 	
-	        <LinearLayout
+	        <TableRow
 	            android:layout_weight="1"
 	            android:layout_width="match_parent"
-	            android:layout_height="0dp"
-	            android:orientation="horizontal" >
-	            	
+	            android:layout_height="0dp" >
+	
 	            <include
 	                android:id="@+id/training_image_1"
 					layout="@layout/training_image_frame_with_info"
@@ -58,7 +56,7 @@
 					layout="@layout/training_image_frame_with_info"
 	                style="@style/training_image_2" />
 	
-	        </LinearLayout>
+	        </TableRow>
 
 	        <RelativeLayout
 	            android:layout_width="wrap_content"
@@ -80,11 +78,10 @@
 	            android:textSize="14sp" />
 	        </RelativeLayout>
 	        	    	
-	        <LinearLayout
+	        <TableRow
 	            android:layout_weight="1"
 	            android:layout_width="match_parent"
-	            android:layout_height="0dp"
-	            android:orientation="horizontal" >
+	            android:layout_height="0dp" >
 	
 	            <include
 	                android:id="@+id/training_image_3"
@@ -95,8 +92,8 @@
 	                android:id="@+id/training_image_4"
 					layout="@layout/training_image_frame_with_info"
 	                style="@style/training_image_4" />
-	        </LinearLayout>
-	    </LinearLayout>
+	        </TableRow>
+	    </TableLayout>
 	
 	    <!--
 	    GridView

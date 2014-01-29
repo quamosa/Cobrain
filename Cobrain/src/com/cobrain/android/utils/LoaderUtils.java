@@ -101,8 +101,9 @@ public class LoaderUtils {
 		loadingText.setOnClickListener(l);
 	}
 
-	public void show(final View v) {
+	public static void show(final View v) {
 		if (v.getVisibility() == View.VISIBLE) return;
+		if (v.getVisibility() == View.GONE) v.setVisibility(View.INVISIBLE);
 		
 		Animation ca = v.getAnimation();
 		if (ca != null) ca.cancel();
@@ -126,17 +127,17 @@ public class LoaderUtils {
 		v.startAnimation(a);
 	}
 	
-	public void hide(View v) {
-		hide(v, true);
+	public static void hide(View v) {
+		hide(v, true, false);
 	}
-	public void hide(final View v, boolean animate) {
+	public static void hide(final View v, boolean animate, final boolean gone) {
 		if (v.getVisibility() != View.VISIBLE) return;
 		
 		Animation ca = v.getAnimation();
 		if (ca != null) ca.cancel();
 		
 		if (!animate) {
-			v.setVisibility(View.INVISIBLE);
+			v.setVisibility((gone) ? View.GONE : View.INVISIBLE);
 			return;
 		}
 		
@@ -153,7 +154,7 @@ public class LoaderUtils {
 			
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				v.setVisibility(View.INVISIBLE);
+				v.setVisibility((gone) ? View.GONE : View.INVISIBLE);
 			}
 		});
 		a.setDuration(250);

@@ -1,9 +1,7 @@
 package com.cobrain.android.adapters;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import com.cobrain.android.R;
@@ -19,7 +17,6 @@ import com.cobrain.android.utils.LoaderUtils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
@@ -39,7 +36,6 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 	//ArrayList<WishListItem> items = new ArrayList<WishListItem>();
 	LoaderUtils loader = new LoaderUtils();
 	SavedAndShareFragment parent;
-	AbsListView.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
 	public SavedAndShareAdapter(Context context, int resource, SavedAndShareFragment parent) {
 		super(context, resource);
@@ -73,31 +69,11 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 	public long getItemId(int position) {
 		return getItem(position).getProduct().getId();
 	}
-
-	HashMap<Integer, WishListItem> test = new HashMap<Integer, WishListItem>();
-	HashMap<Integer, Integer> test2 = new HashMap<Integer, Integer>();
 	
 	@Override
 	public int getItemViewType(int position) {
 		WishListItem item = getItem(position);
-		
-		if (test.get(position) != null) {
-			if (test.get(position) != item) {
-				Log.i("hmmm", "hmm");
-			}
-		}
-
-		if (test2.get(position) != null) {
-			if (test2.get(position) != item.getRaves().size()) {
-				Log.i("arg", "argh");
-			}
-		}
-		
-		test.put(position, item);
-		test2.put(position, item.getRaves().size());
-		
 		int typ = (item.getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES : VIEWTYPE_SAVED_AND_SHARE;
-		
 		return typ;
 	}
 
@@ -106,12 +82,12 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		return 2;
 	}
 
-	@Override
+	/*@Override
 	public void notifyDataSetChanged() {
 		//do sorting here I suppose
 		//doSort();
 		super.notifyDataSetChanged();
-	}
+	}*/
 	
 	static Comparator<WishListItem> comparer =
 			new Comparator<WishListItem>() {
@@ -188,7 +164,10 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 			@Override
 			public void onLoadCompleted(Integer r) {
 				parent.getLoaderUtils().dismissLoading();
-				if (r > 0) { 
+				if (r > 0) {
+					if (r == 2) {
+						parent.removeCrave(position);
+					}
 					shareLayout.setVisibility(View.GONE);
 					privateLayout.setVisibility(View.VISIBLE);
 				}
@@ -221,7 +200,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		View v = convertView;
 		ViewHolder vh;
 		int vtyp = getItemViewType(position);
-		
+
 		if (v == null) {
 			vh = new ViewHolder();
 			switch(vtyp) {
@@ -248,14 +227,12 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 			vh.removeLayout.setOnClickListener(vh);
 			v.setTag(vh);
 
+			AbsListView.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			v.setLayoutParams(lp);
 			v.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 		}
 		else vh = (ViewHolder) v.getTag();
 
-		if (v.getId() != vtyp) {
-			Log.i("hmm", "hmm");
-		}
 
 		//showProgress(true);
 		

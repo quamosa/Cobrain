@@ -2,39 +2,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/DarkPurple"
      >
 
-    <ImageButton
-        android:id="@+id/navigation_button"
-	    android:padding="10dp"
-        android:layout_width="@dimen/button_size"
-        android:layout_height="@dimen/button_size"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-		android:background="@drawable/purple_button_highlight"
-        android:src="@drawable/ic_navigation_menu_action" />
-
-    <ImageButton
-        android:id="@+id/filter_button"
-	    android:padding="10dp"
-        android:layout_width="@dimen/button_size"
-        android:layout_height="@dimen/button_size"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-		android:background="@drawable/purple_button_highlight"
-        android:src="@drawable/ic_navigation_menu_filter" />
-
-    <Button
-        android:id="@+id/frame_caption"
+    <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_size"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@id/filter_button"
-        android:layout_toRightOf="@id/navigation_button"
-        android:gravity="center"
-        android:text="Apparel"
-		android:background="@drawable/purple_button_highlight"
-        android:textSize="25sp" />
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textColor="#000"
+        android:textSize="20sp"
+        />
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_below="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="#a0a0a0"
+        android:text=""
+        />
 
 </RelativeLayout>

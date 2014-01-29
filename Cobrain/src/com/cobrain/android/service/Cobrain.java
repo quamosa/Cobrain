@@ -71,7 +71,7 @@ public class Cobrain {
 		public void showHome();
 		public void showMain(int defaultView);
 		public void showSavedAndShare();
-		public void showTeachMyCobrain();
+		public void showTeachMyCobrain(boolean addToBackStack);
 		public void showNerveCenter();
 		public ActionBar getSupportActionBar();
 		public void closeMenu(boolean animate);
@@ -84,9 +84,9 @@ public class Cobrain {
 		public void showForgotPassword(String email);
 		public void showLogin(String loginUrl);
 		void hideSoftKeyBoard();
-		public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToStack);
+		public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToBackStack);
 		public void showErrorDialog(String message);
-		public void showBrowser(String url, int containerId, String merchant);
+		public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack);
 		public void showContactList(ContactSelectedListener listener);
 		public boolean processIntents();
 		public CobrainView getShown();
@@ -102,6 +102,7 @@ public class Cobrain {
 
 		public void onSlidingMenuOpened();
 		public void onSlidingMenuClosed();
+		public void setSilentMode(boolean silent);
 
 		//public void showFilterMenu(View menuItem);
 	}
@@ -552,7 +553,7 @@ public class Cobrain {
 		return getSharedPrefs().edit();
 	}
 	
-	public void restoreLogin(final Runnable runWhenLoggedIn) {
+	public boolean restoreLogin(final Runnable runWhenLoggedIn) {
 		String prefix = context.getString(R.string.url_cobrain_api);
 		apiKey = getSharedPrefs().getString(prefix + ":apiKey", null);
 		if (apiKey != null) {
@@ -573,7 +574,9 @@ public class Cobrain {
 				}
 				
 			}.execute();
+			return true;
 		}
+		return false;
 	}
 
 	public Context getContext() {

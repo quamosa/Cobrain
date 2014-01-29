@@ -16,6 +16,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class CravesCategoryAdapter extends BaseAdapter {
@@ -133,6 +134,10 @@ public class CravesCategoryAdapter extends BaseAdapter {
 			else {
 				this.parent = new MyAdapter(context);
 			}
+		}
+
+		if (parent instanceof ListView) {
+			return getDropDownView(position, convertView, parent);
 		}
 
 		View v = convertView;

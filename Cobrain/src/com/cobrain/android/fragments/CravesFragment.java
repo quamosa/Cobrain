@@ -7,27 +7,32 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.CravePagerAdapter;
@@ -51,13 +56,19 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	TextView craveFilterHeader;
 	CravesCategoryAdapter cravesCategoryAdapter;
 	ArrayAdapter<NavigationMenuItem> craveFilterAdapter;
-	PopupWindow filterMenu = (android.os.Build.VERSION.SDK_INT > 10) ? new PopupWindow() : null;
-	ListView filterMenuListView;
+	PopupWindow categoryFilterMenu = (android.os.Build.VERSION.SDK_INT > 10) ? new PopupWindow() : null;
+	PopupWindow priceFilterMenu = (android.os.Build.VERSION.SDK_INT > 10) ? new PopupWindow() : null;
+	ListView filterMenuListView, priceFilterMenuListView;
 	//int categoryId;	
 	//private int currentPage = 1;
 	SavedState savedState = new SavedState();
 	View comingsoon;
 	Menu menu;
+	ToggleButton categoryFilter;
+	Button priceFilter;
+	private boolean onSale;
+	private TextView actionBarTitle;
+	public TextView actionBarSubTitle;
 
 	public class SavedState {
 		boolean saved;
@@ -67,6 +78,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		int page;
 		
 		boolean initial = true;
+		public boolean onSale;
 
 		public boolean isInitial() {
 			if (initial) {
@@ -95,7 +107,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		}
 	}
 
-	@Override
+/*	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		this.menu = menu;
 		//if (menu.findItem(R.id.menu_filter) == null) {
@@ -109,11 +121,11 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		switch(item.getItemId()) {
 		case R.id.menu_filter:
 			View v = getActivity().findViewById(item.getItemId());
-			showFilterMenu(v);
+			showPopupMenu(filterMenu, v);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
+	}*/
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -129,13 +141,58 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		craveLoader.setOnLoadListener(this);
 		cravePager.setOnPageChangeListener(this);
 
+		categoryFilter = (ToggleButton) v.findViewById(R.id.category_filter_button);
+		priceFilter = (Button) v.findViewById(R.id.price_filter_button);
+		categoryFilter.setOnClickListener(this);
+		priceFilter.setOnClickListener(this);
+		
 		setTitle(null);
+		actionBar.setDisplayShowCustomEnabled(true);
+		View abv = inflater.inflate(R.layout.actionbar_crave_frame, null);
+		actionBarTitle = (TextView) abv.findViewById(R.id.title);
+		actionBarSubTitle = (TextView) abv.findViewById(R.id.subtitle);
+		ActionBar.LayoutParams params = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+		abv.setLayoutParams(params);
+		actionBar.setCustomView(abv);
 		
 		setupCategoryNavigationMenu();
 		setupFilterMenu(inflater);
 		setupComingSoonView(v);
 
 		return v;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()) {
+
+		case R.id.category_filter_button:
+
+			View image = craveAdapter.getPage(cravePager.getCurrentItem()).itemImage;
+
+			categoryFilter.setChecked(true);
+			categoryFilterMenu.setOnDismissListener(new OnDismissListener () {
+
+				@Override
+				public void onDismiss() {
+					categoryFilter.setChecked(false);
+					categoryFilterMenu.setOnDismissListener(null);
+				}
+				
+			});
+
+			showPopupMenu(categoryFilterMenu, image, Gravity.FILL, 1);
+
+			break;
+			
+		case R.id.price_filter_button:
+			onSale = !onSale;
+			//priceFilter.setCompoundDrawablesRelativeWithIntrinsicBounds(((onSale) ? R.drawable.ic_category_menu_onsale : 0), 0, 0, 0);
+			update();
+			//showPopupMenu(priceFilterMenu, v, Gravity.LEFT);
+			break;
+		}
+		super.onClick(v);
 	}
 
 	void setupComingSoonView(View v) {
@@ -149,10 +206,10 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	private void setupFilterMenu(LayoutInflater inflater) {
 		View v = inflater.inflate(R.layout.menu_craves_filter, null);
 		
-		if (filterMenu == null) {
-			filterMenu = new PopupWindow(v);
+		if (categoryFilterMenu == null) {
+			categoryFilterMenu = new PopupWindow(v);
 		}
-		else filterMenu.setContentView(v);
+		else categoryFilterMenu.setContentView(v);
 		filterMenuListView = (ListView) v.findViewById(R.id.menu_category_filter_listview);
 		filterMenuListView.setOnItemClickListener(this);
 
@@ -163,7 +220,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 			public void onClick(View v) {
 				if (craveFilterLoader.getParentCategoryId() > 0)
 					setCategoryId(craveFilterLoader.getParentCategoryId());
-				filterMenu.dismiss();
+				categoryFilterMenu.dismiss();
 			}
 		});
 
@@ -221,50 +278,61 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 				else rGetName = pCatName;
 
 				//craveFilterHeader.setText(rGetName);
-				craveFilterHeader.setCompoundDrawablesWithIntrinsicBounds(mi.icon, null, null, null);
+				//craveFilterHeader.setCompoundDrawablesWithIntrinsicBounds(mi.icon, null, null, null);
 
 				if (show) {
 					CharSequence label = Html.fromHtml(rGetName + " " + ((show) ? "<small><font color='#a0a0a0'> in " + pCatName + "</font></small>" : ""));
 					mi.label = label;
 				}
 				else mi.label = mi.labelCopy;
+				
+				actionBarTitle.setText(mi.label);
+				
 				cravesCategoryAdapter.notifyDataSetChanged();
-			
-				View v = filterMenu.getContentView();
-				
-				v.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-				
-				DisplayMetrics displayMetrics = controller.getSupportActionBar().getThemedContext().
-						getResources().getDisplayMetrics();
-				int widthMeasureSpec = MeasureSpec.makeMeasureSpec(displayMetrics.widthPixels , MeasureSpec.AT_MOST);
-				int heightMeasureSpec = MeasureSpec.makeMeasureSpec(displayMetrics.heightPixels, MeasureSpec.AT_MOST);
 
-				filterMenuListView.measure(widthMeasureSpec, heightMeasureSpec);
-				try {
-					v.measure(0, heightMeasureSpec);
-				}
-				catch (NullPointerException e) {
-					e.printStackTrace();
-				}
+				setItemCheckedForId(filterMenuListView, savedState.categoryId);
 
-				int wi = v.getMeasuredWidth();
-				int h = v.getMeasuredHeight();
-				
-				for (int i = 0; i < filterMenuListView.getCount(); i++) {
-					View vi = filterMenuListView.getAdapter().getView(i, null, filterMenuListView);
-					vi.measure(0, 0);
-					wi = Math.max(wi, vi.getMeasuredWidth());
-				}
-				
-			    filterMenu.setWidth(wi);
-			    filterMenu.setHeight(h);
-			    filterMenu.setBackgroundDrawable(new ColorDrawable());
-			    filterMenu.setFocusable(true);
-			    filterMenu.setOutsideTouchable(true);
-			    //filterMenu.setWindowLayoutMode(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				setupPopupMenu(categoryFilterMenu, filterMenuListView);
 			}
 			
 		});
+	}
+	
+	void setupPopupMenu(PopupWindow popup, ListView list) {
+		View v = popup.getContentView();
+		
+		v.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		
+		DisplayMetrics displayMetrics = controller.getSupportActionBar().getThemedContext().
+				getResources().getDisplayMetrics();
+		int widthMeasureSpec = MeasureSpec.makeMeasureSpec(displayMetrics.widthPixels , MeasureSpec.AT_MOST);
+		int heightMeasureSpec = MeasureSpec.makeMeasureSpec(displayMetrics.heightPixels, MeasureSpec.AT_MOST);
+
+		list.measure(widthMeasureSpec, heightMeasureSpec);
+		try {
+			v.measure(0, heightMeasureSpec);
+		}
+		catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+
+		int wi = v.getMeasuredWidth();
+		int h = v.getMeasuredHeight();
+		
+		for (int i = 0; i < list.getCount(); i++) {
+			View vi = list.getAdapter().getView(i, null, list);
+			if (vi.getLayoutParams() == null) 
+				vi.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			vi.measure(0, 0);
+			wi = Math.max(wi, vi.getMeasuredWidth());
+		}
+		
+	    popup.setWidth(wi);
+	    popup.setHeight(h);
+	    popup.setBackgroundDrawable(new ColorDrawable());
+	    popup.setFocusable(true);
+	    popup.setOutsideTouchable(true);
+	    //popup.setWindowLayoutMode(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 	}
 
 
@@ -277,8 +345,6 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		Resources res = c.getResources();
 		TypedArray items = res.obtainTypedArray(R.array.craves_category_menu_items);
 
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		
 		for (int i = 0; i < items.length();) {
 			NavigationMenuItem nmi = new NavigationMenuItem();
 			nmi.caption = Html.fromHtml(items.getString(i++));
@@ -292,11 +358,49 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		cravesCategoryAdapter = new CravesCategoryAdapter(c, menuItems);
 		cravesCategoryAdapter.setLayoutId(R.layout.list_item_craves_category);
 		cravesCategoryAdapter.setCaptionLayoutId(R.layout.list_item_craves_category_caption);
-		//cravesCategoryAdapter.setDropDownViewResource(R.layout.list_item_navigation);
-		actionBar.setListNavigationCallbacks(cravesCategoryAdapter, this);
-		if (savedState.isSaved()) {
-			actionBar.setSelectedNavigationItem(savedState.selectedCategoryNavigationPosition);
+		//actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		//actionBar.setListNavigationCallbacks(cravesCategoryAdapter, this);
+
+		ListView list = new ListView(getActivity().getApplicationContext());
+		//list.setBackgroundColor(Color.WHITE);
+		list.setOnItemClickListener(this);
+		priceFilterMenuListView = list;
+		
+		if (priceFilterMenu == null) {
+			priceFilterMenu = new PopupWindow(list);
 		}
+		else priceFilterMenu.setContentView(list);
+		
+		list.setAdapter(cravesCategoryAdapter);
+		cravesCategoryAdapter.notifyDataSetChanged();
+		setupPopupMenu(priceFilterMenu, list);
+		
+		new Handler().post(new Runnable() {
+			public void run() {
+				int pos = 0;
+				
+				if (savedState.isSaved()) {
+					pos = savedState.selectedCategoryNavigationPosition;
+					onSale = savedState.onSale;
+				}
+				
+				setSelectedNavigationItem(pos);
+			}
+		});
+	}
+
+	private void setSelectedNavigationItem(
+			int selectedCategoryNavigationPosition) {
+		//actionBar.setSelectedNavigationItem(savedState.selectedCategoryNavigationPosition);
+		if (selectedCategoryNavigationPosition == -1) selectedCategoryNavigationPosition = 0;
+		NavigationMenuItem mi = cravesCategoryAdapter.getItem(selectedCategoryNavigationPosition);
+		cravesCategoryAdapter.getParent().performItemClick(null, selectedCategoryNavigationPosition, mi.id);
+	}
+	private int getSelectedNavigationIndex() {
+		//return actionBar.getSelectedNavigationIndex();
+		Integer i = (Integer) cravesCategoryAdapter.getParent().getTag();//getSelectedItemPosition();
+		if (i == null) return i = -1;
+		return i;
 	}
 
 	@Override
@@ -331,10 +435,16 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 	@Override
 	public void onDestroyView() {
+		actionBarTitle = null;
+		actionBarSubTitle = null;
+		actionBar.setDisplayShowCustomEnabled(false);
+		actionBar.setCustomView(null);
+		
 		savedState.categoryId = craveLoader.getCategoryId();
 		savedState.position = cravePager.getCurrentItem();
 		savedState.page = getCurrentCravesPage(savedState.position);
-		savedState.selectedCategoryNavigationPosition = actionBar.getSelectedNavigationIndex();
+		savedState.selectedCategoryNavigationPosition = getSelectedNavigationIndex();
+		savedState.onSale = onSale;
 		savedState.save();
 		
 		craveAdapter.dispose();
@@ -355,17 +465,30 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		craveFilterLoader.dispose();
 		//craveFilterLoader = null;
 		
-		filterMenu.setContentView(null);
-		filterMenu = null;
+		priceFilterMenuListView.setOnItemClickListener(null);
+		priceFilterMenuListView.setAdapter(null);
+		priceFilterMenuListView = null;
+		filterMenuListView.setOnItemClickListener(null);
+		filterMenuListView.setAdapter(null);
+		filterMenuListView = null;
+		priceFilterMenu.setContentView(null);
+		priceFilterMenu = null;
+		categoryFilterMenu.setContentView(null);
+		categoryFilterMenu = null;
 
 		cravesCategoryAdapter.clear();
 		cravesCategoryAdapter = null;
 		
 		comingsoon = null;
 		menu = null;
-		
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setListNavigationCallbacks(null, null);
+
+		categoryFilter.setOnClickListener(null);
+		priceFilter.setOnClickListener(null);
+		categoryFilter = null;
+		priceFilter = null;
+
+		//actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		//actionBar.setListNavigationCallbacks(null, null);
 		super.onDestroyView();
 	}
 
@@ -411,6 +534,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	
 	@Override
 	public void onPageSelected(int position) {
+		craveAdapter.updateTitle(position);
 		int page = getCurrentCravesPage(position);
 		if (page > 1 && !craveLoader.isPageLoaded(page - 1))
 			craveLoader.loadPage(page - 1);
@@ -423,28 +547,64 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		// TODO Auto-generated method stub
 	}
 
-	//@Override
-	public void showFilterMenu(View menuItemView) {
-		//filterMenu.showAsDropDown(menuItemView, 0, 0, Gravity.RIGHT);
+	public class PopupMenuLayoutParams {
+		public int gravity;
+		public int paddingLeft;
+		public int paddingRight;
+		public int paddingTop;
+		public int paddingBottom;
+	}
+	public void showPopupMenu(PopupWindow popup, View menuItemView, int gravity, int padding) {
+		//popup.showAsDropDown(menuItemView, 0, 0, Gravity.RIGHT);
 		
-		View view = filterMenu.getContentView();
+		View view = popup.getContentView();
 
-		try {
-			view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-		}
-		catch(NullPointerException e) {
-			e.printStackTrace();
-		}
-		filterMenu.showAsDropDown(menuItemView, menuItemView.getWidth() - view.getMeasuredWidth(), 0);
+		int x = 0, y = 0;
 		
-		//filterMenu.showAsDropDown(menuItemView, 0, 0);
+		switch(gravity) {
+		case Gravity.FILL:
+			int w = menuItemView.getWidth();
+			int h = menuItemView.getHeight();
+			y = -h;
+			
+			x += padding;
+			y += padding;
+			w -= padding*2;
+			h -= padding*2;
+
+			popup.setWidth(w);
+			popup.setHeight(h);
+			break;
+			
+		case Gravity.RIGHT:
+			try {
+				view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+			}
+			catch(NullPointerException e) {
+				e.printStackTrace();
+			}
+			
+			x = menuItemView.getWidth() - view.getMeasuredWidth();
+			break;
+		}
+
+		popup.showAsDropDown(menuItemView, x, y);
+		
+		//popup.showAsDropDown(menuItemView, 0, 0);
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-		NavigationMenuItem item = craveFilterAdapter.getItem(pos);
-		setCategoryId(item.id);
-		filterMenu.dismiss();
+		if (arg0 == filterMenuListView) {
+			NavigationMenuItem item = craveFilterAdapter.getItem(pos);
+			setCategoryId(item.id);
+			categoryFilterMenu.dismiss();
+		}
+		else if (arg0 == priceFilterMenuListView) {
+			arg0.setTag(pos);
+			onNavigationItemSelected(pos, id);
+			priceFilterMenu.dismiss();
+		}
 	}
 	
 	@Override
@@ -461,13 +621,17 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	}
 
 	boolean filterOnSale() {
-		NavigationMenuItem mi = getSelectedCategoryMenuItem();
-		if (mi == null) return false;
-		return mi.id < 0;
+		//NavigationMenuItem mi = getSelectedCategoryMenuItem();
+		//if (mi == null) return false;
+		//return mi.id < 0;
+		return onSale;
 	}
 	NavigationMenuItem getSelectedCategoryMenuItem() {
 		if (cravesCategoryAdapter.getParent() == null) return null;
-		return cravesCategoryAdapter.getItem(cravesCategoryAdapter.getParent().getSelectedItemPosition());
+		//return cravesCategoryAdapter.getItem(cravesCategoryAdapter.getParent().getSelectedItemPosition());
+
+		int i = getSelectedNavigationIndex();
+		return cravesCategoryAdapter.getItem(i);
 	}
 	
 	boolean setCategoryId(int id) {
@@ -479,20 +643,21 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 			break;
 			
 		default:
-			//on sale is -6
-			if (id == -6) id = -savedState.categoryId;
+			////on sale is -6
+			////if (id == -6) id = -savedState.categoryId;
 			//apparel is 6, tops = 5 so we default to tops.. never the top level apparel
 			if (id == 6) id = 5;
 			
 			showFilterMenu(true);
 			comingsoon.setVisibility(View.GONE);
 
-			id = Math.abs(id);
+			//id = Math.abs(id);
 
 			boolean onSale = filterOnSale();
 			boolean restore = savedState.isSaved();
-			
+
 			if (craveLoader.setCategoryId(id) | craveLoader.setOnSaleRecommendationsOnly(onSale)) {
+				priceFilter.setText((onSale) ? "On Sale" : "All Prices");
 				savedState.categoryId = id;
 				//lets only load the top level apparel: id = 6
 				//craveFilterLoader.load(id);
@@ -512,6 +677,21 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		return false;
 	}
 
+	private void setItemCheckedForId(ListView list, int id) {
+		list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		Adapter a = list.getAdapter();
+
+		if (a != null) {
+			for (int i = 0; i < a.getCount(); i++) {
+				NavigationMenuItem mi = (NavigationMenuItem)a.getItem(i);
+				if (id == mi.id) {
+					list.setItemChecked(i, true);
+					break;
+				}
+			}
+		}
+	}
+
 	private void showFilterMenu(boolean show) {
 		if (menu != null) {
 			MenuItem item = menu.findItem(R.id.menu_filter);
@@ -520,9 +700,13 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		//getSherlockActivity().invalidateOptionsMenu();
 	}
 
+	public void showTeachMyCobrain() {
+		cravePager.setId(View.NO_ID); //so we don't save the pager state automatically; i want to do this myself
+		controller.showTeachMyCobrain(true);
+	}
 	public void showBrowser(String url, String merchant) {
 		cravePager.setId(View.NO_ID); //so we don't save the pager state automatically; i want to do this myself
-		controller.showBrowser(url, R.id.content_frame, merchant);
+		controller.showBrowser(url, R.id.content_frame, merchant, true);
 	}
 	
 }	

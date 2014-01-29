@@ -20,6 +20,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	View abHide;
 	boolean updateRequested;
 	StateSaver state = new StateSaver();
+	boolean silentMode;
 	
 	public class StateSaver {
 		Bundle savedState = new Bundle();
@@ -100,7 +101,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public void onError(String message) {
 		if (loaderUtils != null) loaderUtils.dismiss();
-		if (controller != null) controller.showErrorDialog(message);
+		if (!silentMode) if (controller != null) controller.showErrorDialog(message);
 	}
 
 	public void setTitle(CharSequence title) {
@@ -158,6 +159,11 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 
 	@Override
 	public void onSlidingMenuClosed() {
+	}
+	
+	@Override
+	public void setSilentMode(boolean silent) {
+		silentMode = silent;
 	}
 
 }

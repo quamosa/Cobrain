@@ -26,13 +26,13 @@
 	    <item>@drawable/ic_navigation_menu_nerve_center</item>
    	    <item type="integer">4</item>
 	    
-	    <item type="string">Feedback</item>
+	    <!-- item type="string">Feedback</item>
    	    <item>@drawable/ic_navigation_menu_feedback</item>
-   	    <item type="integer">-5</item>
+   	    <item type="integer">-5</item-->
 
-	    <item type="string">Help</item>
+	    <item type="string">About Us</item>
 	    <item>@drawable/ic_navigation_menu_help</item>
-   	    <item type="integer">-6</item>
+   	    <item type="integer">6</item>
 	    
 	</array>
 

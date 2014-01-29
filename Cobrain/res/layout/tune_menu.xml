@@ -20,6 +20,8 @@
 	        android:layout_height="wrap_content"
 	        android:text="someone@cobrain.com"
 	        android:textSize="15sp"
+	        android:paddingTop="8dp"
+	        android:paddingBottom="8dp"
 	        android:textColor="@color/FriendsListHeaderText"
 	        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
 	         />
@@ -30,11 +32,11 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/navigation_menu_divider_height"
 	        android:layout_below="@id/username_layout"
-	        android:background="@android:color/black" />
+	        android:background="@color/NavigationMenuDivider" />
 
          <ListView 
              android:id="@+id/my_craves_list"
-             android:divider="@android:color/black"
+             android:divider="@color/NavigationMenuDivider"
              android:dividerHeight="@dimen/navigation_menu_divider_height"
 	         android:layout_width="match_parent"
 	         android:layout_height="wrap_content"
@@ -85,7 +87,7 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/navigation_menu_divider_height"
 	        android:layout_below="@+id/my_craves_list"
-	        android:background="@android:color/black" />
+	        android:background="@color/NavigationMenuDivider" />
          
 		<RelativeLayout
 	        android:id="@+id/friend_header"
@@ -107,7 +109,7 @@
 		       android:layout_centerVertical="true"
 		       android:textSize="15sp"
 	           android:textColor="@color/FriendsListHeaderText"
-		       android:text="Your Friends" />
+		       android:text="YOUR FRIENDS" />
 
 		   <ProgressBar 
 	        android:id="@+id/friends_list_progress"
@@ -138,17 +140,27 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/navigation_menu_divider_height"
         android:layout_below="@+id/friend_header"
-        android:background="@android:color/black" />
+        android:background="@color/NavigationMenuDivider" />
 
     <LinearLayout
         android:id="@+id/invite_button_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-		android:layout_margin="15dp"
+		android:layout_margin="25dp"
 		android:orientation="vertical"
         >
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:lineSpacingExtra="5dp"
+            android:gravity="center"
+            android:textColor="#bbbbbb"
+            android:text="Make your Cobrain smarter -\ninvite your friends &amp; share your craves"
+            />
+        
 	    <Button
 	    android:id="@+id/verify_invite_button"
 	    style="@style/verify_invite_button"
@@ -156,7 +168,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 		android:layout_marginBottom="15dp"
-	    android:text="SEND VERIFICATION CODE SO I CAN RECEIVE INVITES" />
+        android:textStyle="bold"
+	    android:text="SEND VERIFICATION CODE\nSO I CAN RECEIVE INVITES" />
 	    
       	<RelativeLayout
 	        android:id="@+id/invite_button_layout"
@@ -178,7 +191,8 @@
 	            android:drawableLeft="@drawable/ic_friend_invite"
 	            android:drawablePadding="10dp"
 	            android:clickable="false"
-	            android:text="INVITE MORE FRIENDS"
+	            android:text="ADD MORE FRIENDS"
+	            android:textStyle="bold"
 	            />
 	
 	    </RelativeLayout>
@@ -192,7 +206,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/navigation_menu_divider_height"
         android:layout_above="@id/invite_button_parent"
-        android:background="@android:color/black" />
+        android:background="@color/NavigationMenuDivider" />
     
     <com.fortysevendeg.swipelistview.SwipeListView
         android:id="@+id/friends_list"
@@ -206,7 +220,7 @@
         android:layout_alignParentLeft="true"
         android:listSelector="@drawable/navigation_menu_background_selector"
         android:layout_below="@+id/header_divider"
-        android:divider="@color/FriendsListDivider"
+        android:divider="@color/NavigationMenuDivider"
         android:dividerHeight="@dimen/navigation_menu_divider_height"
         tools:listitem="@layout/list_item_friend" >
     </com.fortysevendeg.swipelistview.SwipeListView>

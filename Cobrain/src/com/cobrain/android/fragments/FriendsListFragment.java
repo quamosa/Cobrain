@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.FriendsListAdapter;
@@ -20,6 +21,7 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.WishList;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
+import com.cobrain.android.utils.HelperUtils.Storage.TempStore;
 import com.cobrain.android.utils.HelperUtils.Timing;
 import com.cobrain.anroid.dialogs.FriendAcceptDialog;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
@@ -90,7 +92,11 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		invite.setOnClickListener(this);
 		
 		TextView myname = (TextView) v.findViewById(R.id.username);
-		myname.setText(controller.getCobrain().getUserInfo().getEmail());
+		myname.setText(controller.
+				getCobrain().
+				getUserInfo().
+				getEmail().
+				toUpperCase(Locale.US));
 		
 		//v.findViewById(R.id.my_saved_craves).setOnClickListener(this);
 		//v.findViewById(R.id.my_shared_craves).setOnClickListener(this);
@@ -101,7 +107,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
  
         friends.setOnItemClickListener(this);
         friends.setSwipeListViewListener(new BaseSwipeListViewListener() {
-            @Override
+            @Override 
             public void onOpened(int position, boolean toRight) {
             }
 
@@ -353,8 +359,10 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			invite.setEnabled(true);
 
 			break;
-		default:
 			
+		default:
+			reportErrorNonSilently("The contact you selected from your contact list doesn't appear to have a mobile phone number or email.\n" +
+				"Please update your contact's information with either then try inviting them again.");
 		}
 	}
 
@@ -391,10 +399,17 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
         	startActivity(intent);
         }
         catch (ActivityNotFoundException e) {
-        	controller.getCobrain().getUserInfo().reportError("We weren't able to find a supported text messaging application on your phone. Please try to send your invite again once you get one installed.");
+        	reportErrorNonSilently("We weren't able to find a supported text messaging application on your phone. Please try to send your invite again once you get one installed.");
         }
 	}
 
+	void reportErrorNonSilently(String message) {
+    	TempStore.push("silentMode", silentMode);
+    	silentMode = false;
+    	controller.getCobrain().getUserInfo().reportError(message);
+    	silentMode = (Boolean) TempStore.pull("silentMode");
+	}
+	
 	void startEmailIntent(String email, String subject, String message) {
 		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
 	            "mailto", email, null));
@@ -406,7 +421,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
     		startActivity(Intent.createChooser(emailIntent, "Send email..."));
         }
         catch (ActivityNotFoundException e) {
-        	controller.getCobrain().getUserInfo().reportError("We weren't able to find a supported email application on your phone. Please try to send your invite again once you get one installed.");
+        	reportErrorNonSilently("We weren't able to find a supported email application on your phone. Please try to send your invite again once you get one installed.");
         }
 	}
 
@@ -514,7 +529,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 	@Override
 	public void onLoadStarted() {
-		progress.setVisibility(View.VISIBLE);
+		if (!silentMode) progress.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -544,6 +559,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	
 	Runnable updater = new Runnable() {
 		public void run() {
+			setSilentMode( timer.getRunCount(this) > 1 );
 			update();
 		}
 	};

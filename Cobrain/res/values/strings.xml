@@ -26,7 +26,9 @@
     <item type="string" name="url_cobrain_api">@string/url_cobrain_api_prd</item>
     <item type="string" name="url_cobrain_app">@string/url_cobrain_app_prd</item>
     <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_prd</item>
-    
+
+    <string name="url_about_us">%1$s/about-us</string>
+
     <string name="url_logout_get">%1$s/logout</string>
     <string name="url_login_post">%1$s/account/login</string>
     <string name="url_account_post">%1$s/account</string>
