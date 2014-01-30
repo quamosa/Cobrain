@@ -1,6 +1,7 @@
 package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 import android.graphics.Bitmap;
@@ -41,6 +42,7 @@ public class TrainingLoader {
 		boolean selected;
 		int id;
 		View parent;
+		HashMap<Integer, View> viewCache = new HashMap<Integer, View>();
 		
 		public void add(View v, int id) {
 			v = v.findViewById(id);
@@ -72,7 +74,11 @@ public class TrainingLoader {
 		}
 
 		public void setText(int id, String text) {
-			TextView tv = (TextView) parent.findViewById(id);
+			TextView tv = (TextView) viewCache.get(id);
+			if (tv == null) {
+				tv = (TextView) parent.findViewById(id);
+				viewCache.put(id, tv);
+			}
 			tv.setText(text);
 		}
 
@@ -98,6 +104,7 @@ public class TrainingLoader {
 		}
 		
 		public void dispose() {
+			viewCache.clear();
 			image.setOnClickListener(null);
 			image = null;
 			checkbox = null;

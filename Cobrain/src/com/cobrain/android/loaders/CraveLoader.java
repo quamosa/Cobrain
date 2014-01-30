@@ -111,7 +111,10 @@ public class CraveLoader {
 					//CraveLoader.this.page = pg;
 					//pagesLoaded.add(pg);
 				}
-				else pagesLoaded.remove((Integer)page);
+				else {
+					pagesLoaded.remove((Integer)page);
+					CraveLoader.this.categoryId = 0;
+				}
 				adapter.load(result);
 				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				currentRequest = null;

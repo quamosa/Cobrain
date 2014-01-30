@@ -21,6 +21,7 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.WishList;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
+import com.cobrain.android.utils.HelperUtils;
 import com.cobrain.android.utils.HelperUtils.Storage.TempStore;
 import com.cobrain.android.utils.HelperUtils.Timing;
 import com.cobrain.anroid.dialogs.FriendAcceptDialog;

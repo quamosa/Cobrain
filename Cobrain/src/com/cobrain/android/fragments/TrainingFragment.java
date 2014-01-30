@@ -126,11 +126,11 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 
 				@Override
 				public void onLoadCompleted(Boolean r) {
-					if (r != null && r == true) {
-						//we saved our choices load new ones now!
+					//if (r != null && r == true) {
+						//we ASSUME we saved our choices load new ones now!
 						loaderUtils.dismissLoading();
 						update(true);
-					}
+					//}
 				}
 				
 			});

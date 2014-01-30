@@ -156,7 +156,10 @@ public class Cobrain {
 		    		onLogout(true);
 					break;
 				default:
-					onLogout(false);
+		    		apiKey = null;
+		    		username = null;
+		    		onLogout(true);
+					//FIXME: dont wait for success log out ---> onLogout(false);
 				}
 			}
     	};

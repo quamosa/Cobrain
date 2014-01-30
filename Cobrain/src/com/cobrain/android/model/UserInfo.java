@@ -208,7 +208,7 @@ public class UserInfo {
 					me.zipcode = ui.zipcode;
 					me.signInCount = me.signInCount;
 				}
-				else reportError("Could not log out user");
+				//else reportError("Could not log out user");
 			}
 			
 		}).go(true);
@@ -287,7 +287,7 @@ public class UserInfo {
 			TrainingResult tr = new Gson().fromJson(wr.getResponse(), TrainingResult.class);
 			return true;
 		}
-		else reportError("Could not save training answers.");
+		//else reportError("Could not save training answers.");
 		
 		return false;
 	}

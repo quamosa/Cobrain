@@ -29,6 +29,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import android.os.AsyncTask;
+import android.os.Build;
 
 public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	private static final int GET = 0;
@@ -159,7 +160,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	        	if (contentType != null) se.setContentType(contentType);
 	        	httppost.setEntity(se);
 	        }
-
+	        
 	        HttpResponse response = httpclient.execute(httppost);
 
 			this.headers = response.getAllHeaders();
@@ -331,6 +332,8 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 				h.add(hd);
 			}
 		}
+
+        h.add(new BasicHeader("x-cobrain-client", "android " + Build.VERSION.RELEASE + " (phone)"));
 
 		return h.toArray(new Header[h.size()]);
 	}

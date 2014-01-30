@@ -43,6 +43,7 @@ public class MainFragment extends BaseCobrainFragment {
 
 		}
 		
+		controller.hideSoftKeyBoard();
 		controller.showDefaultActionBar();
 
 		int defaultView = getArguments().getInt("defaultView");
@@ -89,12 +90,15 @@ public class MainFragment extends BaseCobrainFragment {
 		super.onDestroyView();
 	}
 
-	public void showNavigationMenu() {
+	public NavigationMenuFragment showNavigationMenu() {
 		SlidingMenu sm = controller.getSlidingMenu();
 		if (sm.isMenuShowing()) {
 			sm.showContent();
 		}
 		else sm.showMenu(true);
+
+		NavigationMenuFragment f = (NavigationMenuFragment) getFragmentManager().findFragmentByTag(NavigationMenuFragment.TAG);
+		return f;
 	}
 
 	public FriendsListFragment showFriendsMenu() {

@@ -7,6 +7,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,6 +30,7 @@ import com.cobrain.android.fragments.CravesFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
+import com.cobrain.android.fragments.NavigationMenuFragment;
 import com.cobrain.android.fragments.NerveCenterFragment;
 import com.cobrain.android.fragments.RaveUserListFragment;
 import com.cobrain.android.fragments.ResetPasswordFragment;
@@ -56,7 +58,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
     static final String TAG = MainActivity.class.toString();
 	Cobrain cobrain;
-	CobrainView cobrainView;
+	CobrainView cobrainView, cobrainMainView, cobrainMenuView;
+	Runnable showView;
 	ProgressDialog progressDialog;
 	MainFragment homeFragment;
 	boolean showOptionsMenu = true;
@@ -74,6 +77,21 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showLogin(String loginUrl) {
 		//getSupportActionBar().hide();
+
+		
+		FragmentTransaction t = getSupportFragmentManager().beginTransaction();
+		/*
+		List<Fragment> fragments = getSupportFragmentManager().getFragments();
+		if (fragments != null)
+			for (Fragment f : fragments)
+				if (!(f instanceof MainFragment)) 
+					t.remove(f);
+		*/
+		
+		if (cobrainMainView != null) {
+			t.remove((Fragment) cobrainMainView);
+		}
+		
 		
 		Bundle args = new Bundle();
 		args.putString("loginUrl", loginUrl);
@@ -83,11 +101,9 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         
         //int id = (homeFragment == null) ? android.R.id.content : R.id.content_frame;
         int id = android.R.id.content;
-        cobrainView = login;
+        setCurrentCobrainView(login);
 
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(id, login, LoginFragment.TAG)
+        t.replace(id, login, LoginFragment.TAG)
         	.commitAllowingStateLoss();
 	}
 
@@ -95,7 +111,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	public void onBackPressed() {
 		if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
 			if (!isMenuOpen()) {
-				showMenu();
+				showNavigationMenu();
 				return;
 			}
 			if (!letMeLeave) {
@@ -152,7 +168,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         Bundle args = new Bundle();
         args.putInt("defaultView", defaultView);
         main.setArguments(args);
-        cobrainView = main;
+		setCurrentCobrainView(main);
         homeFragment = main;
         getSupportFragmentManager()
         	.beginTransaction()
@@ -369,6 +385,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		getSlidingMenu().setOnClosedListener(null);
         getSlidingMenu().setOnOpenedListener(null);
 		intentLoader.dispose();
+		cobrainMenuView = null;
+		cobrainMainView = null;
 		cobrainView = null;
 		homeFragment = null;
 		isDestroying = true;
@@ -506,14 +524,16 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public void showNavigationMenu() {
-		if (homeFragment != null)
-			homeFragment.showNavigationMenu();
+		if (homeFragment != null) {
+			NavigationMenuFragment f = homeFragment.showNavigationMenu();
+			setCurrentCobrainView(f);
+		}
 	}
 	@Override
 	public void showFriendsMenu() {
 		if (homeFragment != null) {
 			FriendsListFragment f = homeFragment.showFriendsMenu();
-			cobrainView = f;
+			setCurrentCobrainView(f);
 		}
 	}
 	
@@ -525,7 +545,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showHome() {
         CravesFragment craves = new CravesFragment();
-        cobrainView = craves;
+		setCurrentCobrainView(craves);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, craves, CravesFragment.TAG)
@@ -538,7 +558,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showSavedAndShare() {
 		SavedAndShareFragment f = new SavedAndShareFragment();
-        cobrainView = f;
+        setCurrentCobrainView(f);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, f, SavedAndShareFragment.TAG)
@@ -555,7 +575,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 				if (getSupportFragmentManager().findFragmentByTag(TrainingFragment.TAG) == null) {
 					
 			        TrainingFragment training = new TrainingFragment();
-			        cobrainView = training;
+					setCurrentCobrainView(training);
 			        FragmentTransaction t = getSupportFragmentManager()
 			        	.beginTransaction();
 
@@ -584,13 +604,11 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
                getSlidingMenu().isSecondaryMenuShowing());
 	}
 	
-	Runnable showView;
-
 	@Override
 	public void showNerveCenter() {
 
 		NerveCenterFragment training = new NerveCenterFragment();
-        cobrainView = training;
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, training, NerveCenterFragment.TAG)
@@ -607,7 +625,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		SignupFragment training = new SignupFragment();
 		training.setArguments(args);
 		
-        cobrainView = training;
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(android.R.id.content, training, SignupFragment.TAG)
@@ -616,7 +634,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	
 	public void showAccountSave() {
 		AccountSaveFragment training = new AccountSaveFragment();
-        cobrainView = training;
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(android.R.id.content, training, AccountSaveFragment.TAG)
@@ -629,7 +647,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		Bundle b = new Bundle();
 		b.putString("email", email);
 		training.setArguments(b);
-        cobrainView = training;
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(android.R.id.content, training, ResetPasswordFragment.TAG)
@@ -640,7 +658,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToStack) {
 		WishListFragment training = new WishListFragment();
 		training.initialize(list, showMyPrivateItems);
-        cobrainView = training;
+		setCurrentCobrainView(training);
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         if (addToStack) tr.addToBackStack(WishListFragment.TAG);
@@ -656,8 +674,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		args.putString("merchant", merchant);
 		args.putString("url", url);
 		browser.setArguments(args);
-        cobrainView = browser;
-        
+		setCurrentCobrainView(browser);
+
         FragmentTransaction t = getSupportFragmentManager()
         	.beginTransaction();
         
@@ -672,7 +690,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		Bundle args = new Bundle();
 		args.putString("itemId", itemId);
 		raves.setArguments(args);
-        cobrainView = raves;
+		setCurrentCobrainView(raves);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, raves, RaveUserListFragment.TAG)
@@ -684,7 +702,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	public void showContactList(ContactSelectedListener listener) {
 		ContactListFragment f = new ContactListFragment();
 		f.setContactSelectedListener(listener);
-        cobrainView = f;
+		setCurrentCobrainView(f);
         getSupportFragmentManager()
         	.beginTransaction()
         	.addToBackStack(null)
@@ -760,7 +778,18 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 			showView.run();
 			showView = null;
 		}
-		if (cobrainView != null) cobrainView.onSlidingMenuClosed();
+		if (cobrainMenuView != null) cobrainMenuView.onSlidingMenuClosed();
+	}
+
+	void setCurrentCobrainView(CobrainView cv) {
+		if (!isCobrainViewMenu(cv)) cobrainMainView = cv;
+		else cobrainMenuView = cv;
+		cobrainView = cv;
+	}
+	
+	boolean isCobrainViewMenu(CobrainView cv) {
+		return (cv instanceof FriendsListFragment ||
+				cv instanceof NavigationMenuFragment);
 	}
 
 	@Override
