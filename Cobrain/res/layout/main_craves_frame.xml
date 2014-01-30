@@ -50,6 +50,7 @@
 	        android:layout_weight="1"
 	        android:layout_marginRight="10dp"
 	        android:textColor="@color/crave_filter_button_highlight"
+	        android:drawableRight="@drawable/ic_crave_price_toggle"
 	        android:textSize="15sp"
 	        android:text="All Prices"
 	        />
