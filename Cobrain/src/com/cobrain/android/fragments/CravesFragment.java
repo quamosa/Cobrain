@@ -185,7 +185,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 				
 			});
 
-			showPopupMenu(categoryFilterMenu, image, Gravity.FILL, 1);
+			showPopupMenu(categoryFilterMenu, image, Gravity.FILL, 0);
 
 			break;
 			
