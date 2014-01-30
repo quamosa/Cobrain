@@ -94,6 +94,10 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void onBackPressed() {
 		if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+			if (!isMenuOpen()) {
+				showMenu();
+				return;
+			}
 			if (!letMeLeave) {
 				AlertDialog.Builder b = new AlertDialog.Builder(this);
 				b.setMessage("Are you sure you want to leave Cobrain?");
@@ -161,7 +165,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		ActionBar ab = (ActionBar) getSupportActionBar();
 		
 		if (ab.getCustomView() == actionBarView && actionBarView != null) return;
-		
+
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setDisplayShowHomeEnabled(true);
 		ab.setDisplayHomeAsUpEnabled(false);
@@ -170,18 +174,17 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		        Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
 		        android.R.id.home : R.id.abs__home);
 
-		if (homeIcon != null) {
-			View homeParent = ((View) homeIcon.getParent());
-			//homeParent.setVisibility(View.GONE);
-			//((View) homeIcon).setVisibility(View.GONE);
-			ViewGroup vg = (ViewGroup) homeParent;
-			vg = (ViewGroup) vg.getParent();
-			if (vg != null) vg.removeView(homeParent);
-			//FIXME: just get rid of these views completely so the space can be recovered... not sure how safe this will be going forward tho!
-		}
-
 		//set up default custom view
 		ab.setDisplayShowCustomEnabled(true);
+		
+		if (homeIcon != null) {
+			View homeParent = ((View) homeIcon.getParent());
+			ViewGroup vg = (ViewGroup) homeParent;
+			if (vg != null) {
+				vg.setVisibility(View.GONE);
+			}
+		}
+		
 		if (actionBarView == null) {
 			actionBarView = View.inflate(getApplicationContext(), R.layout.ab_main_frame, null);
 			actionBarTitle = (TextView) actionBarView.findViewById(R.id.title);
@@ -193,6 +196,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		}
 		
 		ab.setCustomView(actionBarView);
+		
 	}
 	
 	@Override

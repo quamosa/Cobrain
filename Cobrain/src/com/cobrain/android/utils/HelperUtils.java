@@ -93,13 +93,29 @@ public class HelperUtils {
 	    }
 
 	    // Scale and keep aspect ratio 
+	    static public Bitmap scaleToFit(Bitmap b, int width, int height, boolean filter) {
+	        float factorH2W = b.getHeight() / (float) b.getWidth();
+	        float w, h;
+	        
+	        if (factorH2W > 1) {
+		        h = height / factorH2W;
+		        w = width;
+	        }
+	        else {
+		        w = width * factorH2W;
+	        	h = height;
+	        }
+	        
+	        return Bitmap.createScaledBitmap(b, (int) w, (int) h, filter);  
+	    }
+
 	    static public Bitmap scaleToFill(Bitmap b, int width, int height, boolean filter) {
 	        float factorH = height / (float) b.getWidth();
 	        float factorW = width / (float) b.getWidth();
 	        float factorToUse = (factorH > factorW) ? factorW : factorH;
 	        return Bitmap.createScaledBitmap(b, (int) (b.getWidth() * factorToUse), (int) (b.getHeight() * factorToUse), filter);  
 	    }
-
+	    
 	    // Scale and dont keep aspect ratio 
 	    static public Bitmap strechToFill(Bitmap b, int width, int height) {
 	        float factorH = height / (float) b.getHeight();

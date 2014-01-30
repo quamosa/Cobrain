@@ -172,7 +172,10 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 		case R.id.category_filter_button:
 
-			View image = craveAdapter.getPage(cravePager.getCurrentItem()).itemImage;
+			CraveFragment f = craveAdapter.getPage(cravePager.getCurrentItem());
+			if (f == null) return;
+			
+			View image = f.itemImage;
 
 			categoryFilter.setChecked(true);
 			categoryFilterMenu.setOnDismissListener(new OnDismissListener () {
@@ -283,8 +286,12 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 				//craveFilterHeader.setText(rGetName);
 				//craveFilterHeader.setCompoundDrawablesWithIntrinsicBounds(mi.icon, null, null, null);
-
+				
 				if (show) {
+					if (rGetName == null || rGetName.equals("null")) {
+						rGetName = pCatName;
+						show = false;
+					}
 					CharSequence label = Html.fromHtml(rGetName + " " + ((show) ? "<small><font color='#a0a0a0'> in " + pCatName + "</font></small>" : ""));
 					mi.label = label;
 				}

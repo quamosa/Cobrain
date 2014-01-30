@@ -235,7 +235,7 @@ public class Cobrain {
 	}
 	
 	public boolean isLoggedIn() {
-		return apiKey != null;
+		return apiKey != null && userInfo != null;
 	}
 	
 	public void login(String url, String username, String password) {

@@ -162,9 +162,12 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	}
 
 	void updateUsername() {
-		String email = controller.getCobrain().getUserInfo().getEmail();
-		if (email != null) email = email.toUpperCase(Locale.US);
-		myname.setText(email);
+		if (controller.getCobrain().isLoggedIn()) {
+			String email = controller.getCobrain().getUserInfo().getEmail();
+			if (email != null) email = email.toUpperCase(Locale.US);
+			myname.setText(email);
+		}
+		else myname.setText(null);
 	}
 	
 	public void update() {
