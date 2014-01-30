@@ -6,10 +6,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="username"></string>
     <string name="password"></string>
+    <string name="blah">My friend what are you doing i am not feeeling it because of this long blah string!</string>
     <!-- string name="username">walter@cobrain.com</string>
     <string name="password">walterwalter</string-->
     <string name="forgot_password_link"><small><u><B>Forgot Password?</B></u></small></string>
     <string name="rank_for_you"><![CDATA[<small>#%1$d of %2$d Craves for You (<font color="#000"><small>Teach for More</small></font>)</small>]]></string>
+    <string name="rank_for_you_empty"><![CDATA[<small>0 Craves (<font color="#000"><small>Teach for More</small></font>)</small>]]></string>
     <string name="item_out_of_num_items">out of %1$,d apparel items</string>
     <string name="item_out_of_num_item">out of 1 apparel item</string>
     <string name="craves_found"><![CDATA[<b><font color="#00BE9B">%1$d</font> Craves Found</b>]]></string>

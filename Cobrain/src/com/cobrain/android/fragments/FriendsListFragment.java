@@ -157,7 +157,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		//update();
+		update();
 		super.onActivityCreated(savedInstanceState);
 	}
 
@@ -534,7 +534,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 	@Override
 	public void onLoadStarted() {
-		if (!silentMode) progress.setVisibility(View.VISIBLE);
+		//if (!silentMode) progress.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -555,7 +555,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	
 	void startUpdateTimer(boolean start) {
 		if (start) {
-			timer.start(updater, 10*1000);
+			int secs = getResources().getInteger(R.integer.default_friends_list_refresh_seconds);
+			timer.start(updater, secs*1000);
 		}
 		else {
 			timer.stop(updater);

@@ -159,7 +159,10 @@ public class TrainingLoader {
 					for (TrainingItem ti : trainingItems)
 						if (ti.selected) ids.add(ti.id);
 
-					return u.saveTrainingAnswers(training.getId(), ids);
+					if (ids.size() > 0) {
+						return u.saveTrainingAnswers(training.getId(), ids);
+					}
+					return true;
 				}
 				
 				return false;
@@ -210,7 +213,7 @@ public class TrainingLoader {
 		trainingItems.add(ti);
 	}
 
-	public void loadTraining(final OnLoadListener<TrainingResult> listener) {
+	public void loadTraining(final boolean refresh, final OnLoadListener<TrainingResult> listener) {
 		if (listener != null) listener.onLoadStarted();
 		
 		currentRequest = new AsyncTask<Void, Void, TrainingResult>() {
@@ -221,7 +224,7 @@ public class TrainingLoader {
 				TrainingResult tr = null;
 				
 				if (u != null) {
-					tr = u.getTrainings();
+					tr = u.getTrainings(refresh);
 					if (tr != null) {
 						training = tr.getTraining();
 					}

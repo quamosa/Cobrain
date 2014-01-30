@@ -43,7 +43,6 @@
 		<Button
 	        android:id="@+id/price_filter_button"
 	        android:background="@drawable/crave_filter_button_highlight"
-	        android:drawableRight="@drawable/ic_dropdown_arrow_ios"
 			android:paddingLeft="15dp"
 			android:paddingRight="15dp"
 	        android:layout_width="0dp"

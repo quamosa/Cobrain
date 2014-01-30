@@ -98,6 +98,7 @@ public class Cobrain {
 		public void setTitle(CharSequence title);
 		public TextView getSubTitleView();
 		public TextView getTitleView();
+		public void showDefaultActionBar();
 	}
 	
 	public interface CobrainView {

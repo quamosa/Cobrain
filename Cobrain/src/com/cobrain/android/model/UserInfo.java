@@ -252,14 +252,13 @@ public class UserInfo {
 		return null;
 	}
 
-	public TrainingResult getTrainings() {
+	public TrainingResult getTrainings(boolean refresh) {
 		if (apiKey == null) return null;
 		
 		String url = context.getString(R.string.url_trainings_post, context.getString(R.string.url_cobrain_api));
 		WebRequest wr = new WebRequest().post(url).setHeaders(apiKeyHeader());
 		
-		String query = "cached=false";
-		wr.setBody(query);
+		if (refresh) wr.setFormField("cache", "false");
 		
 		if (wr.go() == 200) {
 			TrainingResult tr = new Gson().fromJson(wr.getResponse(), TrainingResult.class);

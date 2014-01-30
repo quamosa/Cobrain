@@ -35,7 +35,9 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 			email.setText(args.getString("email"));
 		}
 		
-		hideActionBar();
+		controller.showOptionsMenu(false);
+		actionBar.setCustomView(R.layout.actionbar_login_frame);
+		//hideActionBar();
 		
 		return v;
 	}
@@ -43,7 +45,7 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 	@Override
 	public void onDestroyView() {
 		
-		restoreActionBar();
+		//restoreActionBar();
 		
 		reset.setOnClickListener(null);
 		reset = null;

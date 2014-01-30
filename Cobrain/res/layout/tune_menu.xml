@@ -18,12 +18,15 @@
 	        android:id="@+id/username"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:text="someone@cobrain.com"
-	        style="@style/navigation_menu_header_font"
+	       android:maxLines="1"
+	       android:ellipsize="end"
+	       android:text="@string/blah"
+	        style="@style/navigation_menu_username_header_font"
 	        android:paddingTop="11dp"
 	        android:paddingBottom="11dp"
 	        android:textColor="@color/FriendsListHeaderText"
 	        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
+	        android:layout_marginRight="@dimen/friends_list_item_marginLeft"
 	         />
      </RelativeLayout>
 

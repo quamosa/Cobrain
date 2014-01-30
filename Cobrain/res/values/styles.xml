@@ -140,9 +140,12 @@
         <item name="android:textSize">17sp</item>
     </style>
 
-    <style name="navigation_menu_header_font">
-        <item name="android:textColor">@drawable/navigation_menu_caption_selector</item>
+    <style name="navigation_menu_header_font" parent="@style/navigation_menu_font">
         <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="navigation_menu_username_header_font" parent="@style/navigation_menu_font">
+        <item name="android:textSize">14sp</item>
     </style>
     
     <style name="edit_text">

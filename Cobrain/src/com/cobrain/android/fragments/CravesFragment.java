@@ -495,10 +495,12 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 				}
 			});
 		}
-		else if (r.getTotal() == 0)
-			loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
+		else if (r.getTotal() == 0) {
+		//	loaderUtils.showEmpty("Sorry we couldn't find any craves for you. Try training your Cobrain to help us discover what you crave.");
+			loaderUtils.dismissLoading();
+			craveAdapter.updateTitle(0);
+		}
 		else {
-			loaderUtils.dismiss();
 
 			if (savedState.isSaved()) {
 				cravePager.setCurrentItem(savedState.position, false);
@@ -695,6 +697,11 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	public void showBrowser(String url, String merchant) {
 		cravePager.setId(View.NO_ID); //so we don't save the pager state automatically; i want to do this myself
 		controller.showBrowser(url, R.id.content_frame, merchant, true);
+	}
+
+	public void onCravePageLoaded(int position) {
+		if ((position - 1) == cravePager.getCurrentItem()) 
+			loaderUtils.dismissLoading();
 	}
 	
 }	

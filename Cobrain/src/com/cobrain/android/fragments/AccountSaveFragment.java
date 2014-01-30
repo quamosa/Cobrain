@@ -45,7 +45,10 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 		saveButton.setOnClickListener(this);
 		verifyInviteButton.setOnClickListener(this);
 
-		hideActionBar();
+		controller.showOptionsMenu(false);
+		actionBar.setCustomView(R.layout.actionbar_login_save_account_frame);
+
+		//hideActionBar();
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -58,7 +61,7 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 		name = null;
 		zipcode = null;
 
-		restoreActionBar();
+		//restoreActionBar();
 
 		super.onDestroyView();
 	}

@@ -164,12 +164,17 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		update();
+		if (parent != null)
+			parent.onCravePageLoaded(position);
+
 		super.onActivityCreated(savedInstanceState);
 	}
 	
 	public void setRecommendation(RecommendationsResults results, Product r) {
 		this.results = results;
 		recommendation = r;
+		if (r != null) position = r.getRank();
+		else position = 0;
 		update();
 	}
 
@@ -182,7 +187,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		recommendation = item.getProduct();
 	}
 
-	void updateSaveAndShareState() {
+	void updateSaveAndShareState(boolean animate) {
 		itemId = null;
 		isSaved = false;
 		isPublished = false;
@@ -213,7 +218,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			}
 		}
 		
-		updateFooterButtons();
+		updateFooterButtons(animate);
 	}
 	
 	boolean update() {
@@ -226,7 +231,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			itemDescription.setText(recommendation.getName());
 			itemPrice.setText(recommendation.getPriceFormatted());
 
-			updateSaveAndShareState();
+			updateSaveAndShareState(false);
 
 			showProgress(true, false);
 			
@@ -433,7 +438,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				//wishListParent.loaderUtils.dismissLoading();
 				raveIcon.setEnabled(true);
 				if (result) {
-					updateSaveAndShareState();
+					updateSaveAndShareState(true);
 				}
 			}
 			
@@ -487,7 +492,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			@Override
 			protected void onPostExecute(Boolean result) {
 				parent.loaderUtils.dismissLoading();
-				if (result) updateSaveAndShareState();
+				if (result) updateSaveAndShareState(true);
 			}
 			
 		}.execute(recommendation, save);
@@ -526,13 +531,13 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			protected void onPostExecute(Boolean result) {
 				//show result of is published change
 				parent.loaderUtils.dismissLoading();
-				if (result) updateSaveAndShareState();
+				if (result) updateSaveAndShareState(true);
 			}
 			
 		}.execute(itemId, share);
 	}
 
-	void updateFooterButtons() {
+	void updateFooterButtons(boolean animate) {
 		boolean saved = isSaved;
 		boolean published = isPublished;
 
@@ -584,10 +589,12 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			CharSequence raveInfo = getRaveInfoLabel(wishListItem);
 			if (raveInfo != null) {
 				raveInfoLabel.setText(raveInfo);
-				raveInfoLabel.setVisibility(View.VISIBLE);
+				//raveInfoLabel.setVisibility(View.VISIBLE);
+				LoaderUtils.show(raveInfoLabel, animate);
 			}
 			else
-				raveInfoLabel.setVisibility(View.GONE);
+				LoaderUtils.hide(raveInfoLabel, animate, true);
+				//raveInfoLabel.setVisibility(View.GONE);
 		}
 	
 	}

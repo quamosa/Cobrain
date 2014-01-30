@@ -4,9 +4,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -76,7 +73,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public void showLogin(String loginUrl) {
-		getSupportActionBar().hide();
+		//getSupportActionBar().hide();
 		
 		Bundle args = new Bundle();
 		args.putString("loginUrl", loginUrl);
@@ -159,8 +156,12 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         	.commitAllowingStateLoss();
 	}
 	
-	void showDefaultActionBar() {
+	@Override
+	public void showDefaultActionBar() {
 		ActionBar ab = (ActionBar) getSupportActionBar();
+		
+		if (ab.getCustomView() == actionBarView && actionBarView != null) return;
+		
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setDisplayShowHomeEnabled(true);
 		ab.setDisplayHomeAsUpEnabled(false);
@@ -169,13 +170,15 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		        Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
 		        android.R.id.home : R.id.abs__home);
 
-		View homeParent = ((View) homeIcon.getParent());
-		//homeParent.setVisibility(View.GONE);
-		//((View) homeIcon).setVisibility(View.GONE);
-		ViewGroup vg = (ViewGroup) homeParent;
-		vg = (ViewGroup) vg.getParent();
-		if (vg != null) vg.removeView(homeParent);
-		//FIXME: just get rid of these views completely so the space can be recovered... not sure how safe this will be going forward tho!
+		if (homeIcon != null) {
+			View homeParent = ((View) homeIcon.getParent());
+			//homeParent.setVisibility(View.GONE);
+			//((View) homeIcon).setVisibility(View.GONE);
+			ViewGroup vg = (ViewGroup) homeParent;
+			vg = (ViewGroup) vg.getParent();
+			if (vg != null) vg.removeView(homeParent);
+			//FIXME: just get rid of these views completely so the space can be recovered... not sure how safe this will be going forward tho!
+		}
 
 		//set up default custom view
 		ab.setDisplayShowCustomEnabled(true);
@@ -272,8 +275,10 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.base, menu);
+		if (showOptionsMenu) {
+			MenuInflater inflater = getSupportMenuInflater();
+			inflater.inflate(R.menu.base, menu);
+		}
 		return super.onCreateOptionsMenu(menu);
 	}
 

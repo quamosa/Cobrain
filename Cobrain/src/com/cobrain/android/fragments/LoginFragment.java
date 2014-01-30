@@ -76,9 +76,10 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 		actionBar.setDisplayShowHomeEnabled(false);
 		actionBar.setDisplayHomeAsUpEnabled(false);
 		controller.showOptionsMenu(false);
-		actionBar.setCustomView(R.layout.actionbar_login_frame);
 		*/
-		hideActionBar();
+		//hideActionBar();
+		controller.showOptionsMenu(false);
+		actionBar.setCustomView(R.layout.actionbar_login_frame);
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -94,7 +95,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 		forgotPassword.setText(null);
 		forgotPassword = null;
 
-		restoreActionBar();
+		//restoreActionBar();
 		
 		/*actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayShowCustomEnabled(false);

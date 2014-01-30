@@ -49,7 +49,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
     OnResponseListener responseListener;
     private String body;
     private String contentType;
-	private int timeout = 0;
+	private int timeout = 10 * 1000; //default time out will be 10 secs...
     
     //504 Gateway Timeout
     
@@ -146,7 +146,14 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	        httppost.setHeaders(headerFieldsToHeaders());
 
 	        setFormFields(httppost);
-	    	
+
+        	if (timeout > 0) {
+	        	HttpParams params = new BasicHttpParams();
+	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
+	        	HttpConnectionParams.setSoTimeout(params, timeout);
+	        	httppost.setParams(params);
+        	}
+
 	        if (body != null && body.length() > 0) {
 	        	StringEntity se = new StringEntity(body);
 	        	if (contentType != null) se.setContentType(contentType);
@@ -207,6 +214,14 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
         try {
         	request.setHeaders(headerFieldsToHeaders());
+        	
+        	if (timeout > 0) {
+	        	HttpParams params = new BasicHttpParams();
+	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
+	        	HttpConnectionParams.setSoTimeout(params, timeout);
+	        	request.setParams(params);
+        	}
+        	
         	HttpResponse response =  httpclient.execute(request);
 
         	InputStream s = response.getEntity().getContent();
@@ -231,7 +246,14 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
         	setFormFields(request);
         	
         	request.setHeaders(headerFieldsToHeaders());
-        	
+
+        	if (timeout > 0) {
+	        	HttpParams params = new BasicHttpParams();
+	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
+	        	HttpConnectionParams.setSoTimeout(params, timeout);
+	        	request.setParams(params);
+        	}
+
 	        if (body != null && body.length() > 0) {
 	        	StringEntity se = new StringEntity(body);
 	        	if (contentType != null) se.setContentType(contentType);
@@ -345,5 +367,10 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	}
 	
 	public void onResponse(int responseCode, String response, HashMap<String, String> headers) {}
+
+	public void setFormField(String field, String value) {
+		if (formFields == null) formFields = new HashMap<String, String>();
+		formFields.put(field, value);
+	}
 
 }

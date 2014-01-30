@@ -10,17 +10,10 @@
     android:layout_height="match_parent"
     android:background="#949" >
 
-    <include
-        android:id="@+id/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/actionbar_login_save_account_frame" />
-
     <RelativeLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/header"
         android:layout_margin="20dp"
         android:background="@drawable/drop_shadow" >
 

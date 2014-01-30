@@ -48,8 +48,11 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 			message.setVisibility(View.VISIBLE);
 			message.setText("A Cobrain member wants to share favorite craves with you! Please create your Cobrain account below to see them.");
 		}
-		
-		hideActionBar();
+
+		controller.showOptionsMenu(false);
+		actionBar.setCustomView(R.layout.actionbar_login_frame);
+
+		//hideActionBar();
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -62,7 +65,7 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 		email = null;
 		password = null;
 
-		restoreActionBar();
+		//restoreActionBar();
 
 		super.onDestroyView();
 	}

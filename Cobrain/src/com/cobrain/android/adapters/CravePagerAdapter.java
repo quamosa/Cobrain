@@ -131,14 +131,19 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 	}
 
 	public void updateTitle(int position) {
-		if (results != null && recommendations.size() > position) {
+		if (results != null) {
 			int totalCraves = results.getTotal();
 			
 			//final TextView txt = rankForYouLabel;
-			String s = parentFragment.getString(R.string.rank_for_you,
-					recommendations.get(position).getRank(), 
-					totalCraves
-					);
+			String s;
+			
+			if (recommendations.size() > position && count > position && recommendations.get(position) != null) 
+				s = parentFragment.getString(R.string.rank_for_you,
+						recommendations.get(position).getRank(), 
+						totalCraves
+						);
+			else
+				s = parentFragment.getString(R.string.rank_for_you_empty);
 
 			final TextView txt = parentFragment.getCobrainController().getSubTitleView();
 			txt.setVisibility(View.VISIBLE);

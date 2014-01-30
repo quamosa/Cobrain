@@ -63,21 +63,21 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		update();
+		update(false);
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	public void update() {
+	public void update(boolean refreshTrainings) {
 		controller.getCobrain().checkLogin();
-		loadTrainings();
+		loadTrainings(refreshTrainings);
 	}
 
 	void addTrainingItem(View v, int id) {
 		trainingLoader.addTrainingItem(v, id);
 	}
 
-	void loadTrainings() {
-		trainingLoader.loadTraining(this);
+	void loadTrainings(boolean refresh) {
+		trainingLoader.loadTraining(refresh, this);
 	}
 	
 	@Override
@@ -109,7 +109,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 					if (r != null && r == true) {
 						//we skipped our choices load new ones now!
 						loaderUtils.dismissLoading();
-						update();
+						update(true);
 					}
 				}
 				
@@ -129,7 +129,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 					if (r != null && r == true) {
 						//we saved our choices load new ones now!
 						loaderUtils.dismissLoading();
-						update();
+						update(true);
 					}
 				}
 				
@@ -151,7 +151,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
 					loaderUtils.dismissEmpty();
-					update();
+					update(false);
 				}
 			});
 		}

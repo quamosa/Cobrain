@@ -94,6 +94,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public void onAttach(Activity activity) {
 		controller = (CobrainController) activity;
+		controller.showOptionsMenu(true);
 		actionBar = controller.getSupportActionBar();
 		abHide = new View(activity.getApplicationContext());
 		super.onAttach(activity);

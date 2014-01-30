@@ -43,7 +43,7 @@ public class MainFragment extends BaseCobrainFragment {
 
 		}
 		
-		actionBar.show();
+		controller.showDefaultActionBar();
 
 		int defaultView = getArguments().getInt("defaultView");
 		

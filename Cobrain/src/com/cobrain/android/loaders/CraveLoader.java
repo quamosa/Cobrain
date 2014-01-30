@@ -3,7 +3,6 @@ package com.cobrain.android.loaders;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
-import android.os.Debug;
 import com.cobrain.android.adapters.CravePagerAdapter;
 import com.cobrain.android.model.RecommendationsResults;
 import com.cobrain.android.model.UserInfo;
