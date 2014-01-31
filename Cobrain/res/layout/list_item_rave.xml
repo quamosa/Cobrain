@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/navigation_menu_item_padding" 
     android:paddingBottom="@dimen/navigation_menu_item_padding" 
+    android:background="@color/White"
     android:gravity="center_vertical" >
 
    <!-- ImageView

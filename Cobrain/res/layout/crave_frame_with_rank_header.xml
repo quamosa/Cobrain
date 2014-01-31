@@ -24,13 +24,6 @@
         android:paddingRight="@dimen/crave_padding"
         android:paddingBottom="0dp" >
 
-       <Button
-           android:id="@+id/see_why_button"
-           style="@style/see_why_button"
-           android:layout_width="wrap_content"
-	       android:layout_marginBottom="10dp"
-           android:layout_alignParentRight="true"
-           android:layout_alignParentTop="true" />
 	
 	    <ImageView
 	        android:id="@+id/item_image"
@@ -38,9 +31,16 @@
 	        android:layout_height="match_parent"
 	        android:layout_alignParentBottom="true"
 	        android:layout_alignParentLeft="true"
-	        android:layout_below="@id/see_why_button"
 	        android:src="@drawable/ic_launcher" />
 
+	        <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+         />
+	    
 	      <RelativeLayout
 	        android:id="@+id/border_for_image"
 	        android:layout_width="wrap_content"
@@ -86,19 +86,22 @@
    		    android:visibility="invisible"
    		    android:src="@drawable/ic_onsale" />
 	    	    
-	    <TextView
+	    <!-- TextView
 	        android:id="@+id/rank_for_you_label"
-	        android:layout_width="wrap_content"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
+	        android:gravity="center_horizontal"
 	        android:layout_alignBottom="@+id/see_why_button"
 	        android:layout_alignLeft="@+id/item_image"
+	        android:paddingTop="5dp"
+	        android:paddingBottom="10dp"
 	        android:text="#1 RANK FOR YOU"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	        android:textAppearance="?android:attr/textAppearanceMedium" /-->
 
     <LinearLayout
         android:id="@+id/bottom_buttons"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true" >
         
@@ -224,13 +227,6 @@
 	        
 	    </RelativeLayout>
     
-    <ProgressBar
-        android:id="@+id/progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
     
    </RelativeLayout>    
     

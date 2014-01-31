@@ -1,5 +1,6 @@
 package com.cobrain.android.fragments;
 
+import java.util.List;
 import java.util.Locale;
 
 import com.cobrain.android.R;
@@ -13,6 +14,11 @@ import com.cobrain.android.model.RecommendationsResults;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.HelperUtils;
+import com.cobrain.android.utils.LoaderUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 import android.graphics.Bitmap;
 import android.graphics.Paint;
@@ -22,6 +28,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -74,6 +81,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	private String raveId;
 	private int position;
 	private int totalCraves;
+	private List<WishListItem> wishListItems;
 
 	public CraveFragment() {
 	}
@@ -147,7 +155,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		itemSalePercent = (TextView) v.findViewById(R.id.item_sale_pct);
 		
 		showCravePopup(false, null);
-		showProgress(true);
+		showProgress(true, false);
 		
 		return v;
 	}
@@ -161,24 +169,30 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		update();
+		if (parent != null)
+			parent.onCravePageLoaded(position);
+
 		super.onActivityCreated(savedInstanceState);
 	}
 	
 	public void setRecommendation(RecommendationsResults results, Product r) {
 		this.results = results;
 		recommendation = r;
+		if (r != null) position = r.getRank();
+		else position = 0;
 		update();
 	}
 
-	public void setWishListItem(WishList results, WishListItem item, int position, int total) {
+	public void setWishListItem(WishList results, List<WishListItem> listItems, WishListItem item, int position, int total) {
 		wishList = results;
 		wishListItem = item;
+		wishListItems = listItems;
 		this.position = position;
 		this.totalCraves = total;
 		recommendation = item.getProduct();
 	}
 
-	void updateSaveAndShareState() {
+	void updateSaveAndShareState(boolean animate) {
 		itemId = null;
 		isSaved = false;
 		isPublished = false;
@@ -209,19 +223,11 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			}
 		}
 		
-		updateFooterButtons();
+		updateFooterButtons(animate);
 	}
 	
 	boolean update() {
 		if (isVisible() && recommendation != null) {
-			
-			if (results != null) {
-				int totalCraves = results.getTotal();
-				
-				CharSequence cs = getText(R.string.rank_for_you);
-				cs = TextUtils.replace(cs, new String[] {"%1$d", "%1$s"}, new CharSequence[] {String.valueOf(recommendation.getRank()), String.valueOf(totalCraves) });
-				rankForYouLabel.setText(cs);
-			}
 			
 			if (recommendation.getMerchant() != null) {
 				itemRetailer.setText(recommendation.getMerchant().getName().toUpperCase(Locale.US));
@@ -230,15 +236,15 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			itemDescription.setText(recommendation.getName());
 			itemPrice.setText(recommendation.getPriceFormatted());
 
-			updateSaveAndShareState();
+			updateSaveAndShareState(false);
 
-			showProgress(true);
+			showProgress(true, false);
 			
 			if (recommendation.getImageURL() != null) {
 				ImageLoader.load(recommendation.getImageURL(), itemImage, new OnImageLoadListener() {
 					@Override
 					public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
-						showProgress(false);
+						showProgress(false, !fromCache);
 					}
 		
 					@Override
@@ -306,14 +312,15 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		cravePopupLabel.setText(message);
 	}
 	
-	void showProgress(boolean show) {
+	void showProgress(boolean show, boolean animate) {
 		if (show) {
 			progress.setVisibility(View.VISIBLE);
 			itemImage.setVisibility(View.INVISIBLE);
 		}
 		else {
 			progress.setVisibility(View.GONE);
-			itemImage.setVisibility(View.VISIBLE);
+			if (animate) LoaderUtils.show(itemImage);
+			else itemImage.setVisibility(View.VISIBLE);
 		}
 	}
 	
@@ -348,6 +355,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		
 		wishList = null;
 		wishListItem = null;
+		wishListItems = null;
 		wishListParent = null;
 		craveIndexLabel = null;
 		if (raveIcon != null) {
@@ -435,7 +443,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				//wishListParent.loaderUtils.dismissLoading();
 				raveIcon.setEnabled(true);
 				if (result) {
-					updateSaveAndShareState();
+					updateSaveAndShareState(true);
 				}
 			}
 			
@@ -449,6 +457,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		for (WishListItem item : wishList.getItems()) {
 			if (item.getId().equals(itemId)) {
 				wishListItem = item;
+				wishListItems.set(position-1, wishListItem);
 				_iRavedThis = null;
 				break;
 			}
@@ -456,13 +465,28 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		
 		
 	}
-	
+
 	public void saveRecommendation(Product recommendation, boolean save) {
 		parent.loaderUtils.showLoading((save) ? "Saving your crave..." : "Removing your crave...");
 
 		new AsyncTask<Object, Void, Boolean>() {
 			@Override
 			protected Boolean doInBackground(Object... params) {
+				
+				//FIXME: **** this happened last night not sure why
+				if (parent == null) {
+					Log.e("SAVE_RECOMMENDATION", "parent is null");
+					return false;
+				}
+				if (parent.controller == null) {
+					Log.e("SAVE_RECOMMENDATION", "parent controller is null");
+					return false;
+				}
+				if (parent.controller.getCobrain() == null) {
+					Log.e("SAVE_RECOMMENDATION", "parent controller cobrain is null");
+					return false;
+				}
+				// ******
 
 				UserInfo ui = parent.controller.getCobrain().getUserInfo();
 				String wishListId = ui.getWishListId();
@@ -488,7 +512,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			@Override
 			protected void onPostExecute(Boolean result) {
 				parent.loaderUtils.dismissLoading();
-				if (result) updateSaveAndShareState();
+				if (result) updateSaveAndShareState(true);
 			}
 			
 		}.execute(recommendation, save);
@@ -527,13 +551,13 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			protected void onPostExecute(Boolean result) {
 				//show result of is published change
 				parent.loaderUtils.dismissLoading();
-				if (result) updateSaveAndShareState();
+				if (result) updateSaveAndShareState(true);
 			}
 			
 		}.execute(itemId, share);
 	}
 
-	void updateFooterButtons() {
+	void updateFooterButtons(boolean animate) {
 		boolean saved = isSaved;
 		boolean published = isPublished;
 
@@ -585,10 +609,12 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			CharSequence raveInfo = getRaveInfoLabel(wishListItem);
 			if (raveInfo != null) {
 				raveInfoLabel.setText(raveInfo);
-				raveInfoLabel.setVisibility(View.VISIBLE);
+				//raveInfoLabel.setVisibility(View.VISIBLE);
+				LoaderUtils.show(raveInfoLabel, animate);
 			}
 			else
-				raveInfoLabel.setVisibility(View.GONE);
+				LoaderUtils.hide(raveInfoLabel, animate, true);
+				//raveInfoLabel.setVisibility(View.GONE);
 		}
 	
 	}

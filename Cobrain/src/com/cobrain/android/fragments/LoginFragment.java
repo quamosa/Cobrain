@@ -24,6 +24,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 	private EditText password;
 	private boolean loggingIn;
 	private TextView forgotPassword;
+	private String loginUrl;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,6 +37,9 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		View v = getView();
+		
+		loginUrl = getArguments().getString("loginUrl");
+		
 		loginButton = (Button) v.findViewById(R.id.login_button);
 		signupButton = (Button) v.findViewById(R.id.signup_button);
 		email = (EditText) v.findViewById(R.id.email);
@@ -60,15 +64,22 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 		loginButton.setOnClickListener(this);
 		signupButton.setOnClickListener(this);
 
+		if (loginUrl != null) {
+			TextView message = (TextView) v.findViewById(R.id.message_label);
+			message.setVisibility(View.VISIBLE);
+			message.setText("A Cobrain member wants to share favorite craves with you! Please log in to your Cobrain account below to see them.");
+		}
+
 		//*** for custom action bar view
 		/*actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setDisplayShowHomeEnabled(false);
 		actionBar.setDisplayHomeAsUpEnabled(false);
 		controller.showOptionsMenu(false);
-		actionBar.setCustomView(R.layout.actionbar_login_frame);
 		*/
-		hideActionBar();
+		//hideActionBar();
+		controller.showOptionsMenu(false);
+		actionBar.setCustomView(R.layout.actionbar_login_frame);
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -84,7 +95,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 		forgotPassword.setText(null);
 		forgotPassword = null;
 
-		restoreActionBar();
+		//restoreActionBar();
 		
 		/*actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayShowCustomEnabled(false);
@@ -108,14 +119,14 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 				String password = this.password.getText().toString();
 				if (validate(email, password)) {
 					controller.showProgressDialog("Please wait ...", "Logging you in ...");
-					controller.getCobrain().login(email, password);
+					controller.getCobrain().login(loginUrl, email, password);
 				}
-				else loggingIn = false;
+				loggingIn = false;
 			}
 			break;
 
 		case R.id.signup_button:
-			controller.showSignup();
+			controller.showSignup(loginUrl);
 			break;
 		}
 		

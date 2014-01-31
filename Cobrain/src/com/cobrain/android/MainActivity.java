@@ -4,11 +4,19 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +32,7 @@ import com.cobrain.android.fragments.CravesFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
+import com.cobrain.android.fragments.NavigationMenuFragment;
 import com.cobrain.android.fragments.NerveCenterFragment;
 import com.cobrain.android.fragments.RaveUserListFragment;
 import com.cobrain.android.fragments.ResetPasswordFragment;
@@ -41,41 +50,72 @@ import com.cobrain.android.service.Cobrain.CobrainView;
 import com.cobrain.android.service.Cobrain.OnLoggedInListener;
 import com.cobrain.android.utils.HelperUtils;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.ExceptionParser;
+import com.google.analytics.tracking.android.ExceptionReporter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 
-public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController {
+public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController, OnOpenedListener, OnClosedListener, View.OnClickListener {
 
     static final String TAG = MainActivity.class.toString();
 	Cobrain cobrain;
-	CobrainView cobrainView;
+	CobrainView cobrainView, cobrainMainView, cobrainMenuView;
+	Runnable showView;
 	ProgressDialog progressDialog;
 	MainFragment homeFragment;
 	boolean showOptionsMenu = true;
     IntentLoader intentLoader = new IntentLoader();
 	View menuSelected;
 	int menuItemSelected = -1;
-	
+	boolean letMeLeave;
+	private boolean isDestroying;
+	Handler handler = new Handler();
+	private TextView actionBarTitle;
+	private TextView actionBarSubTitle;
+	private View actionBarView;
+	private View actionBarMenuOpenerView;
+
 	@Override
-	public void showLogin() {
-		getSupportActionBar().hide();
+	public void showLogin(String loginUrl) {
+		//getSupportActionBar().hide();
+
+		
+		FragmentTransaction t = getSupportFragmentManager().beginTransaction();
+		/*
+		List<Fragment> fragments = getSupportFragmentManager().getFragments();
+		if (fragments != null)
+			for (Fragment f : fragments)
+				if (!(f instanceof MainFragment)) 
+					t.remove(f);
+		*/
+		
+		if (cobrainMainView != null) {
+			t.remove((Fragment) cobrainMainView);
+		}
+		
+		
+		Bundle args = new Bundle();
+		args.putString("loginUrl", loginUrl);
 		
         LoginFragment login = new LoginFragment();
+        login.setArguments(args);
+        
         //int id = (homeFragment == null) ? android.R.id.content : R.id.content_frame;
         int id = android.R.id.content;
-        cobrainView = login;
+        setCurrentCobrainView(login);
 
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(id, login, LoginFragment.TAG)
+        t.replace(id, login, LoginFragment.TAG)
         	.commitAllowingStateLoss();
 	}
 
-	boolean letMeLeave;
-	private boolean isDestroying;
-	
 	@Override
 	public void onBackPressed() {
 		if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+			if (!isMenuOpen()) {
+				showNavigationMenu();
+				return;
+			}
 			if (!letMeLeave) {
 				AlertDialog.Builder b = new AlertDialog.Builder(this);
 				b.setMessage("Are you sure you want to leave Cobrain?");
@@ -104,9 +144,33 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
     }
 	
 	@Override
-	public void showMain() {
+	public void showMain(int defaultView) {
+        
+        //we only ever show main on log in and sign up
+        if (defaultView != VIEW_FRIENDS_MENU && cobrain.getUserInfo().getSignInCount() <= 1)
+        	defaultView = VIEW_TEACH;
+
+        homeFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
+        if (homeFragment != null) {
+        	switch(defaultView) {
+        	case VIEW_FRIENDS_MENU:
+        		showFriendsMenu();
+        		break;
+        	case VIEW_TEACH:
+        		showTeachMyCobrain(false);
+        		break;
+        	case VIEW_HOME:
+        		showHome();
+        		break;
+        	}
+        	return;
+        }
+        
         MainFragment main = new MainFragment();
-        cobrainView = main;
+        Bundle args = new Bundle();
+        args.putInt("defaultView", defaultView);
+        main.setArguments(args);
+		setCurrentCobrainView(main);
         homeFragment = main;
         getSupportFragmentManager()
         	.beginTransaction()
@@ -114,7 +178,55 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         	.commitAllowingStateLoss();
 	}
 	
+	@Override
+	public void showDefaultActionBar() {
+		ActionBar ab = (ActionBar) getSupportActionBar();
+		
+		if (ab.getCustomView() == actionBarView && actionBarView != null) return;
+
+		ab.setDisplayShowTitleEnabled(false);
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setDisplayHomeAsUpEnabled(false);
+
+		View homeIcon = findViewById(
+		        Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
+		        android.R.id.home : R.id.abs__home);
+
+		//set up default custom view
+		ab.setDisplayShowCustomEnabled(true);
+		
+		if (homeIcon != null) {
+			View homeParent = ((View) homeIcon.getParent());
+			ViewGroup vg = (ViewGroup) homeParent;
+			if (vg != null) {
+				vg.setVisibility(View.GONE);
+			}
+		}
+		
+		if (actionBarView == null) {
+			actionBarView = View.inflate(getApplicationContext(), R.layout.ab_main_frame, null);
+			actionBarTitle = (TextView) actionBarView.findViewById(R.id.title);
+			actionBarSubTitle = (TextView) actionBarView.findViewById(R.id.subtitle);
+			ActionBar.LayoutParams params = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+			actionBarView.setLayoutParams(params);
+			actionBarMenuOpenerView = actionBarView.findViewById(R.id.app_icon_layout);
+			actionBarMenuOpenerView.setOnClickListener(this);
+		}
+		
+		ab.setCustomView(actionBarView);
+		
+	}
 	
+	@Override
+	public void setTitle(CharSequence title) {
+		actionBarTitle.setText(title);
+	}
+	@Override
+	public void setSubTitle(CharSequence title) {
+		actionBarSubTitle.setVisibility((title == null) ? View.GONE : View.VISIBLE);
+		actionBarSubTitle.setText(title);
+	}
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,18 +236,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		
 		intentLoader.initialize(this);
 		
-		ActionBar ab = (ActionBar) getSupportActionBar();
-		ab.setIcon(getResources().getDrawable(R.drawable.ic_ab_cobrain_logo));
-		//ab.setLogo(getResources().getDrawable(R.drawable.ic_ab_cobrain_logo));
-		try {
-		ab.setHomeAsUpIndicator(R.drawable.ic_slideout_menu_up_indicator);
-		}
-		catch (NoSuchMethodError e) {
-			//FIXME: for andy's phone Ice cream sandwich? 
-		}
-		ab.setDisplayShowTitleEnabled(true);
-		ab.setDisplayHomeAsUpEnabled(true);
-
+		showDefaultActionBar();
+		
 		/*ActionBar ab = controller.getSupportActionBar();
 		ab.setCustomView(R.layout.actionbar_training_frame);
 		ImageButton ib = (ImageButton) controller.getSupportActionBar().getCustomView().findViewById(R.id.navigation_button);
@@ -164,8 +266,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		SlidingMenu sm = getSlidingMenu();
 		sm.setShadowWidthRes(R.dimen.menu_shadow_width);
 		sm.setShadowDrawable(R.drawable.shadow);
-		sm.setBehindOffsetRes(R.dimen.button_size);
-		sm.setAboveOffsetRes(R.dimen.button_size);
+		sm.setBehindOffsetRes(R.dimen.navigation_menu_hide_width);
+		sm.setAboveOffsetRes(R.dimen.friends_menu_hide_width);
 		sm.setFadeEnabled(true);
 		sm.setFadeDegree(.75f);
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
@@ -176,18 +278,29 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		getSlidingMenu().getMenu().setPadding(0, pad, 0, 0);
 		getSlidingMenu().getSecondaryMenu().setPadding(0, pad, 0, 0);
 		// ***************
-	    
-		cobrain.restoreLogin();
-		
-		if (!cobrain.isLoggedIn())
-        	showLogin();
+
+        getSlidingMenu().setOnOpenedListener(this);
+        getSlidingMenu().setOnClosedListener(this);
+
+		if (!processIntents()) {
+			if (!cobrain.restoreLogin(new Runnable() {
+				public void run() {
+					if (!cobrain.isLoggedIn())
+			        	showLogin(null);
+					else showMain(CobrainController.VIEW_HOME);
+				}
+			}))
+				showLogin(null);
+		}
 
     }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.base, menu);
+		if (showOptionsMenu) {
+			MenuInflater inflater = getSupportMenuInflater();
+			inflater.inflate(R.menu.base, menu);
+		}
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -200,16 +313,15 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		}
 		return false;
 	}
-
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
-		case android.R.id.home:
-			showNavigationMenu();
-			break;
+		//case android.R.id.home:
+		//	showNavigationMenu();
+		//	break;
 		case R.id.menu_friends:
-			TasteMakerLoader.show(this);
+			TasteMakerLoader.show(MainActivity.this);
 			showFriendsMenu();
 			break;
 		}
@@ -219,14 +331,14 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void onLoggedIn(UserInfo ui) {
 		dismissDialog(); //dismiss an indeterminate progress dialog if we have one open
-		showMain();
+		showMain(VIEW_HOME);
 	}
 
 	@Override
 	public void onLoggedOut(UserInfo ui) {
 		if (!checkForDestroy()) {
 			dismissDialog(); //dismiss an indeterminate progress dialog if we have one open
-			showLogin();
+			showLogin(null);
 			closeMenu(true);
 		}
 	}
@@ -268,7 +380,15 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		getSupportActionBar().setCustomView(null);
+		actionBarView = null;
+		actionBarTitle = null;
+		actionBarSubTitle = null;
+		getSlidingMenu().setOnClosedListener(null);
+        getSlidingMenu().setOnOpenedListener(null);
 		intentLoader.dispose();
+		cobrainMenuView = null;
+		cobrainMainView = null;
 		cobrainView = null;
 		homeFragment = null;
 		isDestroying = true;
@@ -352,7 +472,25 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	protected void onStart() {
 	    super.onStart();
+	    startGoogleAnalytics();
+	}
+
+	void startGoogleAnalytics() {
 	    EasyTracker.getInstance(this).activityStart(this);
+
+	    // Change uncaught exception parser...
+	    // Note: Checking uncaughtExceptionHandler type can be useful if clearing ga_trackingId during development to disable analytics - avoid NullPointerException.
+	    Thread.UncaughtExceptionHandler uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+	    if (uncaughtExceptionHandler instanceof ExceptionReporter) {
+	      ExceptionReporter exceptionReporter = (ExceptionReporter) uncaughtExceptionHandler;
+	      exceptionReporter.setExceptionParser(new ExceptionParser() {
+			
+			@Override
+			public String getDescription(String arg0, Throwable arg1) {
+				return "Thread: " + arg0 + ", Exception: " + Log.getStackTraceString(arg1);
+			}
+	      });
+	    }
 	}
 	
 	@Override
@@ -388,14 +526,16 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public void showNavigationMenu() {
-		if (homeFragment != null)
-			homeFragment.showNavigationMenu();
+		if (homeFragment != null) {
+			NavigationMenuFragment f = homeFragment.showNavigationMenu();
+			setCurrentCobrainView(f);
+		}
 	}
 	@Override
 	public void showFriendsMenu() {
 		if (homeFragment != null) {
 			FriendsListFragment f = homeFragment.showFriendsMenu();
-			cobrainView = f;
+			setCurrentCobrainView(f);
 		}
 	}
 	
@@ -407,7 +547,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showHome() {
         CravesFragment craves = new CravesFragment();
-        cobrainView = craves;
+		setCurrentCobrainView(craves);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, craves, CravesFragment.TAG)
@@ -420,7 +560,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showSavedAndShare() {
 		SavedAndShareFragment f = new SavedAndShareFragment();
-        cobrainView = f;
+        setCurrentCobrainView(f);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, f, SavedAndShareFragment.TAG)
@@ -430,25 +570,47 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showTeachMyCobrain() {
+	public void showTeachMyCobrain(boolean addToBackStack) {
 		//this displays within MainFragment in the main content area
-		
-        TrainingFragment training = new TrainingFragment();
-        cobrainView = training;
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(R.id.content_frame, training, TrainingFragment.TAG)
-        	.commitAllowingStateLoss();
-        
-        //getSupportFragmentManager().executePendingTransactions();
-		closeMenu(true);
-	}
+		//showView = new Runnable() {
+		//	public void run() {
+				if (getSupportFragmentManager().findFragmentByTag(TrainingFragment.TAG) == null) {
+					
+			        TrainingFragment training = new TrainingFragment();
+					setCurrentCobrainView(training);
+			        FragmentTransaction t = getSupportFragmentManager()
+			        	.beginTransaction();
 
+			        if (addToBackStack) t.addToBackStack(null);
+			        
+			        t.replace(R.id.content_frame, training, TrainingFragment.TAG)
+			        	.commitAllowingStateLoss();
+			        
+			        //getSupportFragmentManager().executePendingTransactions();
+		        
+				}
+		//	}
+		//};
+		
+		//if (isMenuOpen()) {
+			closeMenu(true);
+		//}
+		//else {
+		//	showView.run();
+		//	showView = null;
+		//}
+	}
+	
+	public boolean isMenuOpen() {
+        return (getSlidingMenu().isMenuShowing() ||
+               getSlidingMenu().isSecondaryMenuShowing());
+	}
+	
 	@Override
 	public void showNerveCenter() {
 
 		NerveCenterFragment training = new NerveCenterFragment();
-        cobrainView = training;
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, training, NerveCenterFragment.TAG)
@@ -458,9 +620,14 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showSignup() {
+	public void showSignup(String signupUrl) {
+		Bundle args = new Bundle();
+		args.putString("signupUrl", signupUrl);
+		
 		SignupFragment training = new SignupFragment();
-        cobrainView = training;
+		training.setArguments(args);
+		
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(android.R.id.content, training, SignupFragment.TAG)
@@ -469,7 +636,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	
 	public void showAccountSave() {
 		AccountSaveFragment training = new AccountSaveFragment();
-        cobrainView = training;
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(android.R.id.content, training, AccountSaveFragment.TAG)
@@ -482,7 +649,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		Bundle b = new Bundle();
 		b.putString("email", email);
 		training.setArguments(b);
-        cobrainView = training;
+		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(android.R.id.content, training, ResetPasswordFragment.TAG)
@@ -493,7 +660,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToStack) {
 		WishListFragment training = new WishListFragment();
 		training.initialize(list, showMyPrivateItems);
-        cobrainView = training;
+		setCurrentCobrainView(training);
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         if (addToStack) tr.addToBackStack(WishListFragment.TAG);
@@ -502,18 +669,21 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showBrowser(String url, int containerId, String merchant) {
+	public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack) {
 		BrowserFragment browser = new BrowserFragment();
 		Bundle args = new Bundle();
+		
 		args.putString("merchant", merchant);
 		args.putString("url", url);
 		browser.setArguments(args);
-        cobrainView = browser;
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(containerId, browser, BrowserFragment.TAG)
-        	.addToBackStack(null)
-        	.commitAllowingStateLoss();
+		setCurrentCobrainView(browser);
+
+        FragmentTransaction t = getSupportFragmentManager()
+        	.beginTransaction();
+        
+        t.replace(containerId, browser, BrowserFragment.TAG);
+        if (addToBackStack) t.addToBackStack(null);
+        t.commitAllowingStateLoss();
 	}
 
 	@Override
@@ -522,7 +692,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		Bundle args = new Bundle();
 		args.putString("itemId", itemId);
 		raves.setArguments(args);
-        cobrainView = raves;
+		setCurrentCobrainView(raves);
         getSupportFragmentManager()
         	.beginTransaction()
         	.replace(R.id.content_frame, raves, RaveUserListFragment.TAG)
@@ -534,7 +704,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	public void showContactList(ContactSelectedListener listener) {
 		ContactListFragment f = new ContactListFragment();
 		f.setContactSelectedListener(listener);
-        cobrainView = f;
+		setCurrentCobrainView(f);
         getSupportFragmentManager()
         	.beginTransaction()
         	.addToBackStack(null)
@@ -561,8 +731,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void processIntents() {
-		intentLoader.processAnyIntents(this);
+	public boolean processIntents() {
+		return intentLoader.processAnyIntents(this);
 	}
 
 	@Override
@@ -597,6 +767,49 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		}
 		
 		menuSelected = menu;
+	}
+
+	@Override
+	public void onOpened() {
+		if (cobrainView != null) cobrainView.onSlidingMenuOpened();
+	}
+
+	@Override
+	public void onClosed() {
+		if (showView != null) {
+			showView.run();
+			showView = null;
+		}
+		if (cobrainMenuView != null) cobrainMenuView.onSlidingMenuClosed();
+	}
+
+	void setCurrentCobrainView(CobrainView cv) {
+		if (!isCobrainViewMenu(cv)) cobrainMainView = cv;
+		else cobrainMenuView = cv;
+		cobrainView = cv;
+	}
+	
+	boolean isCobrainViewMenu(CobrainView cv) {
+		return (cv instanceof FriendsListFragment ||
+				cv instanceof NavigationMenuFragment);
+	}
+
+	@Override
+	public TextView getSubTitleView() {
+		return actionBarSubTitle;
+	}
+
+	@Override
+	public TextView getTitleView() {
+		return actionBarTitle;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()) {
+		case R.id.app_icon_layout:
+			showNavigationMenu();
+		}
 	}
 
 }

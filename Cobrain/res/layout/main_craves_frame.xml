@@ -30,12 +30,48 @@
             android:text="Friends can See" />
     </LinearLayout -->
 
+   <LinearLayout
+        android:id="@+id/top_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/crave_padding"
+        android:layout_marginLeft="@dimen/crave_padding"
+        android:layout_marginRight="@dimen/crave_padding"
+		>
+
+		<Button
+	        android:id="@+id/price_filter_button"
+	        android:background="@drawable/crave_filter_button_highlight"
+			android:paddingLeft="15dp"
+			android:paddingRight="15dp"
+	        android:layout_width="0dp"
+	        android:layout_height="40dp"
+	        android:layout_weight="1"
+	        android:layout_marginRight="10dp"
+	        android:textColor="@color/crave_filter_button_highlight"
+	        android:drawableRight="@drawable/ic_crave_price_toggle"
+	        android:textSize="15sp"
+	        android:text="All Prices"
+	        />
+		<ToggleButton
+	        android:id="@+id/category_filter_button"
+	        android:background="@drawable/crave_filter_button_highlight"
+	        android:layout_width="0dp"
+	        android:layout_height="40dp"
+	        android:layout_weight="1"
+	        android:textSize="15sp"
+	        android:textColor="@color/crave_filter_button_highlight"
+	        android:textOn="Category"
+	        android:textOff="Category"
+	        />
+	</LinearLayout>
+		  
     <RelativeLayout
         android:id="@+id/main_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/bottom_buttons"
-        android:layout_alignParentTop="true" >
+        android:layout_below="@+id/top_buttons" >
 
         <ListView 
             android:id="@+id/crave_strip_list"

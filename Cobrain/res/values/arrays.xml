@@ -10,7 +10,7 @@
    	    <item>@drawable/ic_navigation_menu_teach</item>
    	    <item type="integer">1</item>
 
-	    <item type="string">My Saved Craves</item>
+	    <item type="string">My Private Craves</item>
 	    <item>@drawable/ic_navigation_menu_saved_craves</item>
    	    <item type="integer">2</item>
 	    
@@ -26,18 +26,18 @@
 	    <item>@drawable/ic_navigation_menu_nerve_center</item>
    	    <item type="integer">4</item>
 	    
-	    <item type="string">Feedback</item>
+	    <!-- item type="string">Feedback</item>
    	    <item>@drawable/ic_navigation_menu_feedback</item>
-   	    <item type="integer">-5</item>
+   	    <item type="integer">-5</item-->
 
-	    <item type="string">Help</item>
-	    <item>@drawable/ic_navigation_menu_help</item>
-   	    <item type="integer">-6</item>
+	    <item type="string">About Us</item>
+	    <item>@drawable/ic_about_us</item>
+   	    <item type="integer">6</item>
 	    
 	</array>
 
 	<array name="friends_menu_mycraves_menu_items">
-	    <item type="string">My Saved Craves</item>
+	    <item type="string">My Private Craves</item>
    	    <item>@drawable/ic_menu_saved_craves</item>
    	    <item type="integer">2</item>
    	    <item type="string">My Shared Craves</item>
@@ -61,12 +61,5 @@
    	    <item type="integer">-1</item>
 	    <item type="string">Coming Soon</item>
 	</array>
-		
-	<array name="craves_filter_menu_items">
-	    <item type="string">Tops</item>
-	    <item type="string">Bottoms</item>
-	    <item type="string">Accessories</item>
-	    <item type="string">Footwear</item>
-	    <item type="string">Underwear</item>
-	</array>
+
 </resources>

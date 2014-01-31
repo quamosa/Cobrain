@@ -1,6 +1,7 @@
 package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 import android.graphics.Bitmap;
@@ -19,6 +20,7 @@ import com.cobrain.android.model.TrainingResult;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
+import com.cobrain.android.utils.LoaderUtils;
 
 public class TrainingLoader {
 
@@ -40,6 +42,7 @@ public class TrainingLoader {
 		boolean selected;
 		int id;
 		View parent;
+		HashMap<Integer, View> viewCache = new HashMap<Integer, View>();
 		
 		public void add(View v, int id) {
 			v = v.findViewById(id);
@@ -65,13 +68,17 @@ public class TrainingLoader {
 				progress.setVisibility(View.VISIBLE);
 			}
 			else {
-				image.setVisibility(View.VISIBLE);
+				LoaderUtils.show(image);
 				progress.setVisibility(View.GONE);
 			}
 		}
 
 		public void setText(int id, String text) {
-			TextView tv = (TextView) parent.findViewById(id);
+			TextView tv = (TextView) viewCache.get(id);
+			if (tv == null) {
+				tv = (TextView) parent.findViewById(id);
+				viewCache.put(id, tv);
+			}
 			tv.setText(text);
 		}
 
@@ -97,6 +104,7 @@ public class TrainingLoader {
 		}
 		
 		public void dispose() {
+			viewCache.clear();
 			image.setOnClickListener(null);
 			image = null;
 			checkbox = null;
@@ -158,7 +166,10 @@ public class TrainingLoader {
 					for (TrainingItem ti : trainingItems)
 						if (ti.selected) ids.add(ti.id);
 
-					return u.saveTrainingAnswers(training.getId(), ids);
+					if (ids.size() > 0) {
+						return u.saveTrainingAnswers(training.getId(), ids);
+					}
+					return true;
 				}
 				
 				return false;
@@ -209,7 +220,7 @@ public class TrainingLoader {
 		trainingItems.add(ti);
 	}
 
-	public void loadTraining(final OnLoadListener<TrainingResult> listener) {
+	public void loadTraining(final boolean refresh, final OnLoadListener<TrainingResult> listener) {
 		if (listener != null) listener.onLoadStarted();
 		
 		currentRequest = new AsyncTask<Void, Void, TrainingResult>() {
@@ -220,7 +231,7 @@ public class TrainingLoader {
 				TrainingResult tr = null;
 				
 				if (u != null) {
-					tr = u.getTrainings();
+					tr = u.getTrainings(refresh);
 					if (tr != null) {
 						training = tr.getTraining();
 					}

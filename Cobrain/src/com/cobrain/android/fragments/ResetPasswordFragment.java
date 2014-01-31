@@ -35,7 +35,9 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 			email.setText(args.getString("email"));
 		}
 		
-		hideActionBar();
+		controller.showOptionsMenu(false);
+		actionBar.setCustomView(R.layout.actionbar_login_frame);
+		//hideActionBar();
 		
 		return v;
 	}
@@ -43,7 +45,7 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 	@Override
 	public void onDestroyView() {
 		
-		restoreActionBar();
+		//restoreActionBar();
 		
 		reset.setOnClickListener(null);
 		reset = null;
@@ -59,7 +61,7 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 		
 		switch(v.getId()) {
 		case R.id.cancel_button:
-			controller.showLogin();
+			controller.showLogin(null);
 			break;
 		case R.id.reset_button:
 
@@ -84,7 +86,7 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 					                new DialogInterface.OnClickListener() {
 					            public void onClick(DialogInterface dialog, int id) {
 					                dialog.cancel();
-					                controller.showLogin();
+					                controller.showLogin(null);
 					            }
 					        });
 					

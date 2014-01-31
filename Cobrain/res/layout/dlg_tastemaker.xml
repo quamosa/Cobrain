@@ -91,8 +91,8 @@
 	        android:layout_height="wrap_content"
 	        android:layout_alignLeft="@+id/imageView1"
 	        android:layout_alignTop="@+id/imageView1"
-	        android:layout_marginLeft="12dp"
-	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="25dp"
+	        android:layout_centerVertical="true"
 	        android:text="5 Friends"
 	        android:textSize="28sp"
 	        android:textStyle="bold"
@@ -103,7 +103,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_centerVertical="true"
-	        android:layout_marginLeft="20dp"
+	        android:layout_marginLeft="10dp"
 	        android:layout_toRightOf="@+id/textView3"
 	        android:text="="
 	        android:textSize="28sp"
@@ -116,7 +116,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_toRightOf="@+id/textView4"
 	        android:layout_marginTop="28dp"
-	        android:layout_marginLeft="30dp"
+	        android:layout_marginLeft="26dp"
 	        android:text="$5"
 	        android:textAppearance="?android:attr/textAppearanceLarge"
 	        android:textColor="#fff"
@@ -181,22 +181,24 @@
 		        android:textStyle="bold"
 		        android:textSize="22sp" /> 
 	
-		   	    <ImageView
+		   	    <!-- ImageView
 		        android:id="@+id/imageView6"
 		        android:layout_centerVertical="true"
 		        android:layout_toRightOf="@+id/textView6"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:src="@drawable/ic_tastemaker_money_circle"/>
+		        android:src="@drawable/ic_tastemaker_money_circle"/ -->
 	
 	  	   	    <TextView
 	  	   	        android:id="@+id/textView7"
 	  	   	        android:layout_width="wrap_content"
 	  	   	        android:layout_height="wrap_content"
+	  	   	        android:layout_centerVertical="true"
 	  	   	        android:text="$12"
-	  	   	        android:layout_marginLeft="138dp"
-	  	   	        android:layout_marginTop="11dp"
+	  	   	        android:gravity="center"
+	  	   	        android:layout_marginLeft="128dp"
 	  	   	        android:textColor="#fff"
+	  	   	        android:background="@drawable/ic_tastemaker_money_circle"
 	  	   	        android:textSize="18sp" />
 		   	    	   	    
 		</RelativeLayout>

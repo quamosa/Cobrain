@@ -12,16 +12,21 @@
         android:paddingBottom="@dimen/navigation_menu_header_item_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#191c1e"
+        android:background="#000"
         >
 	    <TextView
 	        android:id="@+id/username"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:text="someone@cobrain.com"
-	        android:textSize="15sp"
+	       android:maxLines="1"
+	       android:ellipsize="end"
+	       android:text="@string/blah"
+	        style="@style/navigation_menu_username_header_font"
+	        android:paddingTop="11dp"
+	        android:paddingBottom="11dp"
 	        android:textColor="@color/FriendsListHeaderText"
 	        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
+	        android:layout_marginRight="@dimen/friends_list_item_marginLeft"
 	         />
      </RelativeLayout>
 
@@ -30,11 +35,11 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/navigation_menu_divider_height"
 	        android:layout_below="@id/username_layout"
-	        android:background="@android:color/black" />
+	        android:background="@color/NavigationMenuDivider" />
 
          <ListView 
              android:id="@+id/my_craves_list"
-             android:divider="@android:color/black"
+             android:divider="@color/NavigationMenuDivider"
              android:dividerHeight="@dimen/navigation_menu_divider_height"
 	         android:layout_width="match_parent"
 	         android:layout_height="wrap_content"
@@ -85,36 +90,35 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/navigation_menu_divider_height"
 	        android:layout_below="@+id/my_craves_list"
-	        android:background="@android:color/black" />
+	        android:background="@color/NavigationMenuDivider" />
          
 		<RelativeLayout
 	        android:id="@+id/friend_header"
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:layout_below="@+id/header_divider_3"
-		    android:paddingTop="@dimen/navigation_menu_header_item_padding" 
-		    android:paddingBottom="@dimen/navigation_menu_header_item_padding" 
-		    android:background="#191c1e"
+		    android:paddingTop="6dp" 
+		    android:paddingBottom="6dp" 
+		    android:background="#000"
 		    android:gravity="center_vertical" >
 		
 		   <TextView
 		       android:id="@+id/friend_name"
-		       style="@style/navigation_menu_font"
+		       style="@style/navigation_menu_header_font"
 		       android:layout_width="wrap_content"
 		       android:layout_height="wrap_content"
 		        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
 		       android:layout_alignParentLeft="true"
 		       android:layout_centerVertical="true"
-		       android:textSize="15sp"
 	           android:textColor="@color/FriendsListHeaderText"
-		       android:text="Your Friends" />
+		       android:text="YOUR FRIENDS" />
 
 		   <ProgressBar 
 	        android:id="@+id/friends_list_progress"
-	        android:layout_width="20dp"
-	        android:layout_height="20dp"
+	        android:layout_width="15dp"
+	        android:layout_height="15dp"
 	        android:layout_marginLeft="5dp"
-	        android:layout_centerHorizontal="true"
+	        android:layout_centerVertical="true"
 	        android:layout_toRightOf="@+id/friend_name"
 	        android:visibility="visible"
 	        />
@@ -138,41 +142,75 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/navigation_menu_divider_height"
         android:layout_below="@+id/friend_header"
-        android:background="@android:color/black" />
-    
-	<RelativeLayout
-        android:id="@+id/invite_button_layout"
+        android:background="@color/NavigationMenuDivider" />
+
+    <LinearLayout
+        android:id="@+id/invite_button_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:clickable="true"
-        android:background="@drawable/invite_button_highlight"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:layout_margin="15dp" >
-		   
+		android:layout_marginLeft="25dp"
+		android:layout_marginRight="25dp"
+		android:layout_marginBottom="25dp"
+		android:orientation="vertical"
+        >
+
         <TextView
-            android:id="@+id/invite_button"
-            style="@style/invite_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_friend_invite"
-            android:drawablePadding="10dp"
-            android:clickable="false"
-            android:text="INVITE MORE FRIENDS"
+            android:padding="10dp"
+            android:lineSpacingExtra="5dp"
+            android:gravity="center"
+            android:textColor="#bbbbbb"
+            android:text="Make your Cobrain smarter -\ninvite your friends &amp; share your craves"
             />
+        
+	    <Button
+	    android:id="@+id/verify_invite_button"
+	    style="@style/verify_invite_button"
+	    android:layout_marginTop="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+		android:layout_marginBottom="15dp"
+        android:textStyle="bold"
+	    android:text="SEND VERIFICATION CODE\nSO I CAN RECEIVE INVITES" />
+	    
+      	<RelativeLayout
+	        android:id="@+id/invite_button_layout"
+	        android:gravity="center"
+	        android:clickable="true"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/invite_button_highlight"
+	        android:layout_alignParentBottom="true"
+	        android:paddingTop="10dp"
+	        android:paddingBottom="10dp"
+	         >
+			   
+	        <TextView
+	            android:id="@+id/invite_button"
+	            style="@style/invite_button"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:drawableLeft="@drawable/ic_friend_invite"
+	            android:drawablePadding="10dp"
+	            android:clickable="false"
+	            android:text="ADD MORE FRIENDS"
+	            android:textStyle="bold"
+	            />
+	
+	    </RelativeLayout>
 
-    </RelativeLayout>
-
+      		    
+    </LinearLayout>
 
     <View
         android:visibility="invisible"
         android:id="@+id/footer_divider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/navigation_menu_divider_height"
-        android:layout_above="@id/invite_button_layout"
-        android:background="@android:color/black" />
+        android:layout_above="@id/invite_button_parent"
+        android:background="@color/NavigationMenuDivider" />
     
     <com.fortysevendeg.swipelistview.SwipeListView
         android:id="@+id/friends_list"
@@ -186,24 +224,33 @@
         android:layout_alignParentLeft="true"
         android:listSelector="@drawable/navigation_menu_background_selector"
         android:layout_below="@+id/header_divider"
-        android:divider="@color/FriendsListDivider"
+        android:divider="@color/NavigationMenuDivider"
         android:dividerHeight="@dimen/navigation_menu_divider_height"
         tools:listitem="@layout/list_item_friend" >
     </com.fortysevendeg.swipelistview.SwipeListView>
     
+    <ScrollView
+        android:id="@+id/friends_list_empty_scrollview"
+        android:layout_above="@+id/footer_divider"
+        android:layout_below="@+id/header_divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
     <TextView 
         android:id="@+id/friends_list_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_margin="40dp"
-        android:textSize="18sp"
+        android:textSize="15sp"
+        android:paddingTop="10dp"
+        android:paddingBottom="0dp"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
         android:lineSpacingExtra="7dp"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/footer_divider"
-        android:layout_below="@+id/header_divider"
         android:textColor="@color/FriendsListItemText"
         android:text="Invite friends to see their Shared Craves and Rave about the ones you think are best for them. The more you interact with your friends, the smarter your Cobrain becomes!"
         />
-
+    </ScrollView>
+    
 </RelativeLayout>

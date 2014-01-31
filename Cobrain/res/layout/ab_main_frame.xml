@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="fill_horizontal"
+    android:gravity="center"
+     >
+
+ <!-- view xmlns:android="http://schemas.android.com/apk/res/android"
+      class="com.actionbarsherlock.internal.widget.ActionBarView$HomeView"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:background="?attr/actionBarItemBackground">
+    <ImageView android:id="@id/abs__up"
+               android:src="?attr/homeAsUpIndicator"
+               android:layout_gravity="center_vertical|left"
+               android:visibility="gone"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="-8dip" />
+    <ImageView android:id="@id/abs__home"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="8dip"
+               android:layout_marginTop="@dimen/abs__action_bar_icon_vertical_padding"
+               android:layout_marginBottom="@dimen/abs__action_bar_icon_vertical_padding"
+               android:layout_gravity="center"
+               android:adjustViewBounds="true"
+               android:scaleType="fitCenter" />
+</view-->
+    
+    <RelativeLayout 
+	    android:id="@+id/app_icon_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+		android:background="@drawable/selectable_background_cobrain"
+        android:paddingRight="5dp"
+		android:clickable="true"
+        >
+	    
+	    <ImageView
+	        android:id="@+id/menu_icon"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/ic_slideout_menu_up_indicator"
+		    />
+	    <ImageView
+	        android:id="@+id/app_icon"
+	        android:layout_marginLeft="2dp"
+	        android:layout_toRightOf="@+id/menu_icon"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/ic_ab_cobrain_logo"
+		    />
+    
+    </RelativeLayout>
+    
+    <RelativeLayout 
+    android:layout_toRightOf="@+id/app_icon_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+     >
+    
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textColor="#000"
+        android:textSize="20sp"
+        />
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_below="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="#a0a0a0"
+        android:text=""
+        android:visibility="gone"
+        />
+	</RelativeLayout>
+	
+</RelativeLayout>

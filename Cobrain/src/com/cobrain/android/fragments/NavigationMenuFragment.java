@@ -120,7 +120,7 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 			controller.showHome();
 			break;
 		case 1: //teach
-			controller.showTeachMyCobrain();
+			controller.showTeachMyCobrain(false);
 			break;
 		case 2: //saved
 			controller.showSavedAndShare();
@@ -133,6 +133,9 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 		case 4: //nerve center
 			controller.showNerveCenter();
 			break;
+		case 6: //about us
+			controller.showBrowser(getString(R.string.url_about_us, getString(R.string.url_cobrain_app)), R.id.content_frame, "Cobrain", false);
+			controller.closeMenu(true);
 		}
 
 		controller.setMenuItemSelected((ListView)arg0, position, true);

@@ -10,6 +10,8 @@ import com.cobrain.android.loaders.TrainingLoader.TrainingItem;
 import com.cobrain.android.model.Training.Experiment;
 import com.cobrain.android.model.Training.Member;
 import com.cobrain.android.model.TrainingResult;
+import com.cobrain.android.utils.LoaderUtils;
+
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -43,8 +45,11 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 		save = (Button) v.findViewById(R.id.training_save_button);
 		save.setOnClickListener(this);
 		
-		loaderUtils.hide(question, false);
-		loaderUtils.hide(cravesFound, false);
+		String craves = getResources().getString(R.string.craves_found, 0);
+		cravesFound.setText(Html.fromHtml(craves));
+
+		LoaderUtils.hide(question, false, false);
+		//LoaderUtils.hide(cravesFound, false, false);
 		
 		setTitle("Teach My Cobrain");
 		
@@ -58,21 +63,21 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		update();
+		update(false);
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	public void update() {
+	public void update(boolean refreshTrainings) {
 		controller.getCobrain().checkLogin();
-		loadTrainings();
+		loadTrainings(refreshTrainings);
 	}
 
 	void addTrainingItem(View v, int id) {
 		trainingLoader.addTrainingItem(v, id);
 	}
 
-	void loadTrainings() {
-		trainingLoader.loadTraining(this);
+	void loadTrainings(boolean refresh) {
+		trainingLoader.loadTraining(refresh, this);
 	}
 	
 	@Override
@@ -104,7 +109,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 					if (r != null && r == true) {
 						//we skipped our choices load new ones now!
 						loaderUtils.dismissLoading();
-						update();
+						update(true);
 					}
 				}
 				
@@ -121,11 +126,11 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 
 				@Override
 				public void onLoadCompleted(Boolean r) {
-					if (r != null && r == true) {
-						//we saved our choices load new ones now!
+					//if (r != null && r == true) {
+						//we ASSUME we saved our choices load new ones now!
 						loaderUtils.dismissLoading();
-						update();
-					}
+						update(true);
+					//}
 				}
 				
 			});
@@ -145,7 +150,8 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			loaderUtils.showEmpty("We had a problem loading your training choices. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
-					update();
+					loaderUtils.dismissEmpty();
+					update(false);
 				}
 			});
 		}
@@ -156,7 +162,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			
 			if (score == null) score = 0;
 
-			loaderUtils.dismissLoading();
+			loaderUtils.dismiss();
 			trainingLoader.multiSelect = e.getActionType().equals(SELECT_ANY);
 			question.setText(e.getQuestionText());
 			

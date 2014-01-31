@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.cobrain.android.R;
+import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
 import com.cobrain.android.utils.HelperUtils;
@@ -88,6 +90,10 @@ public class UserInfo {
 		return email;
 	}
 
+	public int getSignInCount() {
+		return signInCount;
+	}
+	
 	public boolean isNotFirstUse() {
 		return firstUse;
 	}
@@ -111,7 +117,7 @@ public class UserInfo {
 			me.email = ui.email;
 			me.genderPreference = ui.genderPreference;
 			me.zipcode = ui.zipcode;
-			me.signInCount = me.signInCount;
+			me.signInCount = ui.signInCount;
 			//notifications?
 
 			return true;
@@ -202,7 +208,7 @@ public class UserInfo {
 					me.zipcode = ui.zipcode;
 					me.signInCount = me.signInCount;
 				}
-				else reportError("Could not log out user");
+				//else reportError("Could not log out user");
 			}
 			
 		}).go(true);
@@ -246,14 +252,13 @@ public class UserInfo {
 		return null;
 	}
 
-	public TrainingResult getTrainings() {
+	public TrainingResult getTrainings(boolean refresh) {
 		if (apiKey == null) return null;
 		
 		String url = context.getString(R.string.url_trainings_post, context.getString(R.string.url_cobrain_api));
 		WebRequest wr = new WebRequest().post(url).setHeaders(apiKeyHeader());
 		
-		String query = "cached=false";
-		wr.setBody(query);
+		if (refresh) wr.setFormField("cache", "false");
 		
 		if (wr.go() == 200) {
 			TrainingResult tr = new Gson().fromJson(wr.getResponse(), TrainingResult.class);
@@ -282,7 +287,7 @@ public class UserInfo {
 			TrainingResult tr = new Gson().fromJson(wr.getResponse(), TrainingResult.class);
 			return true;
 		}
-		else reportError("Could not save training answers.");
+		//else reportError("Could not save training answers.");
 		
 		return false;
 	}
@@ -327,9 +332,14 @@ public class UserInfo {
 		String url = context.getString(R.string.url_profile_delete, context.getString(R.string.url_cobrain_api));
 		WebRequest wr = new WebRequest().setHeaders(apiKeyHeader()).delete(url);
 		if (wr.go() == 200) {
+
+			Editor e = new Cobrain(context).getEditableSharedPrefs();
+			e.clear();
+			e.commit();
+
 			return true;
 		}
-		else reportError("Could not remove your Cobrain profile.");
+		else reportError("Could not remove your Cobrain profile. Please try again later.");
 
 		return false;
 	}
@@ -559,6 +569,15 @@ public class UserInfo {
 
 	public void validateInvitation() {
 		HelperUtils.SMS.sendSMS(context.getString(R.string.sms_invite_validation_number), userId);
+		Cobrain c = new Cobrain(context);
+		Editor prefs = c.getEditableSharedPrefs();
+		prefs.putBoolean("invitesVerified", true);
+		prefs.commit();
+	}
+
+	public boolean areInvitesVerified() {
+		Cobrain c = new Cobrain(context);
+		return c.getSharedPrefs().getBoolean("invitesVerified", false);
 	}
 	
 /*

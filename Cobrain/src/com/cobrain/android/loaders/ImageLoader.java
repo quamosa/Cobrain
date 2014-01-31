@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.cobrain.android.utils.HelperUtils;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -60,7 +62,7 @@ public class ImageLoader {
             	//maybe the image has just finished loading by a previous request
             	result = mMemoryCache.get(url);
 
-            	if (result == null) {
+            	if (result == null || !isCorrectSize(result, mWidth, mHeight)) {
 	                result = load(url, mWidth, mHeight);
                 	if (mOnLoadListener != null) result = mOnLoadListener.onBeforeLoad(mUrl, mTarget, result);
 	
@@ -122,7 +124,8 @@ public class ImageLoader {
 
 	            is = url.openStream();
 	            Bitmap temp = BitmapFactory.decodeStream(is, null, opts);
-	            bitmap = Bitmap.createScaledBitmap(temp, width, height, true);
+	            //bitmap = Bitmap.createScaledBitmap(temp, width, height, true);
+	            bitmap = HelperUtils.Bitmaps.scaleToFill(temp, width, height, true);
 	            if (temp != bitmap) temp.recycle();
             }
             else {
@@ -154,12 +157,13 @@ public class ImageLoader {
             };
         }
 
+        if (view.getTag() != null) {
+        	cancel(view);
+        }
+
         Bitmap bitmap = mMemoryCache.get(url);
-        if (bitmap == null) {
+        if (bitmap == null || !isCorrectSize(bitmap, width, height)) {
             final AsyncLoader task = (AsyncLoader) new AsyncLoader(view, width, height, listener);
-            if (view.getTag() != null) {
-            	cancel(view);
-            }
             view.setTag(task);
             task.execute(url);
         } else {
@@ -168,6 +172,11 @@ public class ImageLoader {
         }
 	}
 
+    static boolean isCorrectSize(Bitmap b, int width, int height) {
+    	if ((width != -1 && b.getWidth() != width) && (height != -1 && b.getHeight() != height)) return false;
+		return true;
+    }
+    
 	public static void cancel(ImageView view) {
     	AsyncLoader loader = (AsyncLoader) view.getTag();
     	if (loader != null) {

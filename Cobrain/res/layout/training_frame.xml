@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:paddingBottom="7dp"
-            android:text="23 Craves Found"
+            android:text="0 Craves Found"
             android:textSize="16sp" />
         
  	    <Button
@@ -33,18 +33,20 @@
  	        android:paddingRight="30dp"
  	        android:text="NONE OF THESE" />
 	
-	    <TableLayout
+	    <LinearLayout
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_above="@+id/training_save_button"
 	        android:layout_below="@+id/craves_found_info"
-	        android:stretchColumns="*" >
+	        android:orientation="vertical"
+	        >
 	
-	        <TableRow
+	        <LinearLayout
 	            android:layout_weight="1"
 	            android:layout_width="match_parent"
-	            android:layout_height="0dp" >
-	
+	            android:layout_height="0dp"
+	            android:orientation="horizontal" >
+	            	
 	            <include
 	                android:id="@+id/training_image_1"
 					layout="@layout/training_image_frame_with_info"
@@ -56,7 +58,7 @@
 					layout="@layout/training_image_frame_with_info"
 	                style="@style/training_image_2" />
 	
-	        </TableRow>
+	        </LinearLayout>
 
 	        <RelativeLayout
 	            android:layout_width="wrap_content"
@@ -78,10 +80,11 @@
 	            android:textSize="14sp" />
 	        </RelativeLayout>
 	        	    	
-	        <TableRow
+	        <LinearLayout
 	            android:layout_weight="1"
 	            android:layout_width="match_parent"
-	            android:layout_height="0dp" >
+	            android:layout_height="0dp"
+	            android:orientation="horizontal" >
 	
 	            <include
 	                android:id="@+id/training_image_3"
@@ -92,8 +95,8 @@
 	                android:id="@+id/training_image_4"
 					layout="@layout/training_image_frame_with_info"
 	                style="@style/training_image_4" />
-	        </TableRow>
-	    </TableLayout>
+	        </LinearLayout>
+	    </LinearLayout>
 	
 	    <!--
 	    GridView

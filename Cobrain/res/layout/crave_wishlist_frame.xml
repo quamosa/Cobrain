@@ -42,6 +42,14 @@
 	        android:layout_below="@id/see_why_button"
 	        android:src="@drawable/ic_launcher" />
 
+	    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+	    
 	      <RelativeLayout
 	        android:id="@+id/border_for_image"
 	        android:layout_width="wrap_content"
@@ -111,7 +119,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_alignBaseline="@+id/see_why_button"
-	        android:layout_alignLeft="@+id/item_image"
+	        android:layout_centerHorizontal="true"
 	        android:text="1 of 30 Shared Craves"
 	        android:textSize="15sp" />
 	    	
@@ -268,14 +276,6 @@
   	        </RelativeLayout>
 	        
 	    </RelativeLayout>
-    
-    <ProgressBar
-        android:id="@+id/progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
     
    </RelativeLayout>    
     

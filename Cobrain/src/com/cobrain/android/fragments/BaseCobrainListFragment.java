@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.service.Cobrain.CobrainView;
@@ -16,10 +15,12 @@ public class BaseCobrainListFragment extends SherlockListFragment implements OnC
 	LoaderUtils loaderUtils = new LoaderUtils();
 	ActionBar actionBar;
 	View abHide;
-
+	boolean silentMode;
+	
 	@Override
 	public void onAttach(Activity activity) {
 		controller = (CobrainController) activity;
+		controller.showOptionsMenu(true);
 		actionBar = controller.getSupportActionBar();
 		abHide = new View(activity.getApplicationContext());
 		super.onAttach(activity);
@@ -78,6 +79,26 @@ public class BaseCobrainListFragment extends SherlockListFragment implements OnC
 //			controller.showFriendsMenu();
 //			break;
 //		}
+	}
+
+	@Override
+	public void onSlidingMenuOpened() {
+	}
+
+	@Override
+	public void onSlidingMenuClosed() {
+	}
+
+	@Override
+	public void setSilentMode(boolean silent) {
+		silentMode = silent;
+	}
+
+	public void setSubTitle(CharSequence title) {
+	}
+
+	public CobrainController getCobrainController() {
+		return null;
 	}
 
 }

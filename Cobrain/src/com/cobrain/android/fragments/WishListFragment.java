@@ -65,7 +65,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState) {
 
-		View v = inflater.inflate(R.layout.main_craves_frame, null);
+		View v = inflater.inflate(R.layout.main_wishlist_frame, null);
 		loaderUtils.initialize((ViewGroup) v);
 		cravePager = (ViewPager) v.findViewById(R.id.crave_pager);
 		craveAdapter = new WishListPagerAdapter(getFragmentManager(), this);
@@ -74,10 +74,12 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		craveLoader.setOnLoadListener(this);
 		cravePager.setOnPageChangeListener(this);
 
-		if (wishList.getOwner().getId().equals(controller.getCobrain().getUserInfo().getUserId())) {
-			setTitle("My " + ((showMyPrivateWishList) ? "Saved" : "Shared") + " Craves");			
+		if (wishList != null) {
+			if (wishList.getOwner().getId().equals(controller.getCobrain().getUserInfo().getUserId())) {
+				setTitle("My " + ((showMyPrivateWishList) ? "Saved" : "Shared") + " Craves");			
+			}
+			else setTitle(wishList.getOwner().getName() + "'s Craves");
 		}
-		else setTitle(wishList.getOwner().getName() + "'s Craves");
 		
 		//setupCategoryNavigationMenu();
 		//setupFilterMenu(inflater);
@@ -236,7 +238,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 	public void update() {
 		controller.getCobrain().checkLogin();
 		loaderUtils.dismiss();
-		if (!setWishListId(wishList.getId())) {
+		if (wishList != null && !setWishListId(wishList.getId())) {
 			craveLoader.setPage(currentPage);
 		}
 	}
@@ -279,6 +281,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 			loaderUtils.showEmpty("We had a problem loading this Wish List. Click here to try loading it again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
+					loaderUtils.dismissEmpty();
 					update();
 				}
 			});
@@ -292,7 +295,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 			}
 		}
 		else
-			loaderUtils.dismissLoading();
+			loaderUtils.dismiss();
 	}
 
 	@Override

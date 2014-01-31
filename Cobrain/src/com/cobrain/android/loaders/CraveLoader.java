@@ -3,7 +3,6 @@ package com.cobrain.android.loaders;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
-import android.os.Debug;
 import com.cobrain.android.adapters.CravePagerAdapter;
 import com.cobrain.android.model.RecommendationsResults;
 import com.cobrain.android.model.UserInfo;
@@ -112,7 +111,10 @@ public class CraveLoader {
 					//CraveLoader.this.page = pg;
 					//pagesLoaded.add(pg);
 				}
-				else pagesLoaded.remove((Integer)page);
+				else {
+					pagesLoaded.remove((Integer)page);
+					CraveLoader.this.categoryId = 0;
+				}
 				adapter.load(result);
 				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				currentRequest = null;

@@ -1,24 +1,100 @@
 package com.cobrain.android.fragments;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.service.Cobrain.CobrainView;
 import com.cobrain.android.utils.LoaderUtils;
+import com.fortysevendeg.swipelistview.SwipeListView;
 
 public class BaseCobrainFragment extends SherlockFragment implements OnClickListener, CobrainView {
 	CobrainController controller;
 	LoaderUtils loaderUtils = new LoaderUtils();
 	ActionBar actionBar;
 	View abHide;
+	boolean updateRequested;
+	StateSaver state = new StateSaver();
+	boolean silentMode;
 
+	public class StateSaver {
+		Bundle savedState = new Bundle();
+		
+		public int getInt(String key, int def) {
+			if (!savedState.containsKey(key)) return def;
+			int i = savedState.getInt(key);
+			savedState.remove(key);
+			return i;
+		}
+
+		public String getString(String key, String def) {
+			if (!savedState.containsKey(key)) return def;
+			String i = savedState.getString(key);
+			savedState.remove(key);
+			return i;
+		}
+		
+		public boolean getBoolean(String key, boolean def) {
+			if (!savedState.containsKey(key)) return def;
+			boolean i = savedState.getBoolean(key);
+			savedState.remove(key);
+			return i;
+		}
+
+		public void putInt(String key, int val) {
+			savedState.putInt(key, val);
+		}
+
+		public void putString(String key, String val) {
+			savedState.putString(key, val);
+		}
+		
+		public void putBoolean(String key, boolean val) {
+			savedState.putBoolean(key, val);
+		}
+
+		public Bundle getBundle() {
+			return savedState;
+		}
+
+		public void restore(ListView list, String key) {
+			int index = getInt(key + ".index", 0);
+			int top = getInt(key + ".top", 0);
+			if (list != null) list.setSelectionFromTop(index, top);
+		}
+		public void save(ListView list, String key) {
+			int index = list.getFirstVisiblePosition();
+			View v = list.getChildAt(0);
+			int top = (v == null) ? 0 : v.getTop();
+			putInt(key + ".index", index);
+			putInt(key + ".top", top);
+		}
+	}
+
+	public void requestUpdate() {
+		updateRequested = true;
+	}
+	public boolean checkForUpdate() {
+		if (updateRequested) {
+			updateRequested = false;
+			update();
+			return true;
+		}
+		return false;
+	}
+	public void update() {
+	}
+	
 	@Override
 	public void onAttach(Activity activity) {
 		controller = (CobrainController) activity;
+		controller.showOptionsMenu(true);
 		actionBar = controller.getSupportActionBar();
 		abHide = new View(activity.getApplicationContext());
 		super.onAttach(activity);
@@ -27,18 +103,24 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public void onError(String message) {
 		if (loaderUtils != null) loaderUtils.dismiss();
-		if (controller != null) controller.showErrorDialog(message);
-	}
-
-	public void setTitle(CharSequence title) {
-		actionBar.setTitle(title);
-	}
-	public CharSequence getTitle() {
-		return actionBar.getTitle();
+		if (!silentMode) if (controller != null) controller.showErrorDialog(message);
 	}
 	
 	public LoaderUtils getLoaderUtils() {
 		return loaderUtils;
+	}
+	
+	@Override
+	public void setTitle(CharSequence title) {
+		controller.setTitle(title);
+	}
+	@Override
+	public void setSubTitle(CharSequence title) {
+		controller.setSubTitle(title);
+	}
+	@Override
+	public CobrainController getCobrainController() {
+		return controller;
 	}
 	
 	void hideActionBar() {
@@ -77,6 +159,19 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 //			controller.showFriendsMenu();
 //			break;
 //		}
+	}
+
+	@Override
+	public void onSlidingMenuOpened() {
+	}
+
+	@Override
+	public void onSlidingMenuClosed() {
+	}
+	
+	@Override
+	public void setSilentMode(boolean silent) {
+		silentMode = silent;
 	}
 
 }

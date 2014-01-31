@@ -9,11 +9,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.view.View;
-import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.cobrain.android.R;
@@ -32,12 +29,9 @@ public class Cobrain {
 	private String username;
 	private String password;
 	private String apiKey;
-	private Button loginButton;
-	private WebView webView;
 	private String token;
 	private UserInfo userInfo;
 	private OnLoggedInListener loggedInListener;
-	Handler handler = new Handler();
 	private Context context;
 	
 	public Cobrain(Context c) {
@@ -68,15 +62,18 @@ public class Cobrain {
 	}
 
 	public interface CobrainController {
-		//public void login(String username, String password);
+		public static final int VIEW_HOME = 0;
+		public static final int VIEW_TEACH = 1;
+		public static final int VIEW_FRIENDS_MENU = 2;
+		
 		public Cobrain getCobrain();
 		public void showDialog(String message);
 		public void showProgressDialog(String title, String message);
 		public void dismissDialog();
 		public void showHome();
-		public void showMain();
+		public void showMain(int defaultView);
 		public void showSavedAndShare();
-		public void showTeachMyCobrain();
+		public void showTeachMyCobrain(boolean addToBackStack);
 		public void showNerveCenter();
 		public ActionBar getSupportActionBar();
 		public void closeMenu(boolean animate);
@@ -85,18 +82,23 @@ public class Cobrain {
 		public void showNavigationMenu();
 		public void showFriendsMenu();
 		public void showOptionsMenu(boolean show);
-		public void showSignup();
+		public void showSignup(String signupUrl);
 		public void showForgotPassword(String email);
-		public void showLogin();
+		public void showLogin(String loginUrl);
 		void hideSoftKeyBoard();
-		public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToStack);
+		public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToBackStack);
 		public void showErrorDialog(String message);
-		public void showBrowser(String url, int containerId, String merchant);
+		public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack);
 		public void showContactList(ContactSelectedListener listener);
-		public void processIntents();
+		public boolean processIntents();
 		public CobrainView getShown();
 		public void showRavesUserList(String itemId);
 		public void setMenuItemSelected(View v, int position, boolean selected);
+		public void setSubTitle(CharSequence title);
+		public void setTitle(CharSequence title);
+		public TextView getSubTitleView();
+		public TextView getTitleView();
+		public void showDefaultActionBar();
 	}
 	
 	public interface CobrainView {
@@ -105,25 +107,17 @@ public class Cobrain {
 		//public void onLoggedOut(UserInfo ui);
 		//public void on
 
+		public void onSlidingMenuOpened();
+		public void onSlidingMenuClosed();
+		public void setSilentMode(boolean silent);
+
+		public abstract void setSubTitle(CharSequence title);
+		public abstract void setTitle(CharSequence title);
+
+		public abstract CobrainController getCobrainController();
+
 		//public void showFilterMenu(View menuItem);
 	}
-
-	public void setLoginButton(Button loginButton) {
-		this.loginButton = loginButton;
-	}
-	
-	public void setWebView(WebView webView) {
-		this.webView = webView;
-	}
-
-    void resetLoginButton(final String response) {
-    	handler.post(new Runnable() {
-    		public void run() {
-    			if (webView != null) webView.loadData(response, "text/html", "UTF-8");
-    			if (loginButton != null) loginButton.setText(isLoggedIn() ? "Log out" : "Log in");
-    		}
-    	});
-    }
 
 	public UserInfo getUserInfo() {
 		return userInfo;
@@ -160,15 +154,16 @@ public class Cobrain {
 		    		apiKey = null;
 		    		username = null;
 		    		onLogout(true);
-			    	resetLoginButton(response);
 					break;
 				default:
-					onLogout(false);
+		    		apiKey = null;
+		    		username = null;
+		    		onLogout(true);
+					//FIXME: dont wait for success log out ---> onLogout(false);
 				}
+				saveApiKey();
 			}
     	};
-		
-    	resetLoginButton("");
 
     	String url = context.getString(R.string.url_logout_get, context.getString(R.string.url_cobrain_app));
 		wr.get(url).execute();
@@ -244,11 +239,11 @@ public class Cobrain {
 	}
 	
 	public boolean isLoggedIn() {
-		return apiKey != null;
+		return apiKey != null && userInfo != null;
 	}
 	
-	public void login(String username, String password) {
-		if (username.equals(this.username) && isLoggedIn()) {
+	public void login(String url, String username, String password) {
+		if (url == null && username.equals(this.username) && isLoggedIn()) {
 			//we are already logged in don't do anything
 			return;
 		}
@@ -256,8 +251,15 @@ public class Cobrain {
 		this.username = username;
 		this.password = password;
 
-    	String url = context.getString(R.string.url_login_post, context.getString(R.string.url_cobrain_app));
-    	new WebRequest().post(url).setOnResponseListener(
+    	WebRequest wr;
+
+    	if (url == null) {
+    		url = context.getString(R.string.url_login_post, context.getString(R.string.url_cobrain_app));
+    		wr = new WebRequest().post(url);
+    	}
+    	else wr = new WebRequest().get(url);
+    	
+    	wr.setOnResponseListener(
     		new ResponseListener() {
 			
 			@Override
@@ -281,15 +283,22 @@ public class Cobrain {
 			
 		}
     	).execute();
-    	resetLoginButton("");
 	}
 
-	public void createAccount(String email, String password) {
+	public void createAccount(String signupUrl, String email, String password) {
 		username = email;
 		this.password = password;
 		
-    	String url = context.getString(R.string.url_account_post, context.getString(R.string.url_cobrain_app));
-    	new WebRequest().post(url).setOnResponseListener(
+		final String url = (signupUrl != null) ? signupUrl :
+			context.getString(R.string.url_account_post, context.getString(R.string.url_cobrain_app));
+		
+		WebRequest wr = new WebRequest();
+		if (signupUrl != null) {
+			wr.get(url);
+		}
+		else wr.post(url);
+		
+    	wr.setOnResponseListener(
     		new ResponseListener() {
 			
 			@Override
@@ -312,7 +321,7 @@ public class Cobrain {
 							e.printStackTrace();
 						}
 
-				    	String url = context.getString(R.string.url_account_post, context.getString(R.string.url_cobrain_app));
+						String url = context.getString(R.string.url_account_post, context.getString(R.string.url_cobrain_app));
 						WebRequest wr = new WebRequest().post(url).setFormFields(fields);
 						switch(wr.go()) {
 							case 200:
@@ -364,16 +373,12 @@ public class Cobrain {
 				boolean success = wr.getHeaders().containsKey("api-key");
 				if (success) apiKey = wr.getHeaders().get("api-key"); else apiKey = null;
 	
-				resetLoginButton("");
-	
 				onLogin(success);
 	
 				break;
 			default:
 				onLogin(false);
 		}
-
-    	resetLoginButton("");
     	
 	}
 
@@ -391,9 +396,14 @@ public class Cobrain {
 	void onLogin(boolean success) {
 		if (success) {
 			signIn(apiKey);
-			if (userInfo.getName() == null || userInfo.getGenderPreference() == null || userInfo.getZipcode() == null) {
-				loggedInListener.onAccountCreated(userInfo);
-				return;
+			if (userInfo.apiKey != null) {
+				if (userInfo.getName() == null || userInfo.getGenderPreference() == null || userInfo.getZipcode() == null) {
+					loggedInListener.onAccountCreated(userInfo);
+					return;
+				}
+			}
+			else {
+				success = false;
 			}
 		}
 		
@@ -529,6 +539,10 @@ public class Cobrain {
 	}
 
 	public void dispose() {
+		if (userInfo != null) {
+			userInfo.dispose();
+			userInfo = null;
+		}
 		loggedInListener = null;
 	}
 
@@ -545,7 +559,7 @@ public class Cobrain {
 		edit.putString(prefix + ":apiKey", apiKey);
 		edit.commit();
 	}
-
+	
 	public SharedPreferences getSharedPrefs() {
 		SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS_COBRAIN, Context.MODE_PRIVATE);
 		return prefs;
@@ -555,7 +569,7 @@ public class Cobrain {
 		return getSharedPrefs().edit();
 	}
 	
-	public void restoreLogin() {
+	public boolean restoreLogin(final Runnable runWhenLoggedIn) {
 		String prefix = context.getString(R.string.url_cobrain_api);
 		apiKey = getSharedPrefs().getString(prefix + ":apiKey", null);
 		if (apiKey != null) {
@@ -563,12 +577,22 @@ public class Cobrain {
 
 				@Override
 				protected Void doInBackground(Void... params) {
-					onLogin(true);
+					//onLogin(true);
+					signIn(apiKey);
+					if (userInfo != null) apiKey = userInfo.apiKey;
+					else apiKey = null;
 					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Void result) {
+					runWhenLoggedIn.run();
 				}
 				
 			}.execute();
+			return true;
 		}
+		return false;
 	}
 
 	public Context getContext() {

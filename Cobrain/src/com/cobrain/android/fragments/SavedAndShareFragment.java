@@ -34,6 +34,12 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	}
 	
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
@@ -45,7 +51,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		loader.initialize(controller, adapter);
 		loader.setOnLoadListener(this);
 
-		setTitle("My Saved Craves");
+		setTitle("My Private Craves");
 
         saves.setSwipeActionLeft(SwipeListView.SWIPE_ACTION_REVEAL);
         saves.setSwipeActionRight(SwipeListView.SWIPE_ACTION_REVEAL);
@@ -119,12 +125,13 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	void update() {
+	public void update() {
 		loader.loadUserList();
 	}
 	
 	@Override
 	public void onDestroyView() {
+		state.save(saves, "saves");
 		adapter.dispose();
 		adapter = null;
 		saves = null;
@@ -134,23 +141,26 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 
 	@Override
 	public void onLoadStarted() {
-		loaderUtils.showLoading("Loading your saved craves...");
+		loaderUtils.showLoading("Loading your private craves...");
 	}
 
 	@Override
 	public void onLoadCompleted(ArrayList<WishListItem> r) {
 		if (r == null) {
-			loaderUtils.showEmpty("We had a problem loading your saved and shared craves. Click here to try loading them again.");
+			loaderUtils.showEmpty("We had a problem loading your private craves. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
+					loaderUtils.dismissEmpty();
 					update();
 				}
 			});
 		}
 		else if (r.size() == 0)
 			showEmpty();
-		else
-			loaderUtils.dismissLoading();
+		else {
+			loaderUtils.dismiss();
+			state.restore(saves, "saves");
+		}
 	}
 	
 	

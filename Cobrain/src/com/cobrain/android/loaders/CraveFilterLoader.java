@@ -14,6 +14,7 @@ public class CraveFilterLoader {
 	private AsyncTask<Void, Void, CategoryTree> currentRequest;
 	int parentCategoryId;
 	String parentCategoryName;
+	int categoryId;
 	
 	public void initialize(CobrainController controller) {
 		this.controller = controller;
@@ -21,6 +22,7 @@ public class CraveFilterLoader {
 
 	public void dispose() {
 		cancel();
+		categoryId = 0;
 		controller = null;
 		onLoadListener = null;
 	}
@@ -45,6 +47,8 @@ public class CraveFilterLoader {
 	}
 
 	public void load(final int categoryId) {
+		//if (CraveFilterLoader.this.categoryId == categoryId) return;
+		
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 		
 		currentRequest = new AsyncTask<Void, Void, CategoryTree>() {
@@ -60,10 +64,12 @@ public class CraveFilterLoader {
 				}
 				
 				if (r == null) {
+					CraveFilterLoader.this.categoryId = 0;
 					parentCategoryId = 0;
 					parentCategoryName = null;
 				}
 				else {
+					CraveFilterLoader.this.categoryId = categoryId;
 					int depth = r.getDepth();
 					if (depth > 1) {
 						for (Category ca : r.getAncestors()) {

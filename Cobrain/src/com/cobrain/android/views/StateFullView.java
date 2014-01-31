@@ -47,8 +47,19 @@ public class StateFullView extends RelativeLayout implements Checkable {
 		selected = checked;
 		onStateChanged(STATE_CHECKED, checked);
 		refreshDrawableState();
+		dispatchSetChecked(checked);
 	}
 
+	void dispatchSetChecked(boolean checked) {
+		for (int i = 0; i < getChildCount(); i++) {
+			View v = getChildAt(i);
+			if (v instanceof Checkable) {
+				Checkable cv = (Checkable)v;
+				cv.setChecked(checked);
+			}
+		}
+	}
+	
 	void onStateChanged(int state, boolean enabled) {
 		if (mStateChangedListener != null) {
 			mStateChangedListener.onStateChanged(this, state, enabled);

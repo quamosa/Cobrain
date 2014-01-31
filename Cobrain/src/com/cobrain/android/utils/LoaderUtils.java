@@ -26,6 +26,8 @@ public class LoaderUtils {
 		View lv = inflater.inflate(R.layout.loading_frame, null);
 		View ev = inflater.inflate(R.layout.empty_frame, null); 
 
+		lv.setVisibility(View.GONE);
+		ev.setVisibility(View.GONE);
 		v.addView(lv, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		v.addView(ev, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
@@ -33,14 +35,15 @@ public class LoaderUtils {
 		loadingText = (TextView) loadingFrame.findViewById(R.id.loading_text);
 		emptyFrame = v.findViewById(R.id.empty_panel);
 		emptyText = (TextView) emptyFrame.findViewById(R.id.empty_text);
-		loadingFrame.setVisibility(View.GONE);
-		emptyFrame.setVisibility(View.GONE);
 		loadingFrame.setClickable(true);
 		emptyFrame.setClickable(true);
 	}
 	
 	public void showLoading(CharSequence message) {
-		loading++;
+		showLoading(message, true);
+	}
+	public void showLoading(CharSequence message, boolean pushToStack) {
+		if (pushToStack) loading++;
 		dismissEmpty();
 		loadingFrame.setVisibility(View.VISIBLE);
 		String msg = null;
@@ -101,8 +104,13 @@ public class LoaderUtils {
 		loadingText.setOnClickListener(l);
 	}
 
-	public void show(final View v) {
+	public static void show(final View v) {
+		show(v, true);
+	}
+	public static void show(final View v, boolean animate) {
 		if (v.getVisibility() == View.VISIBLE) return;
+		if (!animate) v.setVisibility(View.VISIBLE);
+		if (v.getVisibility() == View.GONE) v.setVisibility(View.INVISIBLE);
 		
 		Animation ca = v.getAnimation();
 		if (ca != null) ca.cancel();
@@ -126,17 +134,17 @@ public class LoaderUtils {
 		v.startAnimation(a);
 	}
 	
-	public void hide(View v) {
-		hide(v, true);
+	public static void hide(View v) {
+		hide(v, true, false);
 	}
-	public void hide(final View v, boolean animate) {
+	public static void hide(final View v, boolean animate, final boolean gone) {
 		if (v.getVisibility() != View.VISIBLE) return;
 		
 		Animation ca = v.getAnimation();
 		if (ca != null) ca.cancel();
 		
 		if (!animate) {
-			v.setVisibility(View.INVISIBLE);
+			v.setVisibility((gone) ? View.GONE : View.INVISIBLE);
 			return;
 		}
 		
@@ -153,7 +161,7 @@ public class LoaderUtils {
 			
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				v.setVisibility(View.INVISIBLE);
+				v.setVisibility((gone) ? View.GONE : View.INVISIBLE);
 			}
 		});
 		a.setDuration(250);

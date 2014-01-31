@@ -30,6 +30,7 @@ public class FriendsListLoader {
 	}
 
 	public void dispose() {
+		cancel();
 		adapter = null;
 		controller = null;
 		items.clear();
@@ -64,9 +65,11 @@ public class FriendsListLoader {
 
 			@Override
 			protected void onPostExecute(ArrayList<WishList> result) {
-				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
-				adapter.clear();
-				adapter.addAll(result);
+				if (!isCancelled()) {
+					if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
+					adapter.clear();
+					adapter.addAll(result);
+				}
 				currentRequest = null;
 			}
 
