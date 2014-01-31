@@ -25,9 +25,9 @@
     <string name="sms_invite_validation_number_prd">+1(202)4994992</string>
     <!--  -->
     
-    <item type="string" name="url_cobrain_api">@string/url_cobrain_api</item>
-    <item type="string" name="url_cobrain_app">@string/url_cobrain_app</item>
-    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number</item>
+    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_prd</item>
+    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_prd</item>
+    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_prd</item>
 
     <string name="url_about_us">%1$s/about-us</string>
 
