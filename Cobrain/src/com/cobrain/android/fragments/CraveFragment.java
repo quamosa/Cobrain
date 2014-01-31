@@ -15,11 +15,6 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.HelperUtils;
 import com.cobrain.android.utils.LoaderUtils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.GoogleAnalytics;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
-
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -227,33 +222,48 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	}
 	
 	boolean update() {
-		if (isVisible() && recommendation != null) {
+		if (isVisible()) {
 			
-			if (recommendation.getMerchant() != null) {
-				itemRetailer.setText(recommendation.getMerchant().getName().toUpperCase(Locale.US));
-			}
-			else itemRetailer.setText(null);
-			itemDescription.setText(recommendation.getName());
-			itemPrice.setText(recommendation.getPriceFormatted());
+			if (recommendation != null) {
+				if (recommendation.getMerchant() != null) {
+					itemRetailer.setText(recommendation.getMerchant().getName().toUpperCase(Locale.US));
+				}
+				else itemRetailer.setText(null);
+				itemDescription.setText(recommendation.getName());
+				itemPrice.setText(recommendation.getPriceFormatted());
 
-			updateSaveAndShareState(false);
+				/*
+				if (raveIcon != null) raveIcon.setVisibility(View.VISIBLE);
+				if (saveButton != null) saveButton.setVisibility(View.VISIBLE);
+				if (shareButton != null) shareButton.setVisibility(View.VISIBLE);
+				*/
 
-			showProgress(true, false);
+				updateSaveAndShareState(false);
+	
+				showProgress(true, false);
+				
+				if (recommendation.getImageURL() != null) {
+					ImageLoader.load(recommendation.getImageURL(), itemImage, new OnImageLoadListener() {
+						@Override
+						public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
+							showProgress(false, !fromCache);
+						}
 			
-			if (recommendation.getImageURL() != null) {
-				ImageLoader.load(recommendation.getImageURL(), itemImage, new OnImageLoadListener() {
-					@Override
-					public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
-						showProgress(false, !fromCache);
-					}
-		
-					@Override
-					public Bitmap onBeforeLoad(String url, ImageView view, Bitmap b) {
-						return b;
-					}
-				});
+						@Override
+						public Bitmap onBeforeLoad(String url, ImageView view, Bitmap b) {
+							return b;
+						}
+					});
+				}
+				else itemImage.setVisibility(View.INVISIBLE);
 			}
-			else itemImage.setVisibility(View.INVISIBLE);
+			/*else {
+				if (raveIcon != null) raveIcon.setVisibility(View.INVISIBLE);
+				if (saveButton != null) saveButton.setVisibility(View.INVISIBLE);
+				if (shareButton != null) shareButton.setVisibility(View.INVISIBLE);
+				if (progress != null) progress.setVisibility(View.INVISIBLE);
+
+			}*/
 			
 			return true;
 		}

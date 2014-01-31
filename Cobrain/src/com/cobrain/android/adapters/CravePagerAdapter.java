@@ -14,6 +14,7 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -63,9 +64,19 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 			countOnThisPage = r.getCount();
 			count = r.getTotal();
 			countOnThisPage = Math.min(countOnThisPage, count);
-
+			
 			List<Product> products = r.getProducts();
+			
+			int pc;
+			if (products == null) pc = 0;
+			else pc = products.size();
+			
 			int position = (page - 1) * perPage;
+
+			if (pc < perPage) {
+				Log.e("Craves pager", ":o we got less than what we expected " + count + " : " + (position + pc));
+				count = position + pc;
+			}
 
 			if (recommendations == null) 
 				recommendations = new ArrayList<Product>(position + products.size());
