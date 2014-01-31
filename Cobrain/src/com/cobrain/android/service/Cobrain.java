@@ -161,6 +161,7 @@ public class Cobrain {
 		    		onLogout(true);
 					//FIXME: dont wait for success log out ---> onLogout(false);
 				}
+				saveApiKey();
 			}
     	};
 

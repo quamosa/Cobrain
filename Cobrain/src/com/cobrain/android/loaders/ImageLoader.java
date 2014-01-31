@@ -157,12 +157,13 @@ public class ImageLoader {
             };
         }
 
+        if (view.getTag() != null) {
+        	cancel(view);
+        }
+
         Bitmap bitmap = mMemoryCache.get(url);
         if (bitmap == null || !isCorrectSize(bitmap, width, height)) {
             final AsyncLoader task = (AsyncLoader) new AsyncLoader(view, width, height, listener);
-            if (view.getTag() != null) {
-            	cancel(view);
-            }
             view.setTag(task);
             task.execute(url);
         } else {

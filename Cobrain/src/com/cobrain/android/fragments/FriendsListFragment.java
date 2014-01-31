@@ -539,10 +539,22 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	@Override
 	public void onLoadStarted() {
 		//if (!silentMode) progress.setVisibility(View.VISIBLE);
+		if (silentMode) {
+			friends.setVerticalScrollBarEnabled(false);
+			state.save(friends, "friendlist");
+		}
 	}
 
 	@Override
 	public void onLoadCompleted(ArrayList<WishList> r) {
+		if (silentMode) {
+			friends.post(new Runnable() {
+				public void run() {
+					state.restore(friends, "friendlist");
+					friends.setVerticalScrollBarEnabled(true);
+				}
+			});
+		}
 		progress.setVisibility(View.GONE);
 	}
 

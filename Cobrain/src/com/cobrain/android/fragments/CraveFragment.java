@@ -15,6 +15,10 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.HelperUtils;
 import com.cobrain.android.utils.LoaderUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 import android.graphics.Bitmap;
 import android.graphics.Paint;
@@ -24,6 +28,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -460,13 +465,28 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		
 		
 	}
-	
+
 	public void saveRecommendation(Product recommendation, boolean save) {
 		parent.loaderUtils.showLoading((save) ? "Saving your crave..." : "Removing your crave...");
 
 		new AsyncTask<Object, Void, Boolean>() {
 			@Override
 			protected Boolean doInBackground(Object... params) {
+				
+				//FIXME: **** this happened last night not sure why
+				if (parent == null) {
+					Log.e("SAVE_RECOMMENDATION", "parent is null");
+					return false;
+				}
+				if (parent.controller == null) {
+					Log.e("SAVE_RECOMMENDATION", "parent controller is null");
+					return false;
+				}
+				if (parent.controller.getCobrain() == null) {
+					Log.e("SAVE_RECOMMENDATION", "parent controller cobrain is null");
+					return false;
+				}
+				// ******
 
 				UserInfo ui = parent.controller.getCobrain().getUserInfo();
 				String wishListId = ui.getWishListId();
