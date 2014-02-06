@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
-import com.cobrain.android.service.Cobrain.CobrainController;
-import com.cobrain.android.service.Cobrain.CobrainView;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.utils.LoaderUtils;
 import com.fortysevendeg.swipelistview.SwipeListView;
 
@@ -143,6 +143,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public void onDetach() {
 		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
+		controller.dispatchOnFragmentDetached(this);
 		abHide = null;
 		controller = null;
 		actionBar = null;
@@ -172,6 +173,9 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public void setSilentMode(boolean silent) {
 		silentMode = silent;
+	}
+
+	public void onFragmentDetached(BaseCobrainFragment f) {
 	}
 
 }

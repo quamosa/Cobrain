@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.model.UserInfo;
@@ -12,14 +13,8 @@ import com.cobrain.android.model.v1.Rave;
 import com.cobrain.android.model.v1.RecommendationsResults;
 import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.model.v1.WishListItem;
-import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.HelperUtils;
 import com.cobrain.android.utils.LoaderUtils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.GoogleAnalytics;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
-
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -55,7 +50,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	RelativeLayout craveInfoHeader;
 	RelativeLayout itemInfoFooter;
 	TextView cravePopupLabel;
-	CraveStripsFragment parent;
+	BaseCobrainFragment parent;
 	RecommendationsResults results;
 	private LinearLayout bottomButtons;
 	private ImageButton saveButton;
@@ -86,7 +81,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	public CraveFragment() {
 	}
 	
-	public CraveFragment(CraveStripsFragment parent) {
+	public CraveFragment(BaseCobrainFragment parent) {
 		this.parent = parent;
 	}
 	
@@ -210,6 +205,8 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			isRaved = iRavedThis(wishListItem);
 		}
 		else {
+			//FIXME: uncomment when we have racks api endpoint available
+			/*
 			WishList list = getController().getCobrain().getUserInfo().getCachedWishList();
 	
 			//TODO: make asynchronous
@@ -221,6 +218,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 					break;
 				}
 			}
+			*/
 		}
 		
 		updateFooterButtons(animate);
@@ -383,7 +381,9 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		switch(v.getId()) {
 		case R.id.item_image:
 			if (parent != null) {
-				parent.showBrowser(recommendation.getBuyURL(), recommendation.getMerchant().getName());
+				if (parent instanceof CravesFragment) {
+					((CravesFragment)parent).showBrowser(recommendation.getBuyURL(), recommendation.getMerchant().getName());
+				}
 			}
 			else if (wishListParent != null) {
 				//wishListParent.showBrowser(recommendation.getBuyURL(), recommendation.getMerchant().getName());

@@ -19,9 +19,11 @@ import com.cobrain.android.R;
 import com.cobrain.android.adapters.CravePagerAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
+import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.model.Scenario;
+import com.cobrain.android.model.Sku;
 
 public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadListener<Scenario>, OnItemClickListener {
 	public static final String TAG = "CravesFragment";
@@ -38,7 +40,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 	SavedState savedState = new SavedState();
 	View comingsoon;
 	Menu menu;
-	CraveStripsLoader loader = new CraveStripsLoader();
+	CraveStripsLoader loader;
 
 	public class SavedState {
 		boolean saved;
@@ -66,16 +68,28 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		}
 	}
 
+	void setPageTitle() {
+		setTitle("Cobrain");
+	}
+
+	@Override
+	public void onFragmentDetached(BaseCobrainFragment f) {
+		if (f instanceof CravesFragment) {
+			setPageTitle();
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState) {
 		
 		setHasOptionsMenu(true);
 		
-		View v = inflater.inflate(R.layout.main_craves_frame, null);
+		View v = inflater.inflate(R.layout.frg_crave_strips_fragment, null);
 		craveAdapter = new CravePagerAdapter(getChildFragmentManager(), this);
+		loader = new CraveStripsLoader();
 
-		setTitle("Home");
+		setPageTitle();
 		
 		if (!savedState.isSaved())
 			savedState.categoryId = getResources().getInteger(R.integer.default_category_id);
@@ -151,8 +165,10 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		craveFilterLoader.dispose();
 		//craveFilterLoader = null;
 		
-		filterMenu.setContentView(null);
-		filterMenu = null;
+		if (filterMenu != null) {
+			filterMenu.setContentView(null);
+			filterMenu = null;
+		}
 		
 		super.onDestroyView();
 	}
@@ -299,6 +315,16 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 			long id) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void showCravesFragmentForScenario(Scenario scenario, Sku sku) {
+		for (int i = 0; i < loader.craveStrips.size(); i++) {
+			CraveStrip strip = loader.craveStrips.get(i);
+			if (strip.scenarioId == scenario.getId()) {
+				controller.showCraves(strip, sku, R.id.main_layout, true);
+				return;
+			}
+		}
 	}
 	
 }	

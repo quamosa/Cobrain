@@ -13,13 +13,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.Product;
 import com.cobrain.android.model.v1.Training;
 import com.cobrain.android.model.v1.TrainingResult;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.LoaderUtils;
 
 public class TrainingLoader {

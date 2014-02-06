@@ -1,13 +1,15 @@
 package com.cobrain.android.fragments;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import it.sephiroth.android.library.widget.AdapterView;
+import it.sephiroth.android.library.widget.AdapterView.OnItemClickListener;
 import it.sephiroth.android.library.widget.HListView;
 import android.os.AsyncTask;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -16,17 +18,12 @@ import com.cobrain.android.R;
 import com.cobrain.android.adapters.CraveStripListAdapter;
 import com.cobrain.android.adapters.CraveStripPagerAdapter;
 import com.cobrain.android.adapters.CraveStripPagerListAdapter;
+import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.CraveStripLoader;
-import com.cobrain.android.loaders.OnLoadListener;
-import com.cobrain.android.model.Category;
-import com.cobrain.android.model.CraveStrip;
-import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.ScenarioItem;
 import com.cobrain.android.model.Scenarios;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.CategoryTree;
-import com.cobrain.android.utils.HelperUtils;
 
 public class CraveStripsLoader {
 	CraveFilterLoader loader = new CraveFilterLoader();
@@ -129,6 +126,7 @@ public class CraveStripsLoader {
 			strip.list = new HListView(parent.getActivity().getApplicationContext());
 			strip.list.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, a.getItemHeight()));
 			strip.list.setDivider(null);
+			strip.list.setTag(strip);
 			strip.list.setSelector(R.drawable.sel_transparent);
 			
 			//FYI: to scroll and present views like Netflix android app:

@@ -2,9 +2,9 @@ package com.cobrain.android.adapters;
 
 import java.util.List;
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.loaders.FontLoader;
-import com.cobrain.android.model.CraveStrip;
 import com.cobrain.android.model.v1.RecommendationsResults;
 import com.cobrain.android.utils.LoaderUtils;
 import android.content.Context;

@@ -10,7 +10,7 @@ import android.widget.Button;
 
 import com.cobrain.android.MiniFragment;
 import com.cobrain.android.R;
-import com.cobrain.android.model.CraveStrip;
+import com.cobrain.android.controllers.CraveStrip;
 
 public class CraveStripRefresherFragment extends MiniFragment implements OnClickListener {
 	

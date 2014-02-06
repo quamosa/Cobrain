@@ -1,7 +1,7 @@
 package com.cobrain.android.fragments;
 
 import com.cobrain.android.R;
-import com.cobrain.android.service.Cobrain.CobrainController;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.os.Bundle;

@@ -19,8 +19,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cobrain.android.R;
+import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.CraveFragment;
 import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.fragments.CravesFragment;
+import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.v1.Product;
 import com.cobrain.android.model.v1.RecommendationsResults;
 
@@ -30,12 +33,12 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 	private int countOnThisPage;
 	private int count;
 	private List<Product> recommendations;
-	private CraveStripsFragment parentFragment;
+	private BaseCobrainFragment parentFragment;
 	private boolean destroyAll;
 	private RecommendationsResults results;
 	private HashMap<Integer, CraveFragment> fragments = new HashMap<Integer, CraveFragment>();
 
-	public CravePagerAdapter(FragmentManager fm, CraveStripsFragment cravesFragment) {
+	public CravePagerAdapter(FragmentManager fm, BaseCobrainFragment cravesFragment) {
 		super(fm);
 		parentFragment = cravesFragment;
 	}
@@ -56,15 +59,19 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 		parentFragment = null;
 	}
 	
-	public void load(RecommendationsResults r) {
+	public void load(List<Sku> r) {
 		if (r != null) {
-			page = r.getPage();
-			perPage = r.getPerPage();
-			countOnThisPage = r.getCount();
-			count = r.getTotal();
-			countOnThisPage = Math.min(countOnThisPage, count);
+			//page = r.getPage();
+			//perPage = r.getPerPage();
+			//countOnThisPage = r.getCount();
+			//count = r.getTotal();
+			//countOnThisPage = Math.min(countOnThisPage, count);
+			
+			page = 1;
+			count = perPage = countOnThisPage = r.size();
 
-			List<Product> products = r.getProducts();
+			List<Sku> products = r;
+			
 			int position = (page - 1) * perPage;
 
 			if (recommendations == null) 
@@ -96,7 +103,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 				recommendations = null;
 			}
 		}
-		results = r;
+		//results = r;
 		clear();
 	}
 	
@@ -125,21 +132,23 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 		
 		f.setRecommendation(results, recommendations.get(position));
 		
-		//if (position == 0 && parentFragment.cravePager.getCurrentItem() == position) updateTitle(position);
+		if (parentFragment instanceof CravesFragment) {
+			if (position == 0 && ((CravesFragment)parentFragment).cravePager.getCurrentItem() == position) updateTitle(position);
+		}
 		
 		return f;
 	}
 
 	public void updateTitle(int position) {
-		if (results != null) {
-			int totalCraves = results.getTotal();
+		if (recommendations != null) {
+			int totalCraves = recommendations.size();
 			
 			//final TextView txt = rankForYouLabel;
 			String s;
 			
 			if (recommendations.size() > position && count > position && recommendations.get(position) != null) 
 				s = parentFragment.getString(R.string.rank_for_you,
-						recommendations.get(position).getRank(), 
+						position + 1/*recommendations.get(position).getRank()*/, 
 						totalCraves
 						);
 			else
@@ -198,6 +207,10 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 
 	public CraveFragment getPage(int position) {
 		return fragments.get(position);
+	}
+
+	public int getCountPerPage() {
+		return perPage;
 	}
 
 }

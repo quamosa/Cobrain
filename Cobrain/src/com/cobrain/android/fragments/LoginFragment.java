@@ -1,7 +1,7 @@
 package com.cobrain.android.fragments;
 
 import com.cobrain.android.R;
-import com.cobrain.android.service.Cobrain.CobrainView;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
 
 import android.os.Bundle;
 import android.text.Spannable;

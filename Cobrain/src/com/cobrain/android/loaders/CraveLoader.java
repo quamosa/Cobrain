@@ -1,13 +1,15 @@
 package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.os.AsyncTask;
 import com.cobrain.android.adapters.CravePagerAdapter;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Scenario;
+import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.RecommendationsResults;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
 
 public class CraveLoader {
 	//int page;
@@ -15,8 +17,8 @@ public class CraveLoader {
 	int countPerPage = 25; //50 no longer returns results
 	CravePagerAdapter adapter;
 	CobrainController controller;
-	OnLoadListener<RecommendationsResults> onLoadListener;
-	private AsyncTask<Void, Void, RecommendationsResults> currentRequest;
+	OnLoadListener<List<Sku>> onLoadListener;
+	private AsyncTask<Void, Void, List<Sku>> currentRequest;
 	private ArrayList<Integer> pagesLoaded = new ArrayList<Integer>();
 	boolean onSale;
 
@@ -89,15 +91,17 @@ public class CraveLoader {
 
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 		
-		currentRequest = new AsyncTask<Void, Void, RecommendationsResults>() {
+		currentRequest = new AsyncTask<Void, Void, List<Sku>>() {
 			@Override
-			protected RecommendationsResults doInBackground(Void... params) {
+			protected List<Sku> doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
-				RecommendationsResults r = null;
+				List<Sku> r = null;
 				
 				if (u != null) {
-					r = u.getRecommendations(categoryId, countPerPage, page, onSale);
+					Scenario s = u.getScenario(categoryId);
+					if (s != null) r = s.getSkus();
+					//r = u.getRecommendations(categoryId, countPerPage, page, onSale);
 				}
 				//else Debug.waitForDebugger();
 				
@@ -105,7 +109,7 @@ public class CraveLoader {
 			}
 
 			@Override
-			protected void onPostExecute(RecommendationsResults result) {
+			protected void onPostExecute(List<Sku> result) {
 				if (result != null) {
 					//int pg = result.getPage();
 					//CraveLoader.this.page = pg;
@@ -115,14 +119,21 @@ public class CraveLoader {
 					pagesLoaded.remove((Integer)page);
 					CraveLoader.this.categoryId = 0;
 				}
-				adapter.load(result);
-				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
+				loadSkus(result);
 				currentRequest = null;
 			}
 			
 		}.execute();			
 	}
 
+	public void loadSkus(List<Sku> skus) {
+		if (skus != null && !pagesLoaded.contains(1)) {
+			pagesLoaded.add(1);
+		}
+		adapter.load(skus);
+		if (onLoadListener != null) onLoadListener.onLoadCompleted(skus);
+	}
+	
 	public void cancel() {
 		if (currentRequest != null) {
 			currentRequest.cancel(true);
@@ -130,7 +141,7 @@ public class CraveLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<RecommendationsResults> listener) {
+	public void setOnLoadListener(OnLoadListener<List<Sku>> listener) {
 		onLoadListener = listener;
 	}
 

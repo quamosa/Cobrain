@@ -1,8 +1,8 @@
 package com.cobrain.android.fragments;
 
 import com.cobrain.android.R;
-import com.cobrain.android.service.Cobrain.CobrainController;
-import com.cobrain.android.service.Cobrain.CobrainView;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
 
 import android.os.AsyncTask;
 import android.os.Bundle;

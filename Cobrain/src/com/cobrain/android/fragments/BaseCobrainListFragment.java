@@ -6,8 +6,8 @@ import android.view.View.OnClickListener;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.cobrain.android.service.Cobrain.CobrainController;
-import com.cobrain.android.service.Cobrain.CobrainView;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.utils.LoaderUtils;
 
 public class BaseCobrainListFragment extends SherlockListFragment implements OnClickListener, CobrainView {

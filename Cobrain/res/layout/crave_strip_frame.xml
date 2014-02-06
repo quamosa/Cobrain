@@ -106,5 +106,14 @@
        android:layout_height="match_parent"
        android:background="@drawable/crave_border"
 	/>
+
+  	     <Button
+  	         android:id="@+id/item_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/border_for_image"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/sel_crave_strip_item" />
     
+  	 
 </RelativeLayout>

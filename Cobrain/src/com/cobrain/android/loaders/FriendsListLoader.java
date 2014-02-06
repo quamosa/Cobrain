@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import android.os.AsyncTask;
 
 import com.cobrain.android.adapters.FriendsListAdapter;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.Friendship;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
 
 public class FriendsListLoader {
 

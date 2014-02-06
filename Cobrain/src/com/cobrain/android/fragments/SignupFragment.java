@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cobrain.android.R;
-import com.cobrain.android.service.Cobrain.CobrainView;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
 
 public class SignupFragment extends BaseCobrainFragment implements OnClickListener, CobrainView {
 

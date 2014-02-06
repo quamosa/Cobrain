@@ -1,4 +1,6 @@
-package com.cobrain.android.model;
+package com.cobrain.android.controllers;
+
+import java.util.List;
 
 import it.sephiroth.android.library.widget.HListView;
 import android.support.v4.view.ViewPager;
@@ -11,6 +13,8 @@ import com.cobrain.android.adapters.CraveStripListAdapter;
 import com.cobrain.android.adapters.CraveStripPagerAdapter;
 import com.cobrain.android.loaders.CraveStripLoader;
 import com.cobrain.android.loaders.OnLoadListener;
+import com.cobrain.android.model.Scenario;
+import com.cobrain.android.model.Sku;
 
 public class CraveStrip {
 
@@ -74,6 +78,9 @@ public class CraveStrip {
 	}
 	
 	public void dispose() {
+		list.setTag(null);
+		list.setAdapter(null);
+		
 		allStripsAdapter = null;
 		
 		if (adapter != null) {
@@ -107,6 +114,10 @@ public class CraveStrip {
 	public void refresh() {
 		loader.clearPages();
 		loader.loadPage(1);
+	}
+
+	public List<Sku> getRecommendations() {
+		return adapter.getRecommendations();
 	}
 
 }

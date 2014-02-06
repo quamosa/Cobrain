@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import android.os.AsyncTask;
 import android.os.Debug;
 import com.cobrain.android.adapters.WishListPagerAdapter;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.model.v1.WishListItem;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
 
 public class WishListLoader {
 	String listId;

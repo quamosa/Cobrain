@@ -18,15 +18,13 @@ import android.widget.TextView;
 
 import com.cobrain.android.MiniFragment;
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.minifragments.CraveStripFragment;
 import com.cobrain.android.minifragments.CraveStripHeaderInfoFragment;
 import com.cobrain.android.minifragments.CraveStripRefresherFragment;
-import com.cobrain.android.model.CraveStrip;
 import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
-import com.cobrain.android.model.v1.Product;
-import com.cobrain.android.model.v1.RecommendationsResults;
 
 public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 	
@@ -183,7 +181,7 @@ public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 			
 			int pos = position - offset;
 			CraveStripFragment csf = new CraveStripFragment(getActivity(),  parentFragment);
-			
+
 			if (recommendations == null) 
 				return csf;
 			
@@ -283,12 +281,20 @@ public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 		return fragments.get(position);
 	}
 
+	public List<Sku> getRecommendations() {
+		return recommendations;
+	}
+	
 	public Sku getRecommendation(int position) {
 		if (stripType == CraveStrip.STRIP_TYPE_CRAVES_NOT_AVAILABLE) {
 			position -= 1;
 		}
 		
 		return recommendations.get(position);
+	}
+
+	public Scenario getScenario() {
+		return results;
 	}
 
 }

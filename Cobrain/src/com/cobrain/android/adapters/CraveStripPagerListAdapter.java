@@ -114,7 +114,7 @@ public class CraveStripPagerListAdapter extends ArrayAdapter<MiniFragment> {
 			switch (vh.type) {
 			case ITEM_TYPE_CRAVE:
 				CraveStripFragment csf = (CraveStripFragment) vh.f;
-				csf.setRecommendation(null, pagerAdapter.getRecommendation(position));
+				csf.setRecommendation(pagerAdapter.getScenario(), pagerAdapter.getRecommendation(position));
 			}
 		}
 

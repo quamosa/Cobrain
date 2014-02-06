@@ -1,6 +1,6 @@
 package com.cobrain.android.loaders;
 
-import com.cobrain.android.service.Cobrain.CobrainController;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.service.web.WebRequest;
 
 import android.app.Activity;

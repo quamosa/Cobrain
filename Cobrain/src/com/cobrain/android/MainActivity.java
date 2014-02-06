@@ -1,5 +1,7 @@
 package com.cobrain.android;
 
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -13,10 +15,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,11 +24,18 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.CraveStrip;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
+import com.cobrain.android.controllers.Cobrain.OnLoggedInListener;
 import com.cobrain.android.fragments.AccountSaveFragment;
+import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.BrowserFragment;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.fragments.ContactListFragment;
 import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.fragments.CravesFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
@@ -42,12 +49,9 @@ import com.cobrain.android.fragments.TrainingFragment;
 import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.loaders.IntentLoader;
 import com.cobrain.android.loaders.TasteMakerLoader;
+import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.WishList;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
-import com.cobrain.android.service.Cobrain.CobrainView;
-import com.cobrain.android.service.Cobrain.OnLoggedInListener;
 import com.cobrain.android.utils.HelperUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.ExceptionParser;
@@ -713,6 +717,17 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
+	public void showCraves(CraveStrip strip, Sku sku, int containerId, boolean addToBackStack) {
+		CravesFragment f = CravesFragment.newInstance(strip, sku);
+		setCurrentCobrainView(f);
+        FragmentTransaction t = getSupportFragmentManager()
+        	.beginTransaction();
+        if (addToBackStack) t.addToBackStack(null);
+        t.replace(containerId, f, CravesFragment.TAG)
+        	.commitAllowingStateLoss();
+	}
+
+	@Override
 	public void disableSlidingMenu() {
 		// add a dummy view
 		View v = new View(getApplicationContext());
@@ -812,4 +827,16 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		}
 	}
 
+	@Override
+	public void dispatchOnFragmentDetached(BaseCobrainFragment f) {
+		List<Fragment> fragments = getSupportFragmentManager().getFragments();
+		if (fragments != null) {
+			for (Fragment fragment : fragments) {
+				if (fragment instanceof BaseCobrainFragment) {
+					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
+					bf.onFragmentDetached(f);
+				}
+			}
+		}
+	}
 }

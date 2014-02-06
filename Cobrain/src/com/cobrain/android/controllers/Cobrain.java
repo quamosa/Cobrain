@@ -1,4 +1,4 @@
-package com.cobrain.android.service;
+package com.cobrain.android.controllers;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -14,7 +14,9 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.cobrain.android.R;
+import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
+import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.service.web.ResponseListener;
@@ -99,6 +101,8 @@ public class Cobrain {
 		public TextView getSubTitleView();
 		public TextView getTitleView();
 		public void showDefaultActionBar();
+		public void showCraves(CraveStrip strip, Sku sku, int containerId, boolean addToBackStack);
+		public void dispatchOnFragmentDetached(BaseCobrainFragment f);
 	}
 	
 	public interface CobrainView {

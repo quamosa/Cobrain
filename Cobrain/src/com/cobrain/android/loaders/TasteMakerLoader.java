@@ -4,9 +4,9 @@ import java.util.Calendar;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.fragments.FriendsListFragment;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.service.web.WebRequest;
 
 import android.app.Activity;

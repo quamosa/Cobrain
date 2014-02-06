@@ -10,11 +10,11 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.model.v1.Invitation;
 import com.cobrain.android.model.v1.RecommendationsResults;
 import com.cobrain.android.model.v1.TrainingResult;
 import com.cobrain.android.model.v1.WishList;
-import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
 import com.cobrain.android.utils.HelperUtils;

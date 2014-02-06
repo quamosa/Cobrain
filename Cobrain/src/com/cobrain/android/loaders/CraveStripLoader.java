@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import android.os.AsyncTask;
 
 import com.cobrain.android.adapters.CraveStripPagerAdapter;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
 
 public class CraveStripLoader {
 	//int page;

@@ -3,6 +3,7 @@ package com.cobrain.android.minifragments;
 import java.util.List;
 import com.cobrain.android.MiniFragment;
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.loaders.FontLoader;
@@ -15,7 +16,6 @@ import com.cobrain.android.model.v1.Product;
 import com.cobrain.android.model.v1.Rave;
 import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.model.v1.WishListItem;
-import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.LoaderUtils;
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -84,6 +84,7 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 	private TextView itemSalePrice;
 	private TextView raveCount;
 	private View ravesLayout;
+	private View selector;
 
 	public CraveStripFragment() {
 	}
@@ -124,6 +125,9 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 		itemPrice.setPaintFlags(itemPrice.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
 		itemSalePrice.setPaintFlags(itemSalePrice.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
 
+		selector = v.findViewById(R.id.item_button);
+		selector.setOnClickListener(this);
+		
 		applyWebFont(itemRetailer);
 		applyWebFont(itemDescription);
 		applyWebFont(itemPrice);
@@ -332,7 +336,8 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 
 	@Override
 	public void onDestroyView() {
-		
+		selector.setOnClickListener(null);
+		selector = null;
 		ravesLayout = null;
 		itemSalePrice = null;
 		raveCount = null;
@@ -386,6 +391,9 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()) {
+		case R.id.item_button:
+			parent.showCravesFragmentForScenario(results, recommendation);
+			break;
 		case R.id.item_image:
 			if (parent != null) {
 				parent.showBrowser(recommendation.getBuyURL(), recommendation.getMerchant().getName());
