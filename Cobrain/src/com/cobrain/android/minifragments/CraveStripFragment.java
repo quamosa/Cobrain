@@ -1,8 +1,6 @@
 package com.cobrain.android.minifragments;
 
 import java.util.List;
-import java.util.Locale;
-
 import com.cobrain.android.MiniFragment;
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.CraveStripsFragment;
