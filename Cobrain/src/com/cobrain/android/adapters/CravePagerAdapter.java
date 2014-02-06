@@ -20,9 +20,9 @@ import android.widget.TextView;
 
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.CraveFragment;
-import com.cobrain.android.fragments.CravesFragment;
-import com.cobrain.android.model.Product;
-import com.cobrain.android.model.RecommendationsResults;
+import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.model.v1.Product;
+import com.cobrain.android.model.v1.RecommendationsResults;
 
 public class CravePagerAdapter extends FragmentStatePagerAdapter {
 	private int page = 1;
@@ -30,12 +30,12 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 	private int countOnThisPage;
 	private int count;
 	private List<Product> recommendations;
-	private CravesFragment parentFragment;
+	private CraveStripsFragment parentFragment;
 	private boolean destroyAll;
 	private RecommendationsResults results;
 	private HashMap<Integer, CraveFragment> fragments = new HashMap<Integer, CraveFragment>();
 
-	public CravePagerAdapter(FragmentManager fm, CravesFragment cravesFragment) {
+	public CravePagerAdapter(FragmentManager fm, CraveStripsFragment cravesFragment) {
 		super(fm);
 		parentFragment = cravesFragment;
 	}
@@ -125,7 +125,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 		
 		f.setRecommendation(results, recommendations.get(position));
 		
-		if (position == 0 && parentFragment.cravePager.getCurrentItem() == position) updateTitle(position);
+		//if (position == 0 && parentFragment.cravePager.getCurrentItem() == position) updateTitle(position);
 		
 		return f;
 	}
@@ -159,7 +159,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 			ClickableSpan cs = new ClickableSpan() {
 				@Override
 				public void onClick(View widget) {
-					parentFragment.showTeachMyCobrain();
+					//parentFragment.showTeachMyCobrain();
 				}
 
 				@Override

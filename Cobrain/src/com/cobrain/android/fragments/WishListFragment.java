@@ -34,9 +34,9 @@ import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.loaders.WishListLoader;
 import com.cobrain.android.model.Category;
-import com.cobrain.android.model.CategoryTree;
-import com.cobrain.android.model.WishList;
-import com.cobrain.android.model.WishListItem;
+import com.cobrain.android.model.v1.CategoryTree;
+import com.cobrain.android.model.v1.WishList;
+import com.cobrain.android.model.v1.WishListItem;
 
 public class WishListFragment extends BaseCobrainFragment implements OnLoadListener<ArrayList<WishListItem>>, OnPageChangeListener, OnItemClickListener, OnNavigationListener {
 	public static final String TAG = "SharedCravesFragment";

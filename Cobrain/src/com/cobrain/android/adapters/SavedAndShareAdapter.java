@@ -9,9 +9,9 @@ import com.cobrain.android.fragments.SavedAndShareFragment;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.loaders.OnLoadListener;
-import com.cobrain.android.model.WishListItem;
-import com.cobrain.android.model.Product;
-import com.cobrain.android.model.Rave;
+import com.cobrain.android.model.v1.Product;
+import com.cobrain.android.model.v1.Rave;
+import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.utils.LoaderUtils;
 
 import android.content.Context;

@@ -28,7 +28,7 @@ import com.cobrain.android.fragments.AccountSaveFragment;
 import com.cobrain.android.fragments.BrowserFragment;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.fragments.ContactListFragment;
-import com.cobrain.android.fragments.CravesFragment;
+import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
@@ -43,7 +43,7 @@ import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.loaders.IntentLoader;
 import com.cobrain.android.loaders.TasteMakerLoader;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.WishList;
+import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.service.Cobrain.CobrainView;
@@ -546,11 +546,11 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	
 	@Override
 	public void showHome() {
-        CravesFragment craves = new CravesFragment();
+        CraveStripsFragment craves = new CraveStripsFragment();
 		setCurrentCobrainView(craves);
         getSupportFragmentManager()
         	.beginTransaction()
-        	.replace(R.id.content_frame, craves, CravesFragment.TAG)
+        	.replace(R.id.content_frame, craves, CraveStripsFragment.TAG)
         	.commitAllowingStateLoss();
         
         //getSupportFragmentManager().executePendingTransactions();

@@ -30,7 +30,7 @@
             android:text="Friends can See" />
     </LinearLayout -->
 
-   <LinearLayout
+   <!-- LinearLayout
         android:id="@+id/top_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
 	        android:textOn="Category"
 	        android:textOff="Category"
 	        />
-	</LinearLayout>
+	</LinearLayout-->
 		  
     <RelativeLayout
         android:id="@+id/main_layout"
@@ -77,6 +77,7 @@
             android:id="@+id/crave_strip_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:divider="@null"
             />
         
         <!-- 

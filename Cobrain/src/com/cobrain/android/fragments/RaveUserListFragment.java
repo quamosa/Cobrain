@@ -3,9 +3,9 @@ package com.cobrain.android.fragments;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.RaveUserListAdapter;
 import com.cobrain.android.loaders.RaveUserListLoader;
-import com.cobrain.android.model.Rave;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.WishList;
+import com.cobrain.android.model.v1.Rave;
+import com.cobrain.android.model.v1.WishList;
 
 import android.os.AsyncTask;
 import android.os.Bundle;

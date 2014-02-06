@@ -17,8 +17,9 @@ import com.cobrain.android.loaders.ContactLoader;
 import com.cobrain.android.loaders.ContactLoader.ContactInfo;
 import com.cobrain.android.loaders.FriendsListLoader;
 import com.cobrain.android.loaders.OnLoadListener;
+import com.cobrain.android.model.Friendship;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.WishList;
+import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
 import com.cobrain.android.utils.HelperUtils;
@@ -49,7 +50,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class FriendsListFragment extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<ArrayList<WishList>> {
+public class FriendsListFragment extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<ArrayList<Friendship>> {
 	public static final String TAG = FriendsListFragment.class.toString();
 	private SwipeListView friends;
 	private ListView myCraves;
@@ -443,8 +444,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			protected Boolean doInBackground(Object... params) {
 
 				UserInfo ui = controller.getCobrain().getUserInfo();
-				WishList list = ((WishList) adapter.getItem(position));
-				if (ui.unsubscribe(list.getId(), list.getSubscription().getId())) {
+				Friendship friend = adapter.getItem(position);
+				if (ui.removeFriend(friend.getId())) {
 					return true;
 				}
 				return false;
@@ -466,19 +467,19 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			long id) {
 
 		if (((ListView)parent) == friends) {
-			WishList list = adapter.getItem(position);
+			Friendship friend = adapter.getItem(position);
 	
 			if (adapter.inEditMode()) {
 				adapter.deleteFriend(position);
 				return;
 			}
 			
-			if (list.wasAccepted()) {
-				showWishList(list, false);
+			if (friend.isAccepted()) {
+				showWishList(friend, false);
 				controller.setMenuItemSelected((ListView)parent, position, true);
 			}
 			else {
-				showFriendAccept(list);
+				showFriendAccept(friend);
 			}
 		}
 		else {
@@ -491,14 +492,14 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 				break;
 			case 3:
 				WishList myList = controller.getCobrain().getUserInfo().getCachedWishList();
-				showWishList(myList, false);
+				//TODO: showWishList(myList, false);
 			}
 			
 		}
 	}
 	
-	private void showFriendAccept(final WishList list) {
-		FriendAcceptDialog dialog = new FriendAcceptDialog(list.getOwner().getName(), new OnClickListener() {
+	private void showFriendAccept(final Friendship friend) {
+		FriendAcceptDialog dialog = new FriendAcceptDialog(friend.getUser().getName(), new OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -510,13 +511,12 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 					protected Boolean doInBackground(Boolean... params) {
 						boolean accept = params[0];
 						UserInfo ui = controller.getCobrain().getUserInfo();
-						String listId = list.getId();
-						String subscriptionId = list.getSubscription().getId();
+						int friendId = friend.getId();
 						
 						if (accept)
-							return ui.subscribe(listId, subscriptionId);
+							return ui.acceptFriendship(friendId);
 						else
-							return ui.unsubscribe(listId, subscriptionId);
+							return ui.removeFriend(friendId);
 					}
 
 					@Override
@@ -531,8 +531,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		dialog.show(getChildFragmentManager(), FriendAcceptDialog.TAG);
 	}
 
-	void showWishList(WishList list, boolean showMyPrivateItems) {
-		controller.showWishList(list, showMyPrivateItems, false);
+	void showWishList(Friendship friend, boolean showMyPrivateItems) {
+		//TODO: controller.showWishList(list, showMyPrivateItems, false);
 		controller.closeMenu(true);
 	}
 
@@ -546,7 +546,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	}
 
 	@Override
-	public void onLoadCompleted(ArrayList<WishList> r) {
+	public void onLoadCompleted(ArrayList<Friendship> r) {
 		if (silentMode) {
 			friends.post(new Runnable() {
 				public void run() {

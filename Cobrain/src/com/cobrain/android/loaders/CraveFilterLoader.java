@@ -3,8 +3,8 @@ package com.cobrain.android.loaders;
 import android.os.AsyncTask;
 
 import com.cobrain.android.model.Category;
-import com.cobrain.android.model.CategoryTree;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.model.v1.CategoryTree;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
 

@@ -168,7 +168,7 @@ public class ImageLoader {
             task.execute(url);
         } else {
             view.setImageBitmap(bitmap);
-            listener.onLoad(url, view, bitmap, true);
+            if (listener != null) listener.onLoad(url, view, bitmap, true);
         }
 	}
 

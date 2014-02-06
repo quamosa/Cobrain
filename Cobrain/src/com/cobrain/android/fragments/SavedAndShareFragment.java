@@ -3,23 +3,33 @@ package com.cobrain.android.fragments;
 import java.util.ArrayList;
 
 import com.cobrain.android.R;
+import com.cobrain.android.adapters.CraveCategoryFilterAdapter;
+import com.cobrain.android.adapters.CravePriceFilterAdapter;
+import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.adapters.SavedAndShareAdapter;
+import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.loaders.SavedAndShareLoader;
-import com.cobrain.android.model.WishListItem;
-import com.cobrain.android.model.Product;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.model.v1.CategoryTree;
+import com.cobrain.android.model.v1.Product;
+import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.utils.LoaderUtils;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.PopupWindow;
+import android.widget.Spinner;
 
 public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoadListener<ArrayList<WishListItem>> {
 	public static final String TAG = "SavedAndShareFragment";
@@ -28,6 +38,8 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	SavedAndShareLoader loader = new SavedAndShareLoader();
 	PopupWindow filterMenu = new PopupWindow();
 	ArrayList<WishListItem> sharedCraves = new ArrayList<WishListItem>();
+	Spinner priceFilter;
+	Spinner categoryFilter;
 	
 	public LoaderUtils getLoaderUtils() {
 		return loaderUtils;
@@ -52,6 +64,9 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		loader.setOnLoadListener(this);
 
 		setTitle("My Private Craves");
+		
+		priceFilter = setupPriceFilter(v);
+		categoryFilter = setupCategoryFilter(v);
 
         saves.setSwipeActionLeft(SwipeListView.SWIPE_ACTION_REVEAL);
         saves.setSwipeActionRight(SwipeListView.SWIPE_ACTION_REVEAL);
@@ -111,6 +126,77 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		return v;
 	}
 	
+	private Spinner setupCategoryFilter(View v) {
+		final Spinner s = (Spinner) v.findViewById(R.id.category_filter);
+		final CraveFilterLoader loader = new CraveFilterLoader();
+
+		loader.initialize(controller);
+		loader.setOnLoadListener(new OnLoadListener<CategoryTree>() {
+	
+			@Override
+			public void onLoadStarted() {
+			}
+	
+			@Override
+			public void onLoadCompleted(CategoryTree r) {
+				loader.dispose();
+
+				CraveCategoryFilterAdapter adapter = new CraveCategoryFilterAdapter(getActivity().getApplicationContext(), R.layout.list_item_craves_filter, R.id.caption);
+				adapter.addAll(r.getChildren());
+				s.setAdapter(adapter);
+			}
+			
+		});
+		
+		int categoryId = getResources().getInteger(R.integer.default_category_id); // apparel (6)
+		loader.load(categoryId);
+
+		s.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				SavedAndShareFragment.this.loader.applyCategoryFilter((int) id);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+			}
+		});
+		
+		return s;
+	}
+	
+	private Spinner setupPriceFilter(View v) {
+		Spinner s = (Spinner) v.findViewById(R.id.price_filter);
+		CravePriceFilterAdapter adapter = new CravePriceFilterAdapter(getActivity().getApplicationContext(), R.layout.list_item_craves_filter, R.id.caption);
+		NavigationMenuItem mi = new NavigationMenuItem();
+
+		mi.id = 0;
+		mi.caption = mi.label = mi.labelCopy = "All Prices";
+		adapter.add(mi);
+
+		mi = new NavigationMenuItem();
+		mi.id = 1;
+		mi.caption = mi.label = mi.labelCopy = "On Sale";
+		adapter.add(mi);
+
+		s.setAdapter(adapter);
+		s.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				loader.applyPriceFilter((int) id);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+			}
+		});
+
+		return s;
+	}
+
+	
 	public void removeCrave(int position) {
 		saves.dismiss(position);
 	}
@@ -131,6 +217,16 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	
 	@Override
 	public void onDestroyView() {
+		CravePriceFilterAdapter a = (CravePriceFilterAdapter) priceFilter.getAdapter();
+		priceFilter.setAdapter(null);
+		a.clear();
+		priceFilter = null;
+
+		CraveCategoryFilterAdapter b = (CraveCategoryFilterAdapter) categoryFilter.getAdapter();
+		categoryFilter.setAdapter(null);
+		b.clear();
+		categoryFilter = null;
+		
 		state.save(saves, "saves");
 		adapter.dispose();
 		adapter = null;

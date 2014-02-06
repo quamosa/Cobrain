@@ -6,12 +6,12 @@ import java.util.Locale;
 import com.cobrain.android.R;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
-import com.cobrain.android.model.Rave;
-import com.cobrain.android.model.WishListItem;
-import com.cobrain.android.model.WishList;
-import com.cobrain.android.model.Product;
-import com.cobrain.android.model.RecommendationsResults;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.model.v1.Product;
+import com.cobrain.android.model.v1.Rave;
+import com.cobrain.android.model.v1.RecommendationsResults;
+import com.cobrain.android.model.v1.WishList;
+import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.service.Cobrain.CobrainController;
 import com.cobrain.android.utils.HelperUtils;
 import com.cobrain.android.utils.LoaderUtils;
@@ -55,7 +55,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	RelativeLayout craveInfoHeader;
 	RelativeLayout itemInfoFooter;
 	TextView cravePopupLabel;
-	CravesFragment parent;
+	CraveStripsFragment parent;
 	RecommendationsResults results;
 	private LinearLayout bottomButtons;
 	private ImageButton saveButton;
@@ -86,7 +86,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	public CraveFragment() {
 	}
 	
-	public CraveFragment(CravesFragment parent) {
+	public CraveFragment(CraveStripsFragment parent) {
 		this.parent = parent;
 	}
 	
@@ -169,8 +169,8 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		update();
-		if (parent != null)
-			parent.onCravePageLoaded(position);
+		//if (parent != null)
+		//	parent.onCravePageLoaded(position);
 
 		super.onActivityCreated(savedInstanceState);
 	}

@@ -7,9 +7,9 @@ import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.loaders.TrainingLoader;
 import com.cobrain.android.loaders.TrainingLoader.OnSelectedListener;
 import com.cobrain.android.loaders.TrainingLoader.TrainingItem;
-import com.cobrain.android.model.Training.Experiment;
-import com.cobrain.android.model.Training.Member;
-import com.cobrain.android.model.TrainingResult;
+import com.cobrain.android.model.v1.TrainingResult;
+import com.cobrain.android.model.v1.Training.Experiment;
+import com.cobrain.android.model.v1.Training.Member;
 import com.cobrain.android.utils.LoaderUtils;
 
 import android.os.Bundle;

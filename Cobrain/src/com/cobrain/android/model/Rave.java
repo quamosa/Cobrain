@@ -1,13 +1,9 @@
 package com.cobrain.android.model;
 
-public class Rave {
-	String _id;
-	Member user;
-	
-	public String getId() {
-		return _id;
-	}
-	public Member getUser() {
-		return user;
-	}
+import java.util.List;
+
+public class Rave extends com.cobrain.android.model.v1.Rave {
+	String status;
+	List<String> reasons;
+	String updated_at;
 }

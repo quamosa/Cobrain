@@ -3,7 +3,7 @@ package com.cobrain.android.adapters;
 import java.util.List;
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.FriendsListFragment;
-import com.cobrain.android.model.WishList;
+import com.cobrain.android.model.Friendship;
 import com.cobrain.android.utils.LoaderUtils;
 import com.cobrain.anroid.dialogs.FriendDeleteDialog;
 
@@ -18,10 +18,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class FriendsListAdapter extends ArrayAdapter<WishList> implements DialogInterface.OnClickListener {
+public class FriendsListAdapter extends ArrayAdapter<Friendship> implements DialogInterface.OnClickListener {
 	LoaderUtils loader = new LoaderUtils();
 	FriendsListFragment parent;
-	List<WishList> items;
+	List<Friendship> items;
 	FriendDeleteDialog dialog;
 	
 	boolean editMode;
@@ -32,7 +32,7 @@ public class FriendsListAdapter extends ArrayAdapter<WishList> implements Dialog
 	}*/
 
 	public FriendsListAdapter(Context context, int resource,
-			List<WishList> items, FriendsListFragment parent) {
+			List<Friendship> items, FriendsListFragment parent) {
 		super(context, resource, items);
 		this.items = items;
 		setParent(parent);
@@ -46,8 +46,8 @@ public class FriendsListAdapter extends ArrayAdapter<WishList> implements Dialog
 	for now it only works if the row is visible
 	 */
 	public void deleteFriend(int position) {
-		WishList item = getItem(position);
-		String name = item.getOwner().getName();
+		Friendship item = getItem(position);
+		String name = item.getUser().getName();
 		dialog = new FriendDeleteDialog(name, this);
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -105,11 +105,11 @@ public class FriendsListAdapter extends ArrayAdapter<WishList> implements Dialog
 		}
 		else vh = (ViewHolder) v.getTag();
 		
-		WishList list = getItem(position);
-		int updates = list.getUpdates();
+		Friendship friend = getItem(position);
+		int updates = 0 ;//list.getUpdates();
 
-		vh.friend.setTypeface(null, (!list.wasAccepted()) ? Typeface.ITALIC : Typeface.NORMAL);
-		vh.friend.setText(list.getOwner().getName());
+		vh.friend.setTypeface(null, (!friend.isAccepted()) ? Typeface.ITALIC : Typeface.NORMAL);
+		vh.friend.setText(friend.getUser().getName());
 		vh.position = position;
 		vh.delete.setVisibility(editMode ? View.VISIBLE : View.INVISIBLE);
 		vh.updatesLayout.setVisibility((updates > 0) ? View.VISIBLE : View.INVISIBLE);

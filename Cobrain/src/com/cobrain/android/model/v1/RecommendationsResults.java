@@ -1,4 +1,4 @@
-package com.cobrain.android.model;
+package com.cobrain.android.model.v1;
 
 import java.util.List;
 

@@ -15,8 +15,8 @@ import com.cobrain.android.utils.LoaderUtils;
 import com.fortysevendeg.swipelistview.SwipeListView;
 
 public class BaseCobrainFragment extends SherlockFragment implements OnClickListener, CobrainView {
-	CobrainController controller;
-	LoaderUtils loaderUtils = new LoaderUtils();
+	public CobrainController controller;
+	public LoaderUtils loaderUtils = new LoaderUtils();
 	ActionBar actionBar;
 	View abHide;
 	boolean updateRequested;

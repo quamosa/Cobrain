@@ -10,6 +10,11 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.cobrain.android.R;
+import com.cobrain.android.model.v1.CategoryTree;
+import com.cobrain.android.model.v1.Invitation;
+import com.cobrain.android.model.v1.RecommendationsResults;
+import com.cobrain.android.model.v1.TrainingResult;
+import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
@@ -58,6 +63,14 @@ public class UserInfo {
 	ArrayList<Invitation> invites;
 	private String wishListId;
 
+	@SerializedName("avatar_url")
+	private String avatarUrl;
+
+	@SerializedName("hashed_phone_number")
+	private String hashedPhone;
+
+	private ArrayList<String> notifications;
+	
 	public interface OnSignedInListener {
 		public void onSignedIn(boolean success);
 	}
@@ -76,6 +89,10 @@ public class UserInfo {
 	public boolean testBaseUrl(String url) {
 		WebRequest wr = new WebRequest();
 		return wr.get(url).go() == 200;
+	}
+
+	public ArrayList<String> getNotifications() {
+		return notifications;
 	}
 
 	public String getUserId() {
@@ -114,10 +131,12 @@ public class UserInfo {
 			UserInfo me = UserInfo.this;
 			me.userId = ui.userId;
 			me.name = ui.name;
+			me.avatarUrl = ui.avatarUrl;
 			me.email = ui.email;
 			me.genderPreference = ui.genderPreference;
 			me.zipcode = ui.zipcode;
 			me.signInCount = ui.signInCount;
+			me.hashedPhone = ui.hashedPhone;
 			//notifications?
 
 			return true;
@@ -172,8 +191,8 @@ public class UserInfo {
 		this.apiKey = apiKey;
 		
 		if (fetchUserInfo()) {
-			fetchInvitations();
-			fetchWishList();
+			//fetchInvitations();
+			//fetchWishList();
 		}
 		else {
 			this.apiKey = null;
@@ -232,6 +251,73 @@ public class UserInfo {
 		return false;
 	}
 
+
+	public Scenarios getScenarios() {
+		String url = context.getString(R.string.url_scenarios_get, context.getString(R.string.url_cobrain_api));
+		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
+
+		if (wr.go() == 200) {
+			Scenarios s = gson.fromJson(wr.getResponse(), Scenarios.class);
+			return s;
+		}
+		else reportError("Could not get scenarios");
+		return null;
+	}
+	
+	public Scenario getScenario(int id) {
+		String url = context.getString(R.string.url_scenario_get, context.getString(R.string.url_cobrain_api), id);
+		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
+
+		if (wr.go() == 200) {
+			Scenario s = gson.fromJson(wr.getResponse(), Scenario.class);
+			return s;
+		}
+		else reportError("Could not get scenario");
+		return null;
+	}
+	
+	public ArrayList<Friendship> getFriendships() {
+		String url = context.getString(R.string.url_friendships_get, context.getString(R.string.url_cobrain_api));
+		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
+
+		if (wr.go() == 200) {
+			Type type = new TypeToken<List<Friendship>>(){}.getType();
+			ArrayList<Friendship> f = gson.fromJson(wr.getResponse(), type);
+			return f;
+		}
+		else reportError("Could not get friendships");
+		return null;
+	}
+	
+	public boolean removeFriend(int id) {
+		String url = context.getString(R.string.url_friendships_delete, context.getString(R.string.url_cobrain_api), id);
+		WebRequest wr = new WebRequest().delete(url).setHeaders(apiKeyHeader());
+
+		if (wr.go() == 200) {
+			return true;
+		}
+		else reportError("Could not remove friendship");
+		return false;
+	}
+
+	public boolean acceptFriendship(int id) {
+		String url = context.getString(R.string.url_friendships_put, context.getString(R.string.url_cobrain_api), id);
+		WebRequest wr = new WebRequest().put(url).setHeaders(apiKeyHeader());
+
+		if (wr.go() == 200) {
+			return true;
+		}
+		else reportError("Could not accept friendship");
+		return false;
+	}
+
+
+	/*
+	 *
+	 * Version 1.0 Stuff down here!
+	 * 
+	 */
+	
 	public RecommendationsResults getRecommendations(int categoryId, int maxPerPage, int page, boolean onSale) {
 		if (apiKey != null) {
 			String u = context.getString(R.string.url_recommendations_get, context.getString(R.string.url_cobrain_api));
@@ -377,7 +463,7 @@ public class UserInfo {
 	
 	public String getWishListId() {
 		if (wishListId == null) {
-			wishListId = getLists().get(0)._id;
+			wishListId = getLists().get(0).getId();
 		}
 		return wishListId;
 	}
@@ -579,7 +665,7 @@ public class UserInfo {
 		Cobrain c = new Cobrain(context);
 		return c.getSharedPrefs().getBoolean("invitesVerified", false);
 	}
-	
+
 /*
  * 	 * 
 sendHashedPhoneNumber:(NSString *)hashedPhone

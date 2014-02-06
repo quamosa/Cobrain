@@ -2,11 +2,14 @@ package com.cobrain.android.adapters;
 
 import java.util.List;
 import com.cobrain.android.R;
-import com.cobrain.android.fragments.CravesFragment;
+import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.loaders.FontLoader;
 import com.cobrain.android.model.CraveStrip;
+import com.cobrain.android.model.v1.RecommendationsResults;
 import com.cobrain.android.utils.LoaderUtils;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,11 +21,11 @@ import android.widget.TextView;
 
 public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements DialogInterface.OnClickListener {
 	LoaderUtils loader = new LoaderUtils();
-	CravesFragment parent;
+	CraveStripsFragment parent;
 	List<CraveStrip> items;
 	
 	public CraveStripListAdapter(Context context, int resource,
-			List<CraveStrip> items, CravesFragment parent) {
+			List<CraveStrip> items, CraveStripsFragment parent) {
 		super(context, resource, items);
 		this.items = items;
 		setParent(parent);
@@ -34,7 +37,7 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 		}
 	}
 
-	public void setParent(CravesFragment parent) {
+	public void setParent(CraveStripsFragment parent) {
 		this.parent = parent;
 	}
 
@@ -49,7 +52,7 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 		}
 	}
 
-	LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+	LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -63,6 +66,7 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 			vh.caption = (TextView) v.findViewById(R.id.caption);
 			//vh.pager = (ViewPager) v.findViewById(R.id.pager);
 			vh.layout = (RelativeLayout) v.findViewById(R.id.layout);
+			vh.caption.setTypeface(FontLoader.load(getContext(), "Doppio One.ttf"));
 
 			v.setTag(vh);
 		}
@@ -73,12 +77,6 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 		vh.caption.setText(strip.caption);
 		removeAllViews(vh.layout);
 		addView(vh.layout, strip.container, lp);
-		
-		if (strip.pager.getAdapter() != strip.adapter) {
-			strip.loader.setCategoryId(strip.categoryId);
-			strip.loader.loadPage(1);
-			strip.pager.setAdapter(strip.adapter);
-		}
 
 		return v;
 	}
@@ -91,11 +89,12 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 	}
 	
 	void addView(ViewGroup parent, View v, LayoutParams lp) {
-		if (v.getParent() != parent) {
-			parent.removeView(v);
+		ViewGroup vp = (ViewGroup) v.getParent();
+		if (vp != parent) {
+			if (vp != null) vp.removeView(v);
 			parent.addView(v, lp);
 		}
 		v.setVisibility(View.VISIBLE);
 	}
-	
+
 }

@@ -16,7 +16,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.WishList;
+import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.service.web.ResponseListener;
 import com.cobrain.android.service.web.WebRequest;
 import com.google.gson.Gson;

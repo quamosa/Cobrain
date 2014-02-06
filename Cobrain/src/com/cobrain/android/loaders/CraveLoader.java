@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import android.os.AsyncTask;
 import com.cobrain.android.adapters.CravePagerAdapter;
-import com.cobrain.android.model.RecommendationsResults;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.model.v1.RecommendationsResults;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
 

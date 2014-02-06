@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import android.os.AsyncTask;
 import com.cobrain.android.adapters.SavedAndShareAdapter;
-import com.cobrain.android.model.WishListItem;
-import com.cobrain.android.model.WishList;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.model.v1.WishList;
+import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
 
@@ -16,6 +16,8 @@ public class SavedAndShareLoader {
 	OnLoadListener<ArrayList<WishListItem>> onLoadListener;
 	private AsyncTask<Void, Void, ArrayList<WishListItem>> currentRequest;
 	ArrayList<WishList> lists = null;
+	int categoryId = 0;
+	int priceId = 0;
 
 	public void initialize(CobrainController controller, SavedAndShareAdapter adapter) {
 		this.controller = controller;
@@ -31,6 +33,20 @@ public class SavedAndShareLoader {
 		controller = null;
 		adapter = null;
 		onLoadListener = null;
+	}
+
+	public void applyCategoryFilter(int id) {
+		if (categoryId != id) {
+			categoryId = id;
+			loadUserList();
+		}
+	}
+	
+	public void applyPriceFilter(int id) {
+		if (priceId != id) {
+			priceId = id;
+			loadUserList();
+		}
 	}
 	
 	public void loadUserList() {
@@ -53,7 +69,10 @@ public class SavedAndShareLoader {
 						if (lr.getOwner().getId().equals(u.getUserId())) {
 							WishList ml = u.getList(lr.getId());
 							for (WishListItem item : ml.getItems())
-								if (!item.isPublic()) items.add(item);
+								if (!item.isPublic()) {
+									if (isFilteredItem(item))
+										items.add(item);
+								}
 						}
 					}
 					
@@ -72,6 +91,22 @@ public class SavedAndShareLoader {
 
 		}.execute();		
 	}
+
+	private boolean isFilteredItem(WishListItem item) {
+		boolean ok = false;
+
+		switch(priceId) {
+		case 0: //all prices
+			ok |= true;
+			break;
+		case 1:  //on sale
+			ok |= (item.getProduct().isOnSale());
+			break;
+		}
+
+		return ok;
+	}
+
 
 	public void cancel() {
 		if (currentRequest != null) {

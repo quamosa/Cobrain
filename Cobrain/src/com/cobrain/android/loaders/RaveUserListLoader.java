@@ -7,10 +7,10 @@ import android.os.AsyncTask;
 
 import com.cobrain.android.adapters.FriendsListAdapter;
 import com.cobrain.android.adapters.RaveUserListAdapter;
-import com.cobrain.android.model.Rave;
-import com.cobrain.android.model.WishList;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.WishListItem;
+import com.cobrain.android.model.v1.Rave;
+import com.cobrain.android.model.v1.WishList;
+import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.service.Cobrain;
 import com.cobrain.android.service.Cobrain.CobrainController;
 

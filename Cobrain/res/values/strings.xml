@@ -17,28 +17,42 @@
     <string name="craves_found"><![CDATA[<b><font color="#00BE9B">%1$d</font> Craves Found</b>]]></string>
     
     <!-- urls for qa and prd -->
+    <string name="url_cobrain_api_dev">https://beaker.cobrain.com</string>
     <string name="url_cobrain_api_qa">https://qa.api.cobrain.com</string>
     <string name="url_cobrain_api_prd">https://api.cobrain.com</string>
+    <string name="url_cobrain_app_dev">https://bunsen.cobrain.com</string>
     <string name="url_cobrain_app_qa">https://qa.cobrain.com</string>
     <string name="url_cobrain_app_prd">https://cobrain.com</string>
+    <string name="sms_invite_validation_number_dev">+1(443)5397345</string>
     <string name="sms_invite_validation_number_qa">+1(443)5397345</string>
     <string name="sms_invite_validation_number_prd">+1(202)4994992</string>
     <!--  -->
     
-    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_prd</item>
-    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_prd</item>
-    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_prd</item>
+    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_dev</item>
+    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_dev</item>
+    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_dev</item>
 
     <string name="url_about_us">%1$s/about-us</string>
 
     <string name="url_logout_get">%1$s/logout</string>
     <string name="url_login_post">%1$s/account/login</string>
     <string name="url_account_post">%1$s/account</string>
-    <string name="url_profile_get">%1$s/v1/profile</string>
-    <string name="url_profile_delete">%1$s/v1/profile</string>
-    <string name="url_profile_put">%1$s/v1/profile</string>
     <string name="url_password_reset_get">%1$s/account/password/new</string>
     <string name="url_password_reset_post">%1$s/account/password</string>
+    
+    <!-- v 2.0 -->
+    <string name="url_profile_get">%1$s/users/me</string>
+    <string name="url_profile_delete">%1$s/users/me</string>
+    <string name="url_profile_put">%1$s/users/me</string>
+    <string name="url_scenarios_get">%1$s/scenarios</string>
+    <string name="url_scenario_get">%1$s/scenarios/%2$s</string>
+    <string name="url_friendships_get">%1$s/friendships</string>
+    <string name="url_friendships_put">%1$s/friendships/%2$s</string>
+    <string name="url_friendships_delete">%1$s/friendships/%2$s</string>
+    <string name="url_opinions_put">%1$s/opinion/%2$s</string>
+    <string name="url_skus_get">%1$s/skus</string>
+    
+    <!-- v 1.0 -->
     <string name="url_recommendations_get">%1$s/v1/recommendations</string>
     <string name="url_trainings_post">%1$s/v1/trainings</string>
     <string name="url_trainings_answers_post">%1$s/v1/trainings/%2$d/answers</string>

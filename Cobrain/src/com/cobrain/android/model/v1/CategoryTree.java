@@ -1,6 +1,8 @@
-package com.cobrain.android.model;
+package com.cobrain.android.model.v1;
 
 import java.util.ArrayList;
+
+import com.cobrain.android.model.Category;
 
 public class CategoryTree extends Category {
 	ArrayList<Category> ancestors;

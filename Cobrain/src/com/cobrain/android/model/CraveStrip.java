@@ -1,17 +1,112 @@
 package com.cobrain.android.model;
 
+import it.sephiroth.android.library.widget.HListView;
 import android.support.v4.view.ViewPager;
-import android.view.View;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 
-import com.cobrain.android.adapters.CravePagerAdapter;
-import com.cobrain.android.loaders.CraveLoader;
+import com.cobrain.android.adapters.CraveStripListAdapter;
+import com.cobrain.android.adapters.CraveStripPagerAdapter;
+import com.cobrain.android.loaders.CraveStripLoader;
+import com.cobrain.android.loaders.OnLoadListener;
 
 public class CraveStrip {
+
+	public static final int STRIP_TYPE_CRAVES = 0;
+	public static final int STRIP_TYPE_CRAVES_NOT_AVAILABLE = 1;
+	
 	public String caption;
-	public int categoryId;
-	public CravePagerAdapter adapter;
-	public CraveLoader loader;
+	public CraveStripListAdapter allStripsAdapter;
+	public CraveStripPagerAdapter adapter;
+	public CraveStripLoader loader;
 	public ViewPager pager;
 	public RelativeLayout container;
+	public HListView list;
+	public Adapter listAdapter;
+	public int type;
+	public int scenarioId;
+	OnLoadListener<Scenario> listener;
+	OnLoadListener<Scenario> _listener = new OnLoadListener<Scenario>() {
+
+		@Override
+		public void onLoadStarted() {
+			listener.onLoadStarted();
+		}
+
+		boolean on = false;
+		
+		@Override
+		public void onLoadCompleted(Scenario r) {
+			listener.onLoadCompleted(r);
+
+			boolean changed = false;
+			String whyText;
+			
+			on = !on;
+
+			//if (r.getSkus().size() >= 20) {
+			if (on) {
+				type = STRIP_TYPE_CRAVES;
+				whyText = r.getWhyText();
+			}
+			else {
+				type = STRIP_TYPE_CRAVES_NOT_AVAILABLE;
+				whyText = "Here are some recommendations just for you!";
+			}
+			
+			if (!whyText.equals(caption)) {
+				caption = whyText;
+				allStripsAdapter.notifyDataSetChanged();
+			}
+
+			adapter.setCraveStrip(CraveStrip.this);
+
+			list.smoothScrollToPosition(0);
+		}
+	};
+
+	
+	public CraveStrip(CraveStripListAdapter allStripsAdapter, OnLoadListener<Scenario> listener) {
+		this.allStripsAdapter = allStripsAdapter;
+		this.listener = listener;
+	}
+	
+	public void dispose() {
+		allStripsAdapter = null;
+		
+		if (adapter != null) {
+			adapter.dispose();
+			adapter = null;
+		}
+		listAdapter = null;
+		if (loader != null) {
+			loader.dispose();
+			loader = null;
+		}
+		pager = null;
+		container = null;
+		listener = null;
+		_listener = null;
+	}
+	
+	public void load() {
+		//if (pager.getAdapter() != adapter) {
+		if (list.getAdapter() != listAdapter) {
+			loader.setCategoryId(scenarioId);
+			loader.setOnLoadListener(_listener);
+			loader.loadPage(1);
+
+			list.setAdapter((ListAdapter) listAdapter);
+			//pager.setAdapter(adapter);
+		}
+		
+	}
+
+	public void refresh() {
+		loader.clearPages();
+		loader.loadPage(1);
+	}
+
 }
