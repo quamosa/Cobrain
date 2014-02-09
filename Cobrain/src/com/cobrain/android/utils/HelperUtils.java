@@ -1,11 +1,22 @@
 package com.cobrain.android.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -122,6 +133,28 @@ public class HelperUtils {
 	        float factorW = width / (float) b.getWidth();
 	        return Bitmap.createScaledBitmap(b, (int) (b.getWidth() * factorW), (int) (b.getHeight() * factorH), false);  
 	    }
+
+	    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx) {
+	        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+	            bitmap.getHeight(), Config.ARGB_8888);
+	        Canvas canvas = new Canvas(output);
+	     
+	        final int color = 0xff424242;
+	        final Paint paint = new Paint();
+	        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+	        final RectF rectF = new RectF(rect);
+	        //final float roundPx = 12;
+	     
+	        paint.setAntiAlias(true);
+	        canvas.drawARGB(0, 0, 0, 0);
+	        paint.setColor(color);
+	        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+	     
+	        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+	        canvas.drawBitmap(bitmap, rect, rect, paint);
+	     
+	        return output;
+	    }	
 	}		
 	
 	public static void runOnUiThread(Runnable run) {
@@ -217,4 +250,25 @@ public class HelperUtils {
 		}
 	}
 
+	public static class Assets {
+		public static String read(Context c, String fileName) {
+			try {
+				InputStream is = c.getAssets().open(fileName);
+				BufferedReader in = new BufferedReader(new InputStreamReader(is));
+				StringBuilder buf = new StringBuilder();
+				String str;
+
+			    while ((str = in.readLine()) != null) {
+			    	buf.append(str);
+			    }
+
+			    in.close();
+			    return buf.toString();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
 }

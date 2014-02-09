@@ -75,7 +75,23 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 	@Override
 	public void onFragmentDetached(BaseCobrainFragment f) {
 		if (f instanceof CravesFragment) {
+			HomeFragment home = (HomeFragment) getSherlockActivity().getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG);
+			if (home != null) {
+				home.homePager.setVisibility(View.VISIBLE);
+			}
+			else getView().setVisibility(View.VISIBLE);
 			setPageTitle();
+		}
+	}
+
+	@Override
+	public void onFragmentAttached(BaseCobrainFragment f) {
+		if (f instanceof CravesFragment) {
+			HomeFragment home = (HomeFragment) getSherlockActivity().getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG);
+			if (home != null) {
+				home.homePager.setVisibility(View.GONE);
+			}
+			else getView().setVisibility(View.GONE);
 		}
 	}
 
@@ -105,7 +121,6 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 	void setupCraveStrips(View v) {
 		ListView craveStripList = (ListView) v.findViewById(R.id.crave_strip_list);
 		loader.initialize(this, craveStripList);
-		loader.load();
 	}
 	
 	void setupComingSoonView(View v) {
@@ -132,8 +147,11 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 	}
 
 	public void update() {
-		controller.getCobrain().checkLogin();
-		loaderUtils.dismiss();
+		if (controller != null) {
+			controller.getCobrain().checkLogin();
+			loaderUtils.dismiss();
+			loader.load();
+		}
 	}
 	
 	@Override
@@ -321,7 +339,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		for (int i = 0; i < loader.craveStrips.size(); i++) {
 			CraveStrip strip = loader.craveStrips.get(i);
 			if (strip.scenarioId == scenario.getId()) {
-				controller.showCraves(strip, sku, R.id.main_layout, true);
+				controller.showCraves(strip, sku, R.id.overlay_layout, true);
 				return;
 			}
 		}

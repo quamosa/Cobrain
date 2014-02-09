@@ -1,6 +1,5 @@
 package com.cobrain.android.adapters;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -9,8 +8,8 @@ import com.cobrain.android.fragments.SavedAndShareFragment;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.loaders.OnLoadListener;
-import com.cobrain.android.model.v1.Product;
-import com.cobrain.android.model.v1.Rave;
+import com.cobrain.android.model.Rave;
+import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.utils.LoaderUtils;
 
@@ -27,13 +26,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
+public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 	private static final int VIEWTYPE_SAVED_AND_SHARE = 0;
 	private static final int VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES = 1;
 	private final String RAVE_INFO = "<font color='#9ec5e7'>%s</font> RAVED THIS";
 	private final String RAVE_INFO_WITH_FRIENDS = "<font color='#9ec5e7'>%s</font> AND <font color='#9ec5e7'>%s FRIEND%s</font> RAVED THIS";
 	
-	//ArrayList<WishListItem> items = new ArrayList<WishListItem>();
 	LoaderUtils loader = new LoaderUtils();
 	SavedAndShareFragment parent;
 
@@ -43,7 +41,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 	}
 
 	public SavedAndShareAdapter(Context context, int resource,
-			List<WishListItem> items, SavedAndShareFragment parent) {
+			List<Sku> items, SavedAndShareFragment parent) {
 		super(context, resource, items);
 		setParent(parent);
 	}
@@ -67,12 +65,12 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 	
 	@Override
 	public long getItemId(int position) {
-		return getItem(position).getProduct().getId();
+		return getItem(position).getId();
 	}
 	
 	@Override
 	public int getItemViewType(int position) {
-		WishListItem item = getItem(position);
+		Sku item = getItem(position);
 		int typ = (item.getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES : VIEWTYPE_SAVED_AND_SHARE;
 		return typ;
 	}
@@ -132,7 +130,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				parent.saveRecommendation(getItem(position), false, removeListener);
 				break;
 			case R.id.raves_layout:
-				parent.showRavesUserList(getItem(position).getId());
+				//parent.showRavesUserList(getItem(position).getId());
 			}
 		}
 
@@ -236,8 +234,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 
 		//showProgress(true);
 		
-		WishListItem item = getItem(position);
-		Product p = item.getProduct();
+		Sku p = getItem(position);
 		vh.position = position;
 		if (p.getMerchant() != null) {
 			vh.merchant.setText(p.getMerchant().getName().toUpperCase());
@@ -252,7 +249,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		else vh.info.setText(null);
 		vh.image.setVisibility(View.INVISIBLE);
 		
-		if (item.isPublic()) {
+		if (p.getOpinion().is("shared")) {
 			vh.shareLayout.setVisibility(View.GONE);
 			vh.privateLayout.setVisibility(View.VISIBLE);
 		}
@@ -273,10 +270,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				@Override
 				public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
 					//showProgress(false);
-					if (fromCache) {
-						view.setVisibility(View.VISIBLE);
-					}
-					else loader.show(view);
+					LoaderUtils.show(view, !fromCache);
 				}
 	
 				@Override
@@ -291,7 +285,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 
 	private CharSequence getRaveInfo(int position) {
 		String raveInfo;
-		ArrayList<Rave> raves = getItem(position).getRaves();
+		List<Rave> raves = getItem(position).getRaves();
 		String name = raves.get(0).getUser().getName().toUpperCase(Locale.US);
 		int otherRaves = raves.size() - 1;
 		

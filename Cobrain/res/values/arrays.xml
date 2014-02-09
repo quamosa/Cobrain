@@ -6,15 +6,15 @@
 	    <item>@drawable/ic_navigation_menu_home</item>
    	    <item type="integer">0</item>
 	    
-	    <item type="string">Teach My Cobrain</item>
-   	    <item>@drawable/ic_navigation_menu_teach</item>
-   	    <item type="integer">1</item>
+	    <item type="string">On Sale</item>
+   	    <item>@drawable/ic_category_menu_onsale</item>
+   	    <item type="integer">7</item>
 
-	    <item type="string">My Private Craves</item>
+	    <item type="string">My Private Rack</item>
 	    <item>@drawable/ic_navigation_menu_saved_craves</item>
    	    <item type="integer">2</item>
 	    
-   	    <item type="string">My Shared Craves</item>
+   	    <item type="string">My Shared Rack</item>
    	    <item>@drawable/ic_navigation_menu_share_and_rave</item>
    	    <item type="integer">3</item>
    	    
@@ -22,13 +22,17 @@
 
 	<array name="navigation_bottom_menu_items">
 
-	    <item type="string">Nerve Center</item>
+	    <item type="string">Teach My Cobrain</item>
+   	    <item>@drawable/ic_navigation_menu_teach</item>
+   	    <item type="integer">1</item>
+	    
+   	    <item type="string">Settings</item>
 	    <item>@drawable/ic_navigation_menu_nerve_center</item>
    	    <item type="integer">4</item>
 	    
-	    <!-- item type="string">Feedback</item>
+	    <item type="string">Feedback</item>
    	    <item>@drawable/ic_navigation_menu_feedback</item>
-   	    <item type="integer">-5</item-->
+   	    <item type="integer">5</item>
 
 	    <item type="string">About Us</item>
 	    <item>@drawable/ic_about_us</item>

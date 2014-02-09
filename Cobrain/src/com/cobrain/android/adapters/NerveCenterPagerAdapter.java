@@ -1,8 +1,8 @@
 package com.cobrain.android.adapters;
 
+import com.cobrain.android.fragments.AccountFragment;
 import com.cobrain.android.fragments.ForgetMeFragment;
-import com.cobrain.android.fragments.InviteFragment;
-import com.cobrain.android.fragments.LoginInfoFragment;
+import com.cobrain.android.fragments.ProfileFragment;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,11 +18,11 @@ public class NerveCenterPagerAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
         switch (position) {
         case 0:
-            return "INVITATIONS";
+            return "Profile";
         case 1:
-        	return "LOGIN INFO";
+        	return "Account";
         case 2:
-        	return "FORGET ME";
+        	return "Forget Me";
         }
 		return null;
 	}
@@ -32,9 +32,9 @@ public class NerveCenterPagerAdapter extends FragmentPagerAdapter {
  
         switch (index) {
         case 0:
-            return new InviteFragment();
+            return new ProfileFragment();
         case 1:
-            return new LoginInfoFragment();
+            return new AccountFragment();
         case 2:
             return new ForgetMeFragment();
         }

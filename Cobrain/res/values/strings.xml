@@ -16,6 +16,10 @@
     <string name="item_out_of_num_item">out of 1 apparel item</string>
     <string name="craves_found"><![CDATA[<b><font color="#00BE9B">%1$d</font> Craves Found</b>]]></string>
     
+    <!-- feed strings -->
+    <string name="friend_likes_own"><![CDATA[<font color=\"#%2$x\">%1$s</font> liked a new item]]></string>
+    <string name="friend_raves_mine"><![CDATA[<font color=\"#%2$x\">%1$s</font> raved your shared crave]]></string>
+    
     <!-- urls for qa and prd -->
     <string name="url_cobrain_api_dev">https://beaker.cobrain.com</string>
     <string name="url_cobrain_api_qa">https://qa.api.cobrain.com</string>
@@ -39,6 +43,8 @@
     <string name="url_account_post">%1$s/account</string>
     <string name="url_password_reset_get">%1$s/account/password/new</string>
     <string name="url_password_reset_post">%1$s/account/password</string>
+    <string name="url_password_change_get">%1$s/account/edit</string>
+    <string name="url_password_change_post">%1$s/account</string>
     
     <!-- v 2.0 -->
     <string name="url_profile_get">%1$s/users/me</string>
@@ -49,8 +55,11 @@
     <string name="url_friendships_get">%1$s/friendships</string>
     <string name="url_friendships_put">%1$s/friendships/%2$s</string>
     <string name="url_friendships_delete">%1$s/friendships/%2$s</string>
-    <string name="url_opinions_put">%1$s/opinion/%2$s</string>
+    <string name="url_opinions_put">%1$s/opinions/%2$s</string>
     <string name="url_skus_get">%1$s/skus</string>
+    <string name="url_feed_get">%1$s/feed</string>
+    <string name="url_raves_post">%1$s/raves</string>
+    <string name="url_raves_delete">%1$s/raves</string>
     
     <!-- v 1.0 -->
     <string name="url_recommendations_get">%1$s/v1/recommendations</string>

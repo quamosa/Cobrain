@@ -20,6 +20,10 @@
     <color name="NavigationMenuFontSelectedColor">#fff</color>
     <color name="NavigationMenuBackgroundDefaultColor">#00000000</color>
     <color name="NavigationMenuBackgroundSelectedColor">#55000000</color>
+    <color name="FeedMenuBackgroundDefaultColor">#00000000</color>
+    <color name="FeedMenuBackgroundSelectedColor">#55000000</color>
+    <item name="FriendsColor" type="color">@color/GreyBackground</item>
+    <color name="FeedsColor">#ff858585</color>
     <color name="CraveShareButton">#AAAAAA</color>
     <color name="CraveSaveButtonNormal">#bb000000</color>
     <color name="CraveSaveButtonPressed">#bbde3b75</color>

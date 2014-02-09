@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.cobrain.android.fragments.CraveFragment;
 import com.cobrain.android.fragments.WishListFragment;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.model.v1.WishListItem;
 
@@ -17,11 +19,11 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 	private int perPage;
 	private int countOnThisPage;
 	private int count;
-	private List<WishListItem> listItems;
+	private ArrayList<Sku> listItems;
 	private WishListFragment parentFragment;
 	private boolean destroyAll;
 	//private RecommendationsResults results;
-	private WishList results;
+	private Skus results;
 
 	public WishListPagerAdapter(FragmentManager fm, WishListFragment cravesFragment) {
 		super(fm);
@@ -37,16 +39,16 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		}
 	}
 
-	public void add(WishListItem item, boolean notify) {
-		if (listItems == null) listItems = new ArrayList<WishListItem>();
+	public void add(Sku item, boolean notify) {
+		if (listItems == null) listItems = new ArrayList<Sku>();
 		listItems.add(item);
 		if (notify) notifyDataSetChanged();
 	}
 
-	public void load(WishList r, ArrayList<WishListItem> items, boolean append) {
+	public void load(Skus r, List<Sku> items, boolean append) {
 		load(r, items, append, true);
 	}
-	public void load(WishList r, ArrayList<WishListItem> items, boolean append, boolean notify) {
+	public void load(Skus r, List<Sku> items, boolean append, boolean notify) {
 		//page = r.getPage();
 		//perPage = r.getPerPage();
 		//countOnThisPage = r.getCount();
@@ -59,7 +61,7 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		if (append && listItems != null) {
 			listItems.addAll(items);
 		}
-		else listItems = items;
+		else listItems = new ArrayList<Sku>(items);
 		
 		results = r;
 
@@ -71,9 +73,9 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		}
 	}
 
-	public void load(WishList r, boolean append) {
+	public void load(Skus r, boolean append) {
 		if (r != null) {
-			load(r, r.getItems(), append, false);
+			load(r, r.get(), append, false);
 		}
 		else {
 			page = 1;

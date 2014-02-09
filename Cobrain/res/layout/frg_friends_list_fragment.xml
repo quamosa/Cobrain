@@ -6,44 +6,43 @@
     android:layout_height="match_parent"
     android:background="@color/GreyBackground" >
     
-    <RelativeLayout
-        android:id="@+id/username_layout"
-        android:paddingTop="@dimen/navigation_menu_header_item_padding"
-        android:paddingBottom="@dimen/navigation_menu_header_item_padding"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#000"
-        >
-	    <TextView
-	        android:id="@+id/username"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	       android:maxLines="1"
-	       android:ellipsize="end"
-	       android:text="@string/blah"
-	        style="@style/navigation_menu_username_header_font"
-	        android:paddingTop="11dp"
-	        android:paddingBottom="11dp"
-	        android:textColor="@color/FriendsListHeaderText"
-	        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
-	        android:layout_marginRight="@dimen/friends_list_item_marginLeft"
-	         />
-     </RelativeLayout>
+		<RelativeLayout
+	        android:id="@+id/feed_header"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:paddingTop="6dp" 
+		    android:paddingBottom="6dp" 
+		    android:background="#000"
+		    android:gravity="center_vertical" >
+		
+		   <TextView
+		       android:id="@+id/feed_header_text"
+		       style="@style/navigation_menu_header_font"
+		       android:layout_width="wrap_content"
+		       android:layout_height="wrap_content"
+		        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
+		       android:layout_alignParentLeft="true"
+		       android:layout_centerVertical="true"
+	           android:textColor="@color/FriendsListHeaderText"
+		       android:text="Friend Feed" />
+		</RelativeLayout>
 
        <View
 	        android:id="@+id/header_divider_1"
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/navigation_menu_divider_height"
-	        android:layout_below="@id/username_layout"
+	        android:layout_below="@id/feed_header"
 	        android:background="@color/NavigationMenuDivider" />
 
          <ListView 
-             android:id="@+id/my_craves_list"
+             android:id="@+id/feeds_list"
              android:divider="@color/NavigationMenuDivider"
              android:dividerHeight="@dimen/navigation_menu_divider_height"
 	         android:layout_width="match_parent"
 	         android:layout_height="wrap_content"
 	         android:layout_below="@id/header_divider_1"
+	        android:listSelector="@drawable/sel_transparent"
+	         android:background="@color/FeedsColor"
              />
 
          <!-- 
@@ -89,7 +88,7 @@
 	        android:id="@+id/header_divider_3"
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/navigation_menu_divider_height"
-	        android:layout_below="@+id/my_craves_list"
+	        android:layout_below="@+id/feeds_list"
 	        android:background="@color/NavigationMenuDivider" />
          
 		<RelativeLayout
@@ -111,7 +110,7 @@
 		       android:layout_alignParentLeft="true"
 		       android:layout_centerVertical="true"
 	           android:textColor="@color/FriendsListHeaderText"
-		       android:text="YOUR FRIENDS" />
+		       android:text="Friends List" />
 
 		   <ProgressBar 
 	        android:id="@+id/friends_list_progress"
@@ -222,7 +221,7 @@
         swipe:swipeMode="none"
         android:layout_above="@+id/footer_divider"
         android:layout_alignParentLeft="true"
-        android:listSelector="@drawable/navigation_menu_background_selector"
+        android:listSelector="@drawable/sel_transparent"
         android:layout_below="@+id/header_divider"
         android:divider="@color/NavigationMenuDivider"
         android:dividerHeight="@dimen/navigation_menu_divider_height"

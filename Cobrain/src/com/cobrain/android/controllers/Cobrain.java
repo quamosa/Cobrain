@@ -17,8 +17,9 @@ import com.cobrain.android.R;
 import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.service.web.ResponseListener;
 import com.cobrain.android.service.web.WebRequest;
 import com.google.gson.Gson;
@@ -88,7 +89,8 @@ public class Cobrain {
 		public void showForgotPassword(String email);
 		public void showLogin(String loginUrl);
 		void hideSoftKeyBoard();
-		public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToBackStack);
+		public void showWishList(User owner, boolean showMyPrivateItems, boolean addToBackStack);
+		public void showWishList(Skus list, boolean showMyPrivateItems, boolean addToBackStack);
 		public void showErrorDialog(String message);
 		public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack);
 		public void showContactList(ContactSelectedListener listener);
@@ -102,7 +104,9 @@ public class Cobrain {
 		public TextView getTitleView();
 		public void showDefaultActionBar();
 		public void showCraves(CraveStrip strip, Sku sku, int containerId, boolean addToBackStack);
+		public void dispatchOnFragmentAttached(BaseCobrainFragment f);
 		public void dispatchOnFragmentDetached(BaseCobrainFragment f);
+		public void setCurrentCobrainView(CobrainView cv);
 	}
 	
 	public interface CobrainView {
@@ -147,6 +151,11 @@ public class Cobrain {
 		return token;
 	}
 
+	public boolean quickLogout() {
+		String url = context.getString(R.string.url_logout_get, context.getString(R.string.url_cobrain_app));
+    	return new WebRequest().get(url).go() == 200;
+	}
+	
 	public boolean logout() {
 		if (!isLoggedIn()) return false;
 		
@@ -183,6 +192,61 @@ public class Cobrain {
 			}
 		}
 		return this.token != null;
+	}
+
+	private boolean passwordChanged = false;
+	
+	public boolean changePassword(String username, final String currentPassword, final String newPassword, final String confirmPassword) {
+		quickLogin(null, username, currentPassword, new OnLoggedInListener() {
+			
+			@Override
+			public void onLoggedOut(UserInfo ui) {
+			}
+			
+			@Override
+			public void onLoggedIn(UserInfo ui) {
+				if (apiKey != null) {
+			    	String url = context.getString(R.string.url_password_change_get, context.getString(R.string.url_cobrain_app));
+			    	WebRequest wr = new WebRequest().setHeaders(userInfo.getApiKeyHeader()).get(url);
+		
+			    	if (wr.go() == 200) {
+						if (checkToken(wr.getResponse())) {
+					    	HashMap<String, String> fields = new HashMap<String, String>();
+							fields.put("authenticity_token", token);
+							fields.put("_method", "put");
+							fields.put("user[current_password]", currentPassword);
+							fields.put("user[password]", newPassword);
+							fields.put("user[password_confirmation]", confirmPassword);
+					    	url = context.getString(R.string.url_password_change_post, context.getString(R.string.url_cobrain_app));
+					    	if (wr.post(url).setFormFields(fields).go() == 200) {
+					    		passwordChanged = true;
+					    	}
+						}
+					}
+				}
+			}
+
+	    	/*
+	    	 * <div class="notice">You updated your account successfully.</div>
+<div class="content">
+<h1>Password Changed</h1>
+<p class="info-screen">Your password has been changed.</p>
+	    	 */
+
+			@Override
+			public void onFailure(String message) {
+			}
+			
+			@Override
+			public void onAccountCreated(UserInfo userInfo) {
+			}
+		});
+		
+		if (passwordChanged) {
+			passwordChanged = false;
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean resetPassword(String email) {
@@ -244,6 +308,29 @@ public class Cobrain {
 	
 	public boolean isLoggedIn() {
 		return apiKey != null && userInfo != null;
+	}
+	
+	public boolean quickLogin(String url, String username, String password, OnLoggedInListener listener) {
+    	WebRequest wr;
+
+    	if (url == null) {
+    		url = context.getString(R.string.url_login_post, context.getString(R.string.url_cobrain_app));
+    		wr = new WebRequest().post(url);
+    	}
+    	else wr = new WebRequest().get(url);
+		if (wr.go() == 200) {
+			String token = getAuthToken(wr.getResponse());
+			if (token != null) {
+				OnLoggedInListener l = loggedInListener;
+				loggedInListener = listener;
+				this.username = username;
+				this.password = password;
+				onAuthTokenReceived(token);
+				loggedInListener = l;
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void login(String url, String username, String password) {
@@ -383,6 +470,10 @@ public class Cobrain {
 			default:
 				onLogin(false);
 		}
+		
+		//lets logout after the login so we can clear out our session
+		//for changing passwords and any other stuff we need to do repeatedly against the app
+		quickLogout();
     	
 	}
 

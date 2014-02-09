@@ -34,24 +34,25 @@ import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.BrowserFragment;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.fragments.ContactListFragment;
-import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.fragments.CravesFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
+import com.cobrain.android.fragments.HomeFragment;
 import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
 import com.cobrain.android.fragments.NavigationMenuFragment;
-import com.cobrain.android.fragments.NerveCenterFragment;
 import com.cobrain.android.fragments.RaveUserListFragment;
 import com.cobrain.android.fragments.ResetPasswordFragment;
 import com.cobrain.android.fragments.SavedAndShareFragment;
+import com.cobrain.android.fragments.SettingsFragment;
 import com.cobrain.android.fragments.SignupFragment;
 import com.cobrain.android.fragments.TrainingFragment;
 import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.loaders.IntentLoader;
 import com.cobrain.android.loaders.TasteMakerLoader;
 import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.utils.HelperUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.ExceptionParser;
@@ -550,14 +551,14 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	
 	@Override
 	public void showHome() {
-        CraveStripsFragment craves = new CraveStripsFragment();
-		setCurrentCobrainView(craves);
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(R.id.content_frame, craves, CraveStripsFragment.TAG)
-        	.commitAllowingStateLoss();
-        
-        //getSupportFragmentManager().executePendingTransactions();
+		if (getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG) == null) {
+			HomeFragment home = new HomeFragment();
+			setCurrentCobrainView(home);
+	        getSupportFragmentManager()
+	        	.beginTransaction()
+	        	.replace(R.id.content_frame, home, HomeFragment.TAG)
+	        	.commitAllowingStateLoss();
+		}
 		closeMenu(true);
 	}
 
@@ -613,11 +614,11 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showNerveCenter() {
 
-		NerveCenterFragment training = new NerveCenterFragment();
+		SettingsFragment training = new SettingsFragment();
 		setCurrentCobrainView(training);
         getSupportFragmentManager()
         	.beginTransaction()
-        	.replace(R.id.content_frame, training, NerveCenterFragment.TAG)
+        	.replace(R.id.content_frame, training, SettingsFragment.TAG)
         	.commitAllowingStateLoss();
 
         closeMenu(true);
@@ -661,7 +662,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showWishList(WishList list, boolean showMyPrivateItems, boolean addToStack) {
+	public void showWishList(Skus list, boolean showMyPrivateItems, boolean addToStack) {
 		WishListFragment training = new WishListFragment();
 		training.initialize(list, showMyPrivateItems);
 		setCurrentCobrainView(training);
@@ -672,6 +673,18 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         	.commitAllowingStateLoss();
 	}
 
+	@Override
+	public void showWishList(User owner, boolean showMyPrivateItems, boolean addToStack) {
+		WishListFragment training = new WishListFragment();
+		training.initialize(owner, showMyPrivateItems);
+		setCurrentCobrainView(training);
+
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        if (addToStack) tr.addToBackStack(WishListFragment.TAG);
+        tr.replace(R.id.content_frame, training, WishListFragment.TAG)
+        	.commitAllowingStateLoss();
+	}
+	
 	@Override
 	public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack) {
 		BrowserFragment browser = new BrowserFragment();
@@ -798,7 +811,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		if (cobrainMenuView != null) cobrainMenuView.onSlidingMenuClosed();
 	}
 
-	void setCurrentCobrainView(CobrainView cv) {
+	@Override
+	public void setCurrentCobrainView(CobrainView cv) {
 		if (!isCobrainViewMenu(cv)) cobrainMainView = cv;
 		else cobrainMenuView = cv;
 		cobrainView = cv;
@@ -824,6 +838,19 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		switch(v.getId()) {
 		case R.id.app_icon_layout:
 			showNavigationMenu();
+		}
+	}
+
+	@Override
+	public void dispatchOnFragmentAttached(BaseCobrainFragment f) {
+		List<Fragment> fragments = getSupportFragmentManager().getFragments();
+		if (fragments != null) {
+			for (Fragment fragment : fragments) {
+				if (fragment instanceof BaseCobrainFragment) {
+					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
+					bf.onFragmentAttached(f);
+				}
+			}
 		}
 	}
 

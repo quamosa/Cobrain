@@ -42,15 +42,19 @@ public class LoaderUtils {
 	public void showLoading(CharSequence message) {
 		showLoading(message, true);
 	}
-	public void showLoading(CharSequence message, boolean pushToStack) {
-		if (pushToStack) loading++;
-		dismissEmpty();
-		loadingFrame.setVisibility(View.VISIBLE);
-		String msg = null;
-		if (message != null) {
-			msg = message.toString().toUpperCase();
-		}
-		loadingText.setText(msg);
+	public void showLoading(final CharSequence message, final boolean pushToStack) {
+		HelperUtils.runOnUiThread(new Runnable() {
+			public void run() {
+				if (pushToStack) loading++;
+				dismissEmpty();
+				loadingFrame.setVisibility(View.VISIBLE);
+				String msg = null;
+				if (message != null) {
+					msg = message.toString().toUpperCase();
+				}
+				loadingText.setText(msg);
+			}
+		});
 	}
 
 	public void showEmpty(CharSequence message) {
@@ -64,11 +68,12 @@ public class LoaderUtils {
 		loading--;
 		if (loading <= 0) {
 			loading = 0;
-			HelperUtils.runOnUiThread(new Runnable() {
-				public void run() {
-					loadingFrame.setVisibility(View.GONE);				
-				}
-			});
+			if (loadingFrame != null) 
+				HelperUtils.runOnUiThread(new Runnable() {
+					public void run() {
+						loadingFrame.setVisibility(View.GONE);				
+					}
+				});
 		}
 	}
 
@@ -76,11 +81,12 @@ public class LoaderUtils {
 		empty--;
 		if (empty <= 0) {
 			empty = 0;
-			HelperUtils.runOnUiThread(new Runnable() {
-				public void run() {
-					emptyFrame.setVisibility(View.GONE);
-				}
-			});
+			if (emptyFrame != null)
+				HelperUtils.runOnUiThread(new Runnable() {
+					public void run() {
+						emptyFrame.setVisibility(View.GONE);
+					}
+				});
 		}
 	}
 
@@ -109,7 +115,10 @@ public class LoaderUtils {
 	}
 	public static void show(final View v, boolean animate) {
 		if (v.getVisibility() == View.VISIBLE) return;
-		if (!animate) v.setVisibility(View.VISIBLE);
+		if (!animate) {
+			v.setVisibility(View.VISIBLE);
+			return;
+		}
 		if (v.getVisibility() == View.GONE) v.setVisibility(View.INVISIBLE);
 		
 		Animation ca = v.getAnimation();

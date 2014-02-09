@@ -1,0 +1,97 @@
+{
+  "feed": [
+    {
+      "_id": 234567890,
+      "type": "friend_likes_own",
+      "timestamp": 1234567890,
+      "user": {
+        "avatar_url": "/assets/avatar/piggy.jpg",
+        "_id": 1234567890,
+        "name": "Piggy",
+        "badges": [
+          {
+            "_id": 23456789,
+            "code": "tastemaker",
+            "title": "Tastemaker",
+            "created_at": 234567890,
+            "priority": 2
+          }
+        ]
+      },
+      "skus": []
+    },
+    {
+      "_id": 234567891,
+      "type": "friend_raves_mine",
+      "user": {
+        "avatar_url": "/assets/avatar/gonzo.jpg",
+        "_id": 1234567894,
+        "name": "Gonzo",
+        "badges": []
+      },
+      "skus": []
+    },
+    {
+      "_id": 234567892,
+      "type": "friend_likes_own",
+      "user": {
+        "avatar_url": "/assets/avatar/gonzo.jpg",
+        "_id": 1234567894,
+        "name": "Gonzo",
+        "badges": []
+      },
+      "skus": []
+    },
+    {
+      "_id": 234567893,
+      "type": "friend_raves_mine",
+      "timestamp": 1234567890,
+      "user": {
+        "avatar_url": "/assets/avatar/piggy.jpg",
+        "_id": 1234567890,
+        "name": "Piggy",
+        "badges": [
+          {
+            "_id": 23456789,
+            "code": "tastemaker",
+            "title": "Tastemaker",
+            "created_at": 234567890,
+            "priority": 2
+          }
+        ]
+      },
+      "skus": []
+    },
+    {
+      "_id": 234567894,
+      "type": "friend_likes_own",
+      "timestamp": 1234567890,
+      "user": {
+        "avatar_url": "/assets/avatar/piggy.jpg",
+        "_id": 1234567890,
+        "name": "Piggy",
+        "badges": [
+          {
+            "_id": 23456789,
+            "code": "tastemaker",
+            "title": "Tastemaker",
+            "created_at": 234567890,
+            "priority": 2
+          }
+        ]
+      },
+      "skus": []
+    },
+    {
+      "_id": 234567895,
+      "type": "friend_raves_mine",
+      "user": {
+        "avatar_url": "/assets/avatar/gonzo.jpg",
+        "_id": 1234567894,
+        "name": "Gonzo",
+        "badges": []
+      },
+      "skus": []
+    }
+  ]
+}

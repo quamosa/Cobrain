@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import com.cobrain.android.adapters.FriendsListAdapter;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Friendships;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.Friendship;
 
@@ -15,9 +16,9 @@ public class FriendsListLoader {
 	FriendsListAdapter adapter;
 	CobrainController controller;
 	ArrayList<Friendship> items = new ArrayList<Friendship>();
-	private AsyncTask<Void, Void, ArrayList<Friendship>> currentRequest;
-	private OnLoadListener<ArrayList<Friendship>> onLoadListener;
-	private ArrayList<Friendship> friends;
+	private AsyncTask<Void, Void, Friendships> currentRequest;
+	private OnLoadListener<Friendships> onLoadListener;
+	private Friendships friends;
 
 	public void initialize(CobrainController controller,
 			FriendsListAdapter adapter) {
@@ -39,10 +40,10 @@ public class FriendsListLoader {
 	public void loadFriendList() {
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 
-		currentRequest = new AsyncTask<Void, Void, ArrayList<Friendship>>() {
+		currentRequest = new AsyncTask<Void, Void, Friendships>() {
 
 			@Override
-			protected ArrayList<Friendship> doInBackground(Void... params) {
+			protected Friendships doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
 
@@ -56,11 +57,13 @@ public class FriendsListLoader {
 			}
 
 			@Override
-			protected void onPostExecute(ArrayList<Friendship> result) {
+			protected void onPostExecute(Friendships result) {
 				if (!isCancelled()) {
 					if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
-					adapter.clear();
-					adapter.addAll(result);
+					if (result != null) {
+						adapter.clear();
+						adapter.addAll(result.getFriendships());
+					}
 				}
 				currentRequest = null;
 			}
@@ -75,7 +78,7 @@ public class FriendsListLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<ArrayList<Friendship>> listener) {
+	public void setOnLoadListener(OnLoadListener<Friendships> listener) {
 		onLoadListener = listener;
 	}
 }

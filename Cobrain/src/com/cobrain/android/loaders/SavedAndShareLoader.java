@@ -1,23 +1,23 @@
 package com.cobrain.android.loaders;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.os.AsyncTask;
 import com.cobrain.android.adapters.SavedAndShareAdapter;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.WishList;
-import com.cobrain.android.model.v1.WishListItem;
 
 public class SavedAndShareLoader {
 	SavedAndShareAdapter adapter;
 	CobrainController controller;
-	OnLoadListener<ArrayList<WishListItem>> onLoadListener;
-	private AsyncTask<Void, Void, ArrayList<WishListItem>> currentRequest;
-	ArrayList<WishList> lists = null;
+	OnLoadListener<List<Sku>> onLoadListener;
+	private AsyncTask<Void, Void, List<Sku>> currentRequest;
 	int categoryId = 0;
 	int priceId = 0;
+	private boolean onSale;
 
 	public void initialize(CobrainController controller, SavedAndShareAdapter adapter) {
 		this.controller = controller;
@@ -42,9 +42,9 @@ public class SavedAndShareLoader {
 		}
 	}
 	
-	public void applyPriceFilter(int id) {
-		if (priceId != id) {
-			priceId = id;
+	public void applyPriceFilter(boolean onSale) {
+		if (this.onSale != onSale) {
+			this.onSale = onSale;
 			loadUserList();
 		}
 	}
@@ -52,38 +52,23 @@ public class SavedAndShareLoader {
 	public void loadUserList() {
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 
-		currentRequest = new AsyncTask<Void, Void, ArrayList<WishListItem>>() {
+		currentRequest = new AsyncTask<Void, Void, List<Sku>>() {
 			@Override
-			protected ArrayList<WishListItem> doInBackground(Void... params) {
+			protected List<Sku> doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
 
 				if (u != null) {
-					if (lists == null)
-						lists = u.getLists();
-
-					ArrayList<WishListItem> items = new ArrayList<WishListItem>();
-					
-					for (WishList lr : lists) {
-						//FIXME: Question?: what about shared lists.. ? im only showing my own!
-						if (lr.getOwner().getId().equals(u.getUserId())) {
-							WishList ml = u.getList(lr.getId());
-							for (WishListItem item : ml.getItems())
-								if (!item.isPublic()) {
-									if (isFilteredItem(item))
-										items.add(item);
-								}
-						}
-					}
-					
-					return items;
+					Skus s = u.getSkus(null, "saved", categoryId, onSale);
+					if (s != null) return s.get();
 				}
 
 				return null;
 			}
 
 			@Override
-			protected void onPostExecute(ArrayList<WishListItem> result) {
+			protected void onPostExecute(List<Sku> result) {
+				adapter.clear();
 				adapter.addAll(result);
 				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				currentRequest = null;
@@ -92,22 +77,6 @@ public class SavedAndShareLoader {
 		}.execute();		
 	}
 
-	private boolean isFilteredItem(WishListItem item) {
-		boolean ok = false;
-
-		switch(priceId) {
-		case 0: //all prices
-			ok |= true;
-			break;
-		case 1:  //on sale
-			ok |= (item.getProduct().isOnSale());
-			break;
-		}
-
-		return ok;
-	}
-
-
 	public void cancel() {
 		if (currentRequest != null) {
 			currentRequest.cancel(true);
@@ -115,7 +84,7 @@ public class SavedAndShareLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<ArrayList<WishListItem>> listener) {
+	public void setOnLoadListener(OnLoadListener<List<Sku>> listener) {
 		onLoadListener = listener;
 	}
 

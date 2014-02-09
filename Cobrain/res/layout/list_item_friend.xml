@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.cobrain.android.views.StateFullView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.cobrain.android.views.StateFullView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/navigation_menu_item_padding" 
-    android:paddingBottom="@dimen/navigation_menu_item_padding" 
+    android:paddingTop="@dimen/friends_list_item_padding" 
+    android:paddingBottom="@dimen/friends_list_item_padding" 
     android:background="@drawable/navigation_menu_background_selector"
     android:gravity="center_vertical" >
 
@@ -17,26 +19,25 @@
        android:scaleType="centerCrop"
        android:src="@drawable/ic_friend_delete" />
 
-   
    <TextView
        android:id="@+id/friend_name"
        style="@style/navigation_menu_font"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_alignParentLeft="true"
        android:layout_centerVertical="true"
-       android:layout_toLeftOf="@+id/friend_updates_layout"
-       android:maxLines="1"
        android:layout_marginRight="10dp"
+       android:layout_toLeftOf="@+id/friend_updates_layout"
+       android:layout_toRightOf="@+id/friend_avatar"
+       android:layout_marginLeft="10dp"
        android:ellipsize="end"
-       android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
+       android:maxLines="1"
        android:text="@string/blah" />
 
    <RelativeLayout 
        android:id="@+id/friend_updates_layout"
        android:layout_centerVertical="true"
-       android:layout_width="30dp"
-       android:layout_height="30dp"
+       android:layout_width="20dp"
+       android:layout_height="20dp"
        android:layout_toLeftOf="@+id/friend_delete"
        android:background="#5097d4"
        android:layout_marginRight="15dp"
@@ -51,6 +52,14 @@
 	       android:textColor="@color/White"
 	       android:textSize="15sp" />
    </RelativeLayout>
-   
+
+   <com.cobrain.android.views.RoundedImageView
+       android:id="@+id/friend_avatar"
+       android:layout_width="@dimen/avatar_size"
+       android:layout_height="@dimen/avatar_size"
+       android:layout_centerVertical="true"
+       android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
+       app:corner_radius="@dimen/avatar_corner_radius"
+        />
 
 </com.cobrain.android.views.StateFullView>

@@ -53,7 +53,8 @@ public class CraveStrip {
 			//if (r.getSkus().size() >= 20) {
 			if (on) {
 				type = STRIP_TYPE_CRAVES;
-				whyText = r.getWhyText();
+				if (r != null) whyText = r.getWhyText();
+				else whyText = "Was not able to get Cobrain loves for you... please try refreshing your list.";
 			}
 			else {
 				type = STRIP_TYPE_CRAVES_NOT_AVAILABLE;

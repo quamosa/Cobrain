@@ -1,6 +1,6 @@
 package com.cobrain.android.fragments;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.CraveCategoryFilterAdapter;
@@ -10,15 +10,13 @@ import com.cobrain.android.adapters.SavedAndShareAdapter;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.loaders.SavedAndShareLoader;
+import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.CategoryTree;
-import com.cobrain.android.model.v1.Product;
-import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.utils.LoaderUtils;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
 
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,18 +24,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 
-public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoadListener<ArrayList<WishListItem>> {
+public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoadListener<List<Sku>> {
 	public static final String TAG = "SavedAndShareFragment";
 	private SwipeListView saves;
 	private SavedAndShareAdapter adapter;
 	SavedAndShareLoader loader = new SavedAndShareLoader();
 	PopupWindow filterMenu = new PopupWindow();
-	ArrayList<WishListItem> sharedCraves = new ArrayList<WishListItem>();
 	Spinner priceFilter;
 	Spinner categoryFilter;
 	
@@ -57,7 +53,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		
 		View v = inflater.inflate(R.layout.main_saved_craves_frame, null);
 		saves = (SwipeListView) v.findViewById(R.id.saves_list);
-		adapter = new SavedAndShareAdapter(container.getContext(), R.id.item_info, sharedCraves, this);
+		adapter = new SavedAndShareAdapter(container.getContext(), R.id.item_info, this);
 		saves.setAdapter(adapter);
 		loaderUtils.initialize((ViewGroup) v);
 		loader.initialize(controller, adapter);
@@ -142,7 +138,8 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 				loader.dispose();
 
 				CraveCategoryFilterAdapter adapter = new CraveCategoryFilterAdapter(getActivity().getApplicationContext(), R.layout.list_item_craves_filter, R.id.caption);
-				adapter.addAll(r.getChildren());
+				if (r != null)
+					adapter.addAll(r.getChildren());
 				s.setAdapter(adapter);
 			}
 			
@@ -185,7 +182,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				loader.applyPriceFilter((int) id);
+				loader.applyPriceFilter(id == 1);
 			}
 
 			@Override
@@ -241,7 +238,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	}
 
 	@Override
-	public void onLoadCompleted(ArrayList<WishListItem> r) {
+	public void onLoadCompleted(List<Sku> r) {
 		if (r == null) {
 			loaderUtils.showEmpty("We had a problem loading your private craves. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
@@ -260,7 +257,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	}
 	
 	
-	public void saveRecommendation(final WishListItem savedCrave, boolean save, final OnLoadListener<Integer> listener) {
+	public void saveRecommendation(final Sku savedCrave, boolean save, final OnLoadListener<Integer> listener) {
 		listener.onLoadStarted();
 
 		new AsyncTask<Object, Void, Integer>() {
@@ -268,17 +265,15 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 			protected Integer doInBackground(Object... params) {
 
 				UserInfo ui = controller.getCobrain().getUserInfo();
-				String wishListId = ui.getWishListId();
-				Product p = ((WishListItem) params[0]).getProduct();
-				boolean save = (Boolean) params[1];
+				boolean save = (Boolean) params[0];
 				
 				if (save) {
-					if (ui.addToList(wishListId, p.getId(), false)) {
+					if (ui.addToPrivateRack(savedCrave)) {
 						return 1;
 					}
 				}
 				else {
-					if (ui.removeFromList(wishListId, savedCrave.getId())) {
+					if (ui.removeProduct(savedCrave)) {
 						return 2;
 					}
 				}
@@ -291,10 +286,10 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 				listener.onLoadCompleted(result);
 			}
 			
-		}.execute(savedCrave, save);
+		}.execute(save);
 	}
 
-	public void shareRecommendation(final WishListItem savedCrave, boolean share, final OnLoadListener<Integer> listener) {
+	public void shareRecommendation(final Sku savedCrave, boolean share, final OnLoadListener<Integer> listener) {
 		listener.onLoadStarted();
 
 		new AsyncTask<Object, Void, Integer>() {
@@ -302,17 +297,15 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 			protected Integer doInBackground(Object... params) {
 
 				UserInfo ui = controller.getCobrain().getUserInfo();
-				String wishListId = ui.getWishListId();
-				String itemId = ((WishListItem)params[0]).getId();
-				Boolean isShared = (Boolean)params[1];
+				Boolean isShared = (Boolean)params[0];
 				
-				if (itemId == null) {
-					if (ui.addToList(wishListId, savedCrave.getProduct().getId(), true)) {
+				if (isShared) {
+					if (ui.addToSharedRack(savedCrave)) {
 						return 1;
 					}
 				}
 				else {
-					if (ui.publishListItem(wishListId, itemId, isShared)) { 
+					if (ui.addToPrivateRack(savedCrave)) {
 						return 2;
 					}
 				}
@@ -326,7 +319,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 				listener.onLoadCompleted(result);
 			}
 			
-		}.execute(savedCrave, share);
+		}.execute(share);
 	}
 
 	public void showRavesUserList(String itemId) {

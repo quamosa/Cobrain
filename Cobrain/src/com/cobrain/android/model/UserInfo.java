@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.cobrain.android.R;
@@ -23,15 +24,21 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
-public class UserInfo {
+public class UserInfo extends User {
 	private static final String TAG = "UserInfo";
+	private static boolean DEBUG = true;
+
+	/*
+	if (DEBUG) {
+		String s = HelperUtils.Assets.read(context, "json/feed.json");
+		if (s != null) {
+			Feeds f = gson.fromJson(s, Feeds.class);
+			return f;
+		}
+	}*/
 
 	public String apiKey; //FIXME: only public for testing
-	
-	@SerializedName("_id")
-	private String userId;
 
-	private String name;
 	private String email;
 
 	@SerializedName("gender")
@@ -63,9 +70,6 @@ public class UserInfo {
 	ArrayList<Invitation> invites;
 	private String wishListId;
 
-	@SerializedName("avatar_url")
-	private String avatarUrl;
-
 	@SerializedName("hashed_phone_number")
 	private String hashedPhone;
 
@@ -96,11 +100,7 @@ public class UserInfo {
 	}
 
 	public String getUserId() {
-		return userId;
-	}
-
-	public String getName() {
-		return name;
+		return _id;
 	}
 	
 	public String getEmail() {
@@ -129,9 +129,9 @@ public class UserInfo {
 		
 			UserInfo ui = gson.fromJson(wr.getResponse(), UserInfo.class);
 			UserInfo me = UserInfo.this;
-			me.userId = ui.userId;
+			me._id = ui._id;
 			me.name = ui.name;
-			me.avatarUrl = ui.avatarUrl;
+			me.avatar_url = ui.avatar_url;
 			me.email = ui.email;
 			me.genderPreference = ui.genderPreference;
 			me.zipcode = ui.zipcode;
@@ -220,7 +220,7 @@ public class UserInfo {
 					
 					UserInfo ui = gson.fromJson(response, UserInfo.class);
 					UserInfo me = UserInfo.this;
-					me.userId = ui.userId;
+					me._id = ui._id;
 					me.name = ui.name;
 					me.email = ui.email;
 					me.genderPreference = ui.genderPreference;
@@ -252,6 +252,26 @@ public class UserInfo {
 	}
 
 
+	public Skus getSkus(String userId, String signal, Integer categoryId, Boolean onSale) {
+		String url = context.getString(R.string.url_skus_get, context.getString(R.string.url_cobrain_api));
+		ArrayList<String> qs = new ArrayList<String>();
+		if (userId != null) qs.add("targetUser=" + userId);
+		if (signal != null) qs.add("signal=" + signal);
+		if (categoryId != null) qs.add("categoryId=" + categoryId);
+		if (onSale != null) qs.add("onsale=" + onSale);
+		if (qs.size() > 0) {
+			url += "?" + TextUtils.join("&", qs);
+		}
+		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
+
+		if (wr.go() == 200) {
+			Skus s = gson.fromJson(wr.getResponse(), Skus.class);
+			return s;
+		}
+		else reportError("Could not get skus");
+		return null;
+	}
+	
 	public Scenarios getScenarios() {
 		String url = context.getString(R.string.url_scenarios_get, context.getString(R.string.url_cobrain_api));
 		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
@@ -276,13 +296,12 @@ public class UserInfo {
 		return null;
 	}
 	
-	public ArrayList<Friendship> getFriendships() {
+	public Friendships getFriendships() {
 		String url = context.getString(R.string.url_friendships_get, context.getString(R.string.url_cobrain_api));
 		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
 
 		if (wr.go() == 200) {
-			Type type = new TypeToken<List<Friendship>>(){}.getType();
-			ArrayList<Friendship> f = gson.fromJson(wr.getResponse(), type);
+			Friendships f = gson.fromJson(wr.getResponse(), Friendships.class);
 			return f;
 		}
 		else reportError("Could not get friendships");
@@ -311,6 +330,82 @@ public class UserInfo {
 		return false;
 	}
 
+	public Feeds getFeeds() {
+		String url = context.getString(R.string.url_feed_get, context.getString(R.string.url_cobrain_api));
+		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
+
+		if (wr.go() == 200) {
+			Feeds f = gson.fromJson(wr.getResponse(), Feeds.class);
+			return f;
+		}
+		else reportError("Could not get feeds");
+		
+		return null;
+	}
+
+	public boolean addToPrivateRack(Sku recommendation) {
+		return saveOpinion(recommendation.getOpinion().getId(), "saved", (String[])null);
+	}
+	public boolean addToSharedRack(Sku recommendation) {
+		return saveOpinion(recommendation.getOpinion().getId(), "shared", (String[])null);
+	}
+	public boolean dislikeProduct(Sku recommendation) {
+		return saveOpinion(recommendation.getOpinion().getId(), "disliked", (String[])null);
+	}
+	public boolean removeProduct(Sku recommendation) {
+		return removeOpinion(recommendation);
+	}
+	public boolean removeOpinion(Sku recommendation) {
+		return saveOpinion(recommendation.getOpinion().getId(), null, (String[])null);
+	}
+	
+	public boolean saveOpinion(String opinionId, String status, String ... reasons) {
+		if (apiKey != null) {
+			String url = context.getString(R.string.url_opinions_put, context.getString(R.string.url_cobrain_api), opinionId);
+			String sreasons = "";
+			String json = String.format("{\"status\":\"%s\",\"reasons\":[%s]}",
+					status, sreasons);
+
+			if (reasons != null) {
+				//TODO: not sure what reasons should look like yet!
+			}
+			WebRequest wr = new WebRequest().put(url).setContentType("application/json").setHeaders(apiKeyHeader());
+			if (wr.setBody(json).go() == 200) {
+				return true;
+			}
+			else reportError("Could not save opinion");
+		}
+		return false;
+	}
+
+	public boolean raveProduct(User owner, Sku product) {
+		if (apiKey != null) {
+			String url = context.getString(R.string.url_raves_post, context.getString(R.string.url_cobrain_api));
+			String json = String.format("{\"for\":%s,\"sku\":{\"id\":%s}}",
+					owner.getId(), product.getId());
+
+			WebRequest wr = new WebRequest().post(url).setContentType("application/json").setHeaders(apiKeyHeader());
+			if (wr.setBody(json).go() == 200) {
+				return true;
+			}
+			else reportError("Could not rave product");
+		}
+		return false;
+	}
+	public boolean unraveProduct(User owner, Sku product) {
+		if (apiKey != null) {
+			String url = context.getString(R.string.url_raves_delete, context.getString(R.string.url_cobrain_api));
+			String json = String.format("{\"for\":%s,\"sku\":{\"id\":%s}}",
+					owner.getId(), product.getId());
+
+			WebRequest wr = new WebRequest().delete(url).setContentType("application/json").setHeaders(apiKeyHeader());
+			if (wr.setBody(json).go() == 200) {
+				return true;
+			}
+			else reportError("Could not rave product");
+		}
+		return false;
+	}
 
 	/*
 	 *
@@ -432,7 +527,7 @@ public class UserInfo {
 
 	public String getInviteUrl() {
 		if (apiKey != null) {
-			if (invites.size() > 0) return invites.get(0).getLink();
+			if (invites != null && invites.size() > 0) return invites.get(0).getLink();
 		}
 		
 		return null;
@@ -443,7 +538,7 @@ public class UserInfo {
 	}
 	
 	public WishList getList(String id, boolean fromCache) {
-		if (apiKey != null) {
+		if (apiKey != null && id != null) {
 			
 			if (fromCache && listCache.containsKey(id)) return listCache.get(id);
 			
@@ -463,7 +558,8 @@ public class UserInfo {
 	
 	public String getWishListId() {
 		if (wishListId == null) {
-			wishListId = getLists().get(0).getId();
+			ArrayList<WishList> lists = getLists();
+			if (lists != null) wishListId = lists.get(0).getId();
 		}
 		return wishListId;
 	}
@@ -654,7 +750,7 @@ public class UserInfo {
 	}
 
 	public void validateInvitation() {
-		HelperUtils.SMS.sendSMS(context.getString(R.string.sms_invite_validation_number), userId);
+		HelperUtils.SMS.sendSMS(context.getString(R.string.sms_invite_validation_number), _id);
 		Cobrain c = new Cobrain(context);
 		Editor prefs = c.getEditableSharedPrefs();
 		prefs.putBoolean("invitesVerified", true);
@@ -664,6 +760,10 @@ public class UserInfo {
 	public boolean areInvitesVerified() {
 		Cobrain c = new Cobrain(context);
 		return c.getSharedPrefs().getBoolean("invitesVerified", false);
+	}
+
+	public HashMap<String, String> getApiKeyHeader() {
+		return apiKeyHeader();
 	}
 
 /*

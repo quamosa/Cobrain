@@ -7,8 +7,9 @@ import com.cobrain.android.R;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.Product;
 import com.cobrain.android.model.v1.Rave;
 import com.cobrain.android.model.v1.RecommendationsResults;
 import com.cobrain.android.model.v1.WishList;
@@ -40,7 +41,7 @@ import android.widget.TextView;
 
 public class CraveFragment extends Fragment implements OnClickListener, OnTouchListener {
 
-	private Product recommendation;
+	private Sku recommendation;
 	TextView itemRetailer;
 	TextView itemDescription;
 	TextView itemPrice;
@@ -57,15 +58,15 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	private ImageButton shareButton;
 	boolean isSaved;
 	boolean isPublished;
-	private String itemId;
+	private int itemId;
 	private boolean isOnSale;
 	private Integer salePrice;
 	private RelativeLayout saleLayout;
 	private TextView itemRegularPrice;
 	private TextView itemSalePercent;
 	private ImageView itemSaleIcon;
-	private WishList wishList;
-	private WishListItem wishListItem;
+	private Skus wishList;
+	private Sku wishListItem;
 	private WishListFragment wishListParent;
 	private TextView craveIndexLabel;
 	private ImageView raveIcon;
@@ -76,7 +77,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	private String raveId;
 	private int position;
 	private int totalCraves;
-	private List<WishListItem> wishListItems;
+	private List<Sku> wishListItems;
 
 	public CraveFragment() {
 	}
@@ -170,7 +171,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		super.onActivityCreated(savedInstanceState);
 	}
 	
-	public void setRecommendation(RecommendationsResults results, Product r) {
+	public void setRecommendation(RecommendationsResults results, Sku r) {
 		this.results = results;
 		recommendation = r;
 		if (r != null) position = r.getRank();
@@ -178,17 +179,17 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		update();
 	}
 
-	public void setWishListItem(WishList results, List<WishListItem> listItems, WishListItem item, int position, int total) {
+	public void setWishListItem(Skus results, List<Sku> listItems, Sku item, int position, int total) {
 		wishList = results;
 		wishListItem = item;
 		wishListItems = listItems;
 		this.position = position;
 		this.totalCraves = total;
-		recommendation = item.getProduct();
+		recommendation = (Sku) item;
 	}
 
 	void updateSaveAndShareState(boolean animate) {
-		itemId = null;
+		itemId = 0;
 		isSaved = false;
 		isPublished = false;
 		isOnSale = false;
@@ -201,10 +202,13 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 
 		if (wishListItem != null) {
 			itemId = wishListItem.getId();
-			isPublished = wishListItem.isPublic();
+			isPublished = wishListItem.getOpinion().is("shared");
 			isRaved = iRavedThis(wishListItem);
 		}
 		else {
+			isSaved = recommendation.getOpinion().is("saved");
+			isPublished = recommendation.getOpinion().is("shared");
+
 			//FIXME: uncomment when we have racks api endpoint available
 			/*
 			WishList list = getController().getCobrain().getUserInfo().getCachedWishList();
@@ -265,7 +269,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			return wishListParent.controller;
 	}
 	
-	private CharSequence getRaveInfoLabel(WishListItem item) {
+	private CharSequence getRaveInfoLabel(Sku item) {
 		boolean iRaved = iRavedThis(item);
 		int raves = item.getRaves().size();
 		
@@ -291,7 +295,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	}
 
 	//TODO: make asynchronous
-	private Boolean iRavedThis(WishListItem item) {
+	private Boolean iRavedThis(Sku item) {
 		if (_iRavedThis == null) {
 			_iRavedThis = false;
 			raveId = null;
@@ -392,7 +396,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		case R.id.just_for_me_button: 
 			//save or unsave toggle
 			if (isPublished) {
-				shareRecommendation(itemId, false);
+				shareRecommendation(recommendation, false);
 			}
 			else saveRecommendation(recommendation, !isSaved);
 			break;
@@ -401,7 +405,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			if (isPublished) {
 				saveRecommendation(recommendation, false);
 			}
-			else shareRecommendation(itemId, !isPublished);
+			else shareRecommendation(recommendation, !isPublished);
 			break;
 		case R.id.item_rave_icon:
 			//rave toggle
@@ -421,14 +425,14 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				UserInfo ui = wishListParent.controller.getCobrain().getUserInfo();
 				
 				if (rave) {
-					if (ui.raveListItem(wishList.getId(), wishListItem.getId())) {
+					if (ui.raveProduct(wishList.getOwner(), wishListItem)) {
 						//isRaved = rave;
 						refreshWishList();
 						return true;
 					}
 				}
 				else {
-					if (ui.unraveListItem(wishList.getId(), wishListItem.getId(), raveId)) {
+					if (ui.unraveProduct(wishList.getOwner(), wishListItem)) {
 						//isRaved = rave;
 						refreshWishList();
 						return true;
@@ -451,11 +455,11 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	}
 
 	void refreshWishList() {
-		String itemId = wishListItem.getId();
-		wishList = getController().getCobrain().getUserInfo().getList(wishList.getId());
+		int itemId = wishListItem.getId();
+		wishList = getController().getCobrain().getUserInfo().getSkus(wishList.getOwner().getId(), "shared", null, null);
 
-		for (WishListItem item : wishList.getItems()) {
-			if (item.getId().equals(itemId)) {
+		for (Sku item : wishList.get()) {
+			if (item.getId() == itemId) {
 				wishListItem = item;
 				wishListItems.set(position-1, wishListItem);
 				_iRavedThis = null;
@@ -466,7 +470,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		
 	}
 
-	public void saveRecommendation(Product recommendation, boolean save) {
+	public void saveRecommendation(Sku recommendation, boolean save) {
 		parent.loaderUtils.showLoading((save) ? "Saving your crave..." : "Removing your crave...");
 
 		new AsyncTask<Object, Void, Boolean>() {
@@ -489,18 +493,17 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				// ******
 
 				UserInfo ui = parent.controller.getCobrain().getUserInfo();
-				String wishListId = ui.getWishListId();
-				Product p = (Product) params[0];
 				boolean save = (Boolean) params[1];
+				Sku recommendation = (Sku) params[0];
 				
 				if (save) {
-					if (ui.addToList(wishListId, p.getId(), false)) {
+					if (ui.addToPrivateRack(recommendation)) {
 						isSaved = true;
 						return true;
 					}
 				}
 				else {
-					if (ui.removeFromList(wishListId, itemId)) {
+					if (ui.removeProduct(recommendation)) {
 						isSaved = false;
 						return true;
 					}
@@ -518,7 +521,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		}.execute(recommendation, save);
 	}
 
-	public void shareRecommendation(String itemId, boolean share) {
+	public void shareRecommendation(Sku recommendation, boolean share) {
 		parent.loaderUtils.showLoading((share) ? "Sharing your crave..." : "Making your crave private...");
 
 		new AsyncTask<Object, Void, Boolean>() {
@@ -526,20 +529,18 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			protected Boolean doInBackground(Object... params) {
 
 				UserInfo ui = parent.controller.getCobrain().getUserInfo();
-				String wishListId = ui.getWishListId();
-				String itemId = (String)params[0];
+				Sku recommendation = (Sku)params[0];
 				Boolean isShared = (Boolean)params[1];
 				
-				if (itemId == null) {
-					if (ui.addToList(wishListId, recommendation.getId(), true)) {
+				if (isShared) {
+					if (ui.addToSharedRack(recommendation)) {
 						isSaved = true;
-						isPublished = isShared;
 						return true;
 					}
 				}
 				else {
-					if (ui.publishListItem(wishListId, itemId, isShared)) { 
-						isPublished = isShared;
+					if (ui.removeProduct(recommendation)) {
+						isSaved = false;
 						return true;
 					}
 				}
@@ -554,7 +555,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				if (result) updateSaveAndShareState(true);
 			}
 			
-		}.execute(itemId, share);
+		}.execute(recommendation, share);
 	}
 
 	void updateFooterButtons(boolean animate) {
@@ -603,7 +604,8 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			cs = TextUtils.replace(cs, new String[] {"%1", "%2", "%3"}, new CharSequence[] {String.valueOf(position), String.valueOf(totalCraves), sharedOrSaved });
 			craveIndexLabel.setText(cs);
 			
-			raveNew.setVisibility(wishListItem.isNew() ? View.VISIBLE : View.INVISIBLE);
+			//raveNew.setVisibility(wishListItem.isNew() ? View.VISIBLE : View.INVISIBLE);
+			raveNew.setVisibility(View.INVISIBLE);
 			raveIcon.setImageResource(iRavedThis(wishListItem) ? R.drawable.crave_rave_button_pressed : R.drawable.crave_rave_button);
 
 			CharSequence raveInfo = getRaveInfoLabel(wishListItem);

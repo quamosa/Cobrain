@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    >
+
+     <RelativeLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:padding="20dp"
+         android:paddingTop="25dp" >
+
+         <TextView
+             android:id="@+id/current_pwd_label"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginBottom="10dp"
+             android:layout_marginTop="20dp"
+             android:textColor="#000"
+             android:text="Current Password" />
+
+         <EditText
+             android:id="@+id/current_password"
+             style="@style/edit_text"
+             android:inputType="textPassword"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginBottom="10dp"
+             android:layout_below="@+id/current_pwd_label" />
+         
+         <TextView
+             android:id="@+id/name_label"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginBottom="10dp"
+             android:textColor="#000"
+             android:layout_below="@+id/current_password"
+             android:text="New Password" />
+
+         <EditText
+             android:id="@+id/new_password"
+             style="@style/edit_text"
+             android:inputType="textPassword"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginBottom="10dp"
+             android:layout_below="@id/name_label" />
+
+         <TextView
+             android:id="@+id/zipcode_label"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_below="@+id/new_password"
+             android:layout_marginBottom="10dp"
+             android:textColor="#000"
+             android:text="Password Confirmation" />
+
+         <EditText
+             android:id="@+id/confirm_password"
+             style="@style/edit_text"
+             android:inputType="textPassword"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_below="@id/zipcode_label" />
+         
+         <Button
+             android:id="@+id/save_account_button"
+             style="@style/login_button"
+             android:layout_below="@+id/confirm_password"
+             android:text="UPDATE PASSWORD" />
+     </RelativeLayout>
+
+</ScrollView>

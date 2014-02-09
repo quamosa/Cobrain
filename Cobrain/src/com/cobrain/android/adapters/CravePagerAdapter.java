@@ -32,7 +32,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 	private int perPage;
 	private int countOnThisPage;
 	private int count;
-	private List<Product> recommendations;
+	private List<Sku> recommendations;
 	private BaseCobrainFragment parentFragment;
 	private boolean destroyAll;
 	private RecommendationsResults results;
@@ -75,7 +75,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 			int position = (page - 1) * perPage;
 
 			if (recommendations == null) 
-				recommendations = new ArrayList<Product>(position + products.size());
+				recommendations = new ArrayList<Sku>(position + products.size());
 
 			if (recommendations.size() == 0 && position == 0) {
 				recommendations.addAll(products);
@@ -164,7 +164,7 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 			int start = buf.getSpanStart(spans[0]);
 			int end = buf.getSpanEnd(spans[0]);
 			final int linkColor = parentFragment.getResources().getColor(R.color.SeaGreen);
-			
+
 			ClickableSpan cs = new ClickableSpan() {
 				@Override
 				public void onClick(View widget) {

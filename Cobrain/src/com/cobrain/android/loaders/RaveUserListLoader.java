@@ -66,8 +66,10 @@ public class RaveUserListLoader {
 			@Override
 			protected void onPostExecute(ArrayList<Rave> result) {
 				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
-				adapter.clear();
-				adapter.addAll(result);
+				if (result != null) {
+					adapter.clear();
+					adapter.addAll(result);
+				}
 				
 				currentRequest = null;
 			}

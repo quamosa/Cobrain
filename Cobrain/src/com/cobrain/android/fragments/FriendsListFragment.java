@@ -7,22 +7,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
-
 import com.cobrain.android.R;
+import com.cobrain.android.adapters.FeedListAdapter;
 import com.cobrain.android.adapters.FriendsListAdapter;
-import com.cobrain.android.adapters.NavigationMenuAdapter;
-import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.loaders.ContactLoader;
 import com.cobrain.android.loaders.ContactLoader.ContactInfo;
+import com.cobrain.android.loaders.FeedLoader;
 import com.cobrain.android.loaders.FriendsListLoader;
 import com.cobrain.android.loaders.OnLoadListener;
+import com.cobrain.android.model.Feed;
+import com.cobrain.android.model.Feeds;
 import com.cobrain.android.model.Friendship;
+import com.cobrain.android.model.Friendships;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.WishList;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
-import com.cobrain.android.utils.HelperUtils;
 import com.cobrain.android.utils.HelperUtils.Storage.TempStore;
 import com.cobrain.android.utils.HelperUtils.Timing;
 import com.cobrain.anroid.dialogs.FriendAcceptDialog;
@@ -33,8 +32,6 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,38 +39,40 @@ import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class FriendsListFragment extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<ArrayList<Friendship>> {
+public class FriendsListFragment extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<Friendships> {
 	public static final String TAG = FriendsListFragment.class.toString();
 	private SwipeListView friends;
-	private ListView myCraves;
+	private ListView feeds;
 	private FriendsListAdapter adapter;
-	private NavigationMenuAdapter myCravesAdapter;
+	private FeedListAdapter feedsAdapter;
 	FriendsListLoader loader = new FriendsListLoader();
+	FeedLoader feedLoader = new FeedLoader();
 	private ImageView edit;
 	ProgressBar progress;
 	View invite;
 	Button verify;
 	ContactLoader contacts = new ContactLoader();
 	Timing.Timer timer = new Timing.Timer();
-	TextView myname;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View v = inflater.inflate(R.layout.tune_menu, null);
+		View v = inflater.inflate(R.layout.frg_friends_list_fragment, null);
 		edit = (ImageView) v.findViewById(R.id.friend_edit);
 		friends = (SwipeListView) v.findViewById(R.id.friends_list);
 		progress = (ProgressBar) v.findViewById(R.id.friends_list_progress);
-		myCraves = (ListView) v.findViewById(R.id.my_craves_list);
+		feeds = (ListView) v.findViewById(R.id.feeds_list);
 		verify = (Button) v.findViewById(R.id.verify_invite_button);
 		verify.setOnClickListener(this);
 		adapter = new FriendsListAdapter(container.getContext(), R.id.friend_name, loader.getItems(), this);
@@ -93,9 +92,6 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 		invite = v.findViewById(R.id.invite_button_layout);
 		invite.setOnClickListener(this);
-		
-		myname = (TextView) v.findViewById(R.id.username);
-		updateUsername();
 		
 		//v.findViewById(R.id.my_saved_craves).setOnClickListener(this);
 		//v.findViewById(R.id.my_shared_craves).setOnClickListener(this);
@@ -151,8 +147,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
             }
 
         });
-		
-        setupMyCravesList(myCraves);
+
+        setupMyFeedsList(feeds);
 
 		return v;
 	}
@@ -163,43 +159,50 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	void updateUsername() {
-		if (controller.getCobrain().isLoggedIn()) {
-			String email = controller.getCobrain().getUserInfo().getEmail();
-			if (email != null) email = email.toUpperCase(Locale.US);
-			myname.setText(email);
-		}
-		else myname.setText(null);
-	}
-	
 	public void update() {
-		updateUsername();
 		verify.setVisibility((!controller.getCobrain().getUserInfo().areInvitesVerified()) ? View.VISIBLE : View.GONE);
 		loader.loadFriendList();
+		feedLoader.loadFeedList();
 	}
 	
-	void setupMyCravesList(ListView menu) {
-		ArrayList<NavigationMenuItem> menuItems = new ArrayList<NavigationMenuItem>();
-		Resources res = getActivity().getApplicationContext().getResources();
-		TypedArray items = res.obtainTypedArray(R.array.friends_menu_mycraves_menu_items);
+	void setupMyFeedsList(final ListView menu) {
+		ArrayList<Feed> menuItems = new ArrayList<Feed>();
+		feedsAdapter = new FeedListAdapter(getActivity().getApplicationContext(), menuItems, this);
+		feedLoader.initialize(controller, feedsAdapter);
+		feedLoader.setOnLoadListener(new OnLoadListener<Feeds>() {
 
-		for (int i = 0; i < items.length();) {
-			NavigationMenuItem nmi = new NavigationMenuItem();
-			nmi.caption = items.getString(i++);
-			nmi.icon = items.getDrawable(i++);
-			nmi.id = items.getInt(i++, 0);
-			menuItems.add(nmi);
-		}
+			@Override
+			public void onLoadStarted() {
+			}
 
-		myCravesAdapter = new NavigationMenuAdapter(getActivity().getApplicationContext(), menuItems);
-		myCravesAdapter.setLayoutId(R.layout.list_item_navigation_mycraves);
-		menu.setAdapter(myCravesAdapter);
+			@Override
+			public void onLoadCompleted(Feeds r) {
+				int height = getResources().getDimensionPixelSize(R.dimen.min_feed_list_height);
+		        if (r != null) {
+		        	if (r.getFeeds().size() > 2) {
+		        		View item = feedsAdapter.getView(0, null, menu);
+		        		if (item.getLayoutParams() == null) {
+		        			item.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		        		}
+		        		item.measure(0, 0);
+		        		height = (int) (2.5 * item.getMeasuredHeight());
+		        	}
+		        }
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) menu.getLayoutParams();
+				params.height = height;
+	            menu.setLayoutParams(params);
+			}
+
+		});
+		
+		menu.setAdapter(feedsAdapter);
 		menu.setOnItemClickListener(this);
 	}
 	
 	@Override
 	public void onDestroyView() {
 		timer.dispose();
+		feedLoader.dispose();
 		loader.dispose();
 		verify.setOnClickListener(null);
 		verify = null;
@@ -209,11 +212,10 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		edit.setOnClickListener(null);
 		edit = null;
 		progress = null;
-		myname = null;
-		myCraves.setAdapter(null);
-		myCraves = null;
-		myCravesAdapter.clear();
-		myCravesAdapter = null;
+		feeds.setAdapter(null);
+		feeds = null;
+		feedsAdapter.clear();
+		feedsAdapter = null;
 		adapter.clear();
 		adapter = null;
 		//FIXME: friends.setAdapter(null);
@@ -475,7 +477,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			}
 			
 			if (friend.isAccepted()) {
-				showWishList(friend, false);
+				//showFriendCraves(friend.getUser(), false);
 				controller.setMenuItemSelected((ListView)parent, position, true);
 			}
 			else {
@@ -485,15 +487,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		else {
 			controller.setMenuItemSelected((ListView)parent, position, true);
 
-			switch ((int)id) {
-			case 2:
-				controller.showSavedAndShare();
-				controller.closeMenu(true);
-				break;
-			case 3:
-				WishList myList = controller.getCobrain().getUserInfo().getCachedWishList();
-				//TODO: showWishList(myList, false);
-			}
+			Feed f = feedsAdapter.getItem(position);
+			//showFriendCraves(f.getUser(), false);
 			
 		}
 	}
@@ -546,7 +541,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	}
 
 	@Override
-	public void onLoadCompleted(ArrayList<Friendship> r) {
+	public void onLoadCompleted(Friendships r) {
 		if (silentMode) {
 			friends.post(new Runnable() {
 				public void run() {

@@ -5,11 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import it.sephiroth.android.library.widget.AdapterView;
-import it.sephiroth.android.library.widget.AdapterView.OnItemClickListener;
 import it.sephiroth.android.library.widget.HListView;
 import android.os.AsyncTask;
-import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -21,6 +18,7 @@ import com.cobrain.android.adapters.CraveStripPagerListAdapter;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.CraveStripLoader;
+import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.model.ScenarioItem;
 import com.cobrain.android.model.Scenarios;
 import com.cobrain.android.model.UserInfo;
@@ -31,7 +29,7 @@ public class CraveStripsLoader {
 	ListView craveStripList;
 	CraveStripListAdapter craveStripListAdapter;
 	ArrayList<CraveStrip> craveStrips = new ArrayList<CraveStrip>();
-
+	
 	public void initialize(CraveStripsFragment parent, ListView list) {
 		this.parent = parent;
 		craveStripList = list;
@@ -88,6 +86,8 @@ public class CraveStripsLoader {
 					
 					Collections.sort(sc.getResults(), c);
 	
+					scenariosToStrips( sc.getResults() );
+
 					return sc.getResults();
 				}
 
@@ -96,7 +96,7 @@ public class CraveStripsLoader {
 
 			@Override
 			protected void onPostExecute(List<ScenarioItem> result) {
-				scenariosToStrips(result);
+				loadStrips();
 			}
 			
 		}.execute();
@@ -105,50 +105,54 @@ public class CraveStripsLoader {
 	void setup() {
 		craveStripListAdapter = new CraveStripListAdapter(parent.getActivity().getApplicationContext(), R.id.caption, craveStrips, parent);
 	}
-	
-	void scenariosToStrips(List<ScenarioItem> scenarios) {
-		for (ScenarioItem s : scenarios) {
-			CraveStrip strip = new CraveStrip(craveStripListAdapter, parent);
 
-			//CraveStripGroupedPagerAdapter adapter = new CraveStripGroupedPagerAdapter(getActivity(), CravesFragment.this);
-			CraveStripPagerAdapter adapter = new CraveStripPagerAdapter(parent.getActivity(), strip, parent);
-			CraveStripLoader loader = new CraveStripLoader();
-			loader.initialize(parent.controller, adapter);
-
-			strip.scenarioId = s.getId();
-			strip.adapter = adapter;
-			strip.loader = loader;
-			//strip.pager = new com.cobrain.android.views.ViewPager(getActivity().getApplicationContext());
-
-			CraveStripPagerListAdapter a = new CraveStripPagerListAdapter(parent.getActivity().getApplicationContext(), adapter);
-			strip.listAdapter = a;
-
-			strip.list = new HListView(parent.getActivity().getApplicationContext());
-			strip.list.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, a.getItemHeight()));
-			strip.list.setDivider(null);
-			strip.list.setTag(strip);
-			strip.list.setSelector(R.drawable.sel_transparent);
-			
-			//FYI: to scroll and present views like Netflix android app:
-			//strip.pager.setPageMargin(-80); to do like netflix android app
-			//strip.adapter = new CraveStripGroupedPagerAdapter
-			
-			
-			strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
-			/*
-			strip.pager.setId(strip.categoryId);
-			strip.container.setId(strip.categoryId + 0x1000);
-			strip.container.addView(strip.pager);
-			*/
-			strip.container.addView(strip.list);
-
+	void loadStrips() {
+		for (CraveStrip strip : craveStrips) {
 			strip.load();
-
-			craveStrips.add(strip);
 		}
-		
 		craveStripList.setAdapter(craveStripListAdapter);
-		
+	}
+
+	void scenariosToStrips(List<ScenarioItem> scenarios) {
+		if (scenarios != null) {
+			for (ScenarioItem s : scenarios) {
+				CraveStrip strip = new CraveStrip(craveStripListAdapter, parent);
+	
+				//CraveStripGroupedPagerAdapter adapter = new CraveStripGroupedPagerAdapter(getActivity(), CravesFragment.this);
+				CraveStripPagerAdapter adapter = new CraveStripPagerAdapter(parent.getActivity(), strip, parent);
+				CraveStripLoader loader = new CraveStripLoader();
+				loader.initialize(parent.controller, adapter);
+	
+				strip.scenarioId = s.getId();
+				strip.adapter = adapter;
+				strip.loader = loader;
+				//strip.pager = new com.cobrain.android.views.ViewPager(getActivity().getApplicationContext());
+	
+				CraveStripPagerListAdapter a = new CraveStripPagerListAdapter(parent.getActivity().getApplicationContext(), adapter);
+				strip.listAdapter = a;
+	
+				strip.list = new HListView(parent.getActivity().getApplicationContext());
+				strip.list.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, a.getItemHeight()));
+				strip.list.setDivider(null);
+				strip.list.setTag(strip);
+				strip.list.setSelector(R.drawable.sel_transparent);
+				
+				//FYI: to scroll and present views like Netflix android app:
+				//strip.pager.setPageMargin(-80); to do like netflix android app
+				//strip.adapter = new CraveStripGroupedPagerAdapter
+				
+				
+				strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
+				/*
+				strip.pager.setId(strip.categoryId);
+				strip.container.setId(strip.categoryId + 0x1000);
+				strip.container.addView(strip.pager);
+				*/
+				strip.container.addView(strip.list);
+	
+				craveStrips.add(strip);
+			}
+		}
 	}
 
 }

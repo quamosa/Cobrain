@@ -81,8 +81,8 @@ public class ImageLoader {
                 mTarget.setTag(null);
                 if (result != null) {
                 	mTarget.setImageBitmap(result);
-                	if (mOnLoadListener != null) mOnLoadListener.onLoad(mUrl, mTarget, result, false);
                 }
+            	if (mOnLoadListener != null) mOnLoadListener.onLoad(mUrl, mTarget, result, false);
             } else if (mTarget.getTag() != null) {
             	ImageLoader.cancel(mTarget);
             }

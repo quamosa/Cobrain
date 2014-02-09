@@ -1,15 +1,15 @@
 package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.os.AsyncTask;
-import android.os.Debug;
 import com.cobrain.android.adapters.WishListPagerAdapter;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.WishList;
-import com.cobrain.android.model.v1.WishListItem;
 
 public class WishListLoader {
 	String listId;
@@ -18,8 +18,8 @@ public class WishListLoader {
 	int countPerPage = 5; //50 no longer returns results
 	WishListPagerAdapter adapter;
 	CobrainController controller;
-	OnLoadListener<ArrayList<WishListItem>> onLoadListener;
-	private AsyncTask<Void, Void, ArrayList<WishListItem>> currentRequest;
+	OnLoadListener<List<Sku>> onLoadListener;
+	private AsyncTask<Void, Void, List<Sku>> currentRequest;
 	private ArrayList<Integer> pagesLoaded = new ArrayList<Integer>();
 	boolean onSale;
 	boolean showPrivateOrPublic; //private is true
@@ -101,34 +101,35 @@ public class WishListLoader {
 		}
 	}
 	
-	void loadWishList(final String listId, final int countPerPage, final int page) {
+	void loadWishList(final String userId, final int countPerPage, final int page) {
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 		
-		currentRequest = new AsyncTask<Void, Void, ArrayList<WishListItem>>() {
-			WishList r = null;
+		currentRequest = new AsyncTask<Void, Void, List<Sku>>() {
 
+			Skus r = null;
+			
 			@Override
-			protected ArrayList<WishListItem> doInBackground(Void... params) {
+			protected List<Sku> doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
-				ArrayList<WishListItem> items = new ArrayList<WishListItem>();
+				List<Sku> items = null;
 				
 				if (u != null) {
-					r = u.getList(listId);
-					if (r != null) {
-						for (WishListItem item : r.getItems()) {
-							if (!item.isPublic() == showPrivateOrPublic) {
-								items.add(item);
-							}
-						}
-					}
+					r = u.getSkus(userId, showPrivateOrPublic ? "saved" : "shared", null, null);
+					items = r.get();
 				}
 				
 				return items;
 			}
 
 			@Override
-			protected void onPostExecute(ArrayList<WishListItem> result) {
+			protected void onCancelled() {
+				r = null;
+				super.onCancelled();
+			}
+
+			@Override
+			protected void onPostExecute(List<Sku> result) {
 				if (result != null) {
 					int pg = 1; //result.getPage();
 					WishListLoader.this.page = pg;
@@ -150,7 +151,7 @@ public class WishListLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<ArrayList<WishListItem>> listener) {
+	public void setOnLoadListener(OnLoadListener<List<Sku>> listener) {
 		onLoadListener = listener;
 	}
 }

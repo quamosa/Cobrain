@@ -103,7 +103,8 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		}
 	}
 
-
+	public CravesFragment() {}
+	
 	private CravesFragment(CraveStrip strip, Sku sku) {
 		skus = new ArrayList<Sku>();
 		pageTitle = "<small><small>" + strip.caption + "</small></small>";
@@ -675,7 +676,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	}
 	public void showBrowser(String url, String merchant) {
 		cravePager.setId(View.NO_ID); //so we don't save the pager state automatically; i want to do this myself
-		controller.showBrowser(url, R.id.main_layout, merchant, true);
+		controller.showBrowser(url, R.id.overlay_layout, merchant, true);
 	}
 
 	public void onCravePageLoaded(int position) {

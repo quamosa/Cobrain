@@ -3,12 +3,11 @@ package com.cobrain.android.fragments;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.RaveUserListAdapter;
 import com.cobrain.android.loaders.RaveUserListLoader;
-import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.v1.Rave;
-import com.cobrain.android.model.v1.WishList;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,16 +41,15 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 
 		loaderUtils.showLoading("Loading " + rave.getUser().getName() + "'s rave list...");
 		
-		new AsyncTask<Object, Void, WishList>() {
+		new AsyncTask<Object, Void, Skus>() {
 			@Override
-			protected WishList doInBackground(Object... params) {
+			protected Skus doInBackground(Object... params) {
 
-				WishList list = controller.getCobrain().getUserInfo().getListForUser(rave.getUser().getId());
-				return list;
+				return controller.getCobrain().getUserInfo().getSkus(rave.getUser().getId(), "shared", null, null);
 			}
 
 			@Override
-			protected void onPostExecute(WishList result) {
+			protected void onPostExecute(Skus result) {
 				loaderUtils.dismiss();
 				if (result != null) {
 					controller.showWishList(result, false, true);
@@ -78,6 +76,16 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 
 	void update() {
 		loader.loadFriendList(itemId);
+	}
+
+	public static Fragment newInstance(String userId) {
+		Bundle args = new Bundle();
+		args.putString("userId", userId);
+		
+		RaveUserListFragment f = new RaveUserListFragment();
+		f.setArguments(args);
+
+		return f;
 	}
 	
 }

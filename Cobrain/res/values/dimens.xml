@@ -12,6 +12,8 @@
 	<dimen name="navigation_menu_item_padding">12dp</dimen>
 	<dimen name="navigation_menu_item_marginLeft">25dp</dimen>
 
+	<dimen name="friends_list_item_padding">4dp</dimen>
+	
 	<dimen name="friends_list_item_marginLeft">40dp</dimen>
 	<dimen name="raves_list_item_marginLeft">50dp</dimen>
 	
@@ -26,4 +28,10 @@
 	<dimen name="saved_and_shared_item_height">127dp</dimen>
 
 	<dimen name="crave_strip_item_height">220dp</dimen>
+	<dimen name="min_feed_list_height">75dp</dimen>
+	
+	<dimen name="avatar_size">47dp</dimen>
+	<dimen name="avatar_corner_radius">5dp</dimen>
+	
+	<dimen name="home_pager_margin_size">27dp</dimen>
 </resources>

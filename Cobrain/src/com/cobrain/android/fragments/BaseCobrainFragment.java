@@ -5,14 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.utils.LoaderUtils;
-import com.fortysevendeg.swipelistview.SwipeListView;
 
 public class BaseCobrainFragment extends SherlockFragment implements OnClickListener, CobrainView {
 	public CobrainController controller;
@@ -22,6 +19,8 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	boolean updateRequested;
 	StateSaver state = new StateSaver();
 	boolean silentMode;
+
+	public BaseCobrainFragment() {}
 
 	public class StateSaver {
 		Bundle savedState = new Bundle();
@@ -97,6 +96,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		controller.showOptionsMenu(true);
 		actionBar = controller.getSupportActionBar();
 		abHide = new View(activity.getApplicationContext());
+		controller.dispatchOnFragmentAttached(this);
 		super.onAttach(activity);
 	}
 
@@ -176,6 +176,8 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	}
 
 	public void onFragmentDetached(BaseCobrainFragment f) {
+	}
+	public void onFragmentAttached(BaseCobrainFragment f) {
 	}
 
 }

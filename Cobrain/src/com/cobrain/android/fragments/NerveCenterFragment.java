@@ -39,7 +39,7 @@ public class NerveCenterFragment extends BaseCobrainFragment implements OnPageCh
 		actionBar.addTab(actionBar.newTab().setText("LOGIN INFO").setTabListener(this));
 		actionBar.addTab(actionBar.newTab().setText("FORGET ME").setTabListener(this));
 		
-    	setTitle("Nerve Center");
+    	setTitle("Settings");
     	
         return v;
 	}

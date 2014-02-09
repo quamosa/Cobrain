@@ -6,5 +6,13 @@ public class Opinion {
 	String _id;
 	String updated_at;
 	List<String> reasons;
-	String status;
+	String signal;
+	
+	public String getId() {
+		return _id;
+	}
+
+	public boolean is(String signal) {
+		return this.signal != null && this.signal.equals(signal);
+	}
 }
