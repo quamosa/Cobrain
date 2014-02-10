@@ -848,7 +848,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 			for (Fragment fragment : fragments) {
 				if (f != fragment && fragment instanceof BaseCobrainFragment) {
 					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
-					bf.dispatchOnFragmentAttached(f);
+					bf.onFragmentAttached(f);
 				}
 			}
 		}
@@ -861,7 +861,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 			for (Fragment fragment : fragments) {
 				if (f != fragment && fragment instanceof BaseCobrainFragment) {
 					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
-					bf.dispatchOnFragmentDetached(f);
+					bf.onFragmentDetached(f);
 				}
 			}
 		}

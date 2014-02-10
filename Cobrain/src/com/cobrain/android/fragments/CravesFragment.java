@@ -23,8 +23,10 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
@@ -628,6 +630,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 			boolean restore = savedState.isSaved();
 
 			if (craveLoader.setCategoryId(id) | craveLoader.setOnSaleRecommendationsOnly(onSale)) {
+//				priceFilter.setText((onSale) ? "On Sale" : "All Prices");
 				savedState.categoryId = id;
 				//lets only load the top level apparel: id = 6
 				//craveFilterLoader.load(id);

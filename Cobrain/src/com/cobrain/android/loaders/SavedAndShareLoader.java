@@ -68,8 +68,10 @@ public class SavedAndShareLoader {
 
 			@Override
 			protected void onPostExecute(List<Sku> result) {
-				adapter.clear();
-				adapter.addAll(result);
+				if (result != null) {
+					adapter.clear();
+					adapter.addAll(result);
+				}
 				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				currentRequest = null;
 			}

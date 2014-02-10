@@ -53,7 +53,14 @@ public class ScenarioStripPagerAdapter extends CraveStripPagerAdapter<Scenario> 
 		default:
 			
 			int pos = position - offset;
-			CraveStripFragment<Scenario> csf = new CraveStripFragment<Scenario>(getActivity(),  parentFragment);
+			CraveStripFragment<Scenario> csf = new CraveStripFragment<Scenario>(getActivity(),  parentFragment) {
+
+				@Override
+				protected void onShowZoomedCrave(Scenario skuParent, Sku s) {
+					parentFragment.showCravesFragmentForScenario(skuParent, s);
+				}
+				
+			};
 
 			if (recommendations == null) 
 				return csf;
