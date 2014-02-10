@@ -14,13 +14,13 @@ public class Skus {
 	}
 
 	public User getOwner() {
-		return null;
+		return owner;
 	}
 	public void setOwner(User owner) {
 		this.owner = owner;
-	}
-	public void setId(String id) {
-		this._id = id;
+		if (owner != null) 
+			this._id = owner.getId();
+		else this._id = null;
 	}
 
 	public String getId() {

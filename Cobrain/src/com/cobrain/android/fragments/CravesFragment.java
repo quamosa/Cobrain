@@ -30,7 +30,7 @@ import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.cobrain.android.R;
-import com.cobrain.android.adapters.CravePagerAdapter;
+import com.cobrain.android.adapters.SkuPagerAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.controllers.CraveStrip;
@@ -48,7 +48,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 	List<Sku> skus;
 
 	public ViewPager cravePager;
-	CravePagerAdapter craveAdapter;
+	SkuPagerAdapter craveAdapter;
 	CraveLoader craveLoader = new CraveLoader();
 	CraveFilterLoader craveFilterLoader = new CraveFilterLoader();
 	TextView craveFilterHeader;
@@ -140,7 +140,7 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 		
 		View v = inflater.inflate(R.layout.frg_craves_fragment, null);
 		cravePager = (ViewPager) v.findViewById(R.id.crave_pager);
-		craveAdapter = new CravePagerAdapter(getChildFragmentManager(), this);
+		craveAdapter = new SkuPagerAdapter(getChildFragmentManager(), this);
 		cravePager.setAdapter(craveAdapter);
 		craveLoader.initialize(controller, craveAdapter);
 		craveLoader.setOnLoadListener(this);

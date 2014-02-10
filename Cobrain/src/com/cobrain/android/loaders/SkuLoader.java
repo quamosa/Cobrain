@@ -1,26 +1,25 @@
 package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import android.os.AsyncTask;
 import com.cobrain.android.adapters.SkuPagerAdapter;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
-import com.cobrain.android.model.Scenario;
-import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
 
-public class CraveLoader {
-	//int page;
+public class SkuLoader {
 	int categoryId = 0;
-	int countPerPage = 25; //50 no longer returns results
+	int countPerPage = 25;
 	SkuPagerAdapter adapter;
 	CobrainController controller;
-	OnLoadListener<List<Sku>> onLoadListener;
-	private AsyncTask<Void, Void, List<Sku>> currentRequest;
+	OnLoadListener<Skus> onLoadListener;
+	private AsyncTask<Void, Void, Skus> currentRequest;
 	private ArrayList<Integer> pagesLoaded = new ArrayList<Integer>();
 	boolean onSale;
+	private User owner;
+	private String signal;
 
 	public int getCategoryId() {
 		return categoryId;
@@ -33,7 +32,6 @@ public class CraveLoader {
 	public boolean setCategoryId(int categoryId) {
 		if (categoryId != this.categoryId) {
 			this.categoryId = categoryId;
-			//page = 0;
 			pagesLoaded.clear();
 			return true;
 		}
@@ -42,7 +40,24 @@ public class CraveLoader {
 	public boolean setOnSaleRecommendationsOnly(boolean onSale) {
 		if (this.onSale != onSale) {
 			this.onSale = onSale;
-			//page = 0;
+			pagesLoaded.clear();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean setOwner(User owner) {
+		if (this.owner != owner) {
+			this.owner = owner;
+			pagesLoaded.clear();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean setSignal(String signal) {
+		if (this.signal != signal) {
+			this.signal = signal;
 			pagesLoaded.clear();
 			return true;
 		}
@@ -74,50 +89,41 @@ public class CraveLoader {
 		adapter = null;
 		onLoadListener = null;
 	}
-
+	
 	public void loadPage(int page) {
 		if (page < 1) page = 1;
 		else if (page > 1 && adapter.getMaxPages() > 0 && page > adapter.getMaxPages()) page = adapter.getMaxPages();
 		
 		//if (this.page != page) {
 			if (!pagesLoaded.contains(page)) {
-				loadRecommendations(categoryId, countPerPage, page);
+				loadRecommendations(owner, signal, countPerPage, page);
 			}
 		//}
 	}
 	
-	void loadRecommendations(final int categoryId, final int countPerPage, final int page) {
+	void loadRecommendations(final User owner, final String signal, final int countPerPage, final int page) {
 		pagesLoaded.add(page);
 
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 		
-		currentRequest = new AsyncTask<Void, Void, List<Sku>>() {
+		currentRequest = new AsyncTask<Void, Void, Skus>() {
 			@Override
-			protected List<Sku> doInBackground(Void... params) {
+			protected Skus doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
-				List<Sku> r = null;
 				
 				if (u != null) {
-					Scenario s = u.getScenario(categoryId);
-					if (s != null) r = s.getSkus();
-					//r = u.getRecommendations(categoryId, countPerPage, page, onSale);
+					return u.getSkus(owner, signal, null, null);
 				}
-				//else Debug.waitForDebugger();
 				
-				return r;
+				return null;
 			}
 
 			@Override
-			protected void onPostExecute(List<Sku> result) {
-				if (result != null) {
-					//int pg = result.getPage();
-					//CraveLoader.this.page = pg;
-					//pagesLoaded.add(pg);
-				}
-				else {
+			protected void onPostExecute(Skus result) {
+				if (result == null) {
 					pagesLoaded.remove((Integer)page);
-					CraveLoader.this.categoryId = 0;
+					SkuLoader.this.categoryId = 0;
 				}
 				loadSkus(result);
 				currentRequest = null;
@@ -126,11 +132,11 @@ public class CraveLoader {
 		}.execute();			
 	}
 
-	public void loadSkus(List<Sku> skus) {
+	public void loadSkus(Skus skus) {
 		if (skus != null && !pagesLoaded.contains(1)) {
 			pagesLoaded.add(1);
 		}
-		adapter.load(skus);
+		adapter.load(skus.get());
 		if (onLoadListener != null) onLoadListener.onLoadCompleted(skus);
 	}
 	
@@ -141,7 +147,7 @@ public class CraveLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<List<Sku>> listener) {
+	public void setOnLoadListener(OnLoadListener<Skus> listener) {
 		onLoadListener = listener;
 	}
 

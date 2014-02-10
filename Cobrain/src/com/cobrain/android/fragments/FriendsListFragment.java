@@ -19,6 +19,7 @@ import com.cobrain.android.model.Feed;
 import com.cobrain.android.model.Feeds;
 import com.cobrain.android.model.Friendship;
 import com.cobrain.android.model.Friendships;
+import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
@@ -477,7 +478,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			}
 			
 			if (friend.isAccepted()) {
-				//showFriendCraves(friend.getUser(), false);
+				showWishList(friend.getUser(), false);
 				controller.setMenuItemSelected((ListView)parent, position, true);
 			}
 			else {
@@ -488,7 +489,13 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			controller.setMenuItemSelected((ListView)parent, position, true);
 
 			Feed f = feedsAdapter.getItem(position);
-			//showFriendCraves(f.getUser(), false);
+					 
+			if (f.isType("friend_likes_own")) {
+				showWishList(f.getUser(), false);
+			}
+			else if (f.isType("friend_raves_mine")) {
+				showWishList(controller.getCobrain().getUserInfo(), false);
+			}
 			
 		}
 	}
@@ -526,8 +533,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		dialog.show(getChildFragmentManager(), FriendAcceptDialog.TAG);
 	}
 
-	void showWishList(Friendship friend, boolean showMyPrivateItems) {
-		//TODO: controller.showWishList(list, showMyPrivateItems, false);
+	void showWishList(User owner, boolean showMyPrivateItems) {
+		controller.showWishList(owner, showMyPrivateItems, false);
 		controller.closeMenu(true);
 	}
 

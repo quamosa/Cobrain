@@ -9,7 +9,6 @@ import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.loaders.FontLoader;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
-import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.Product;
@@ -40,7 +39,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class CraveStripFragment extends MiniFragment implements OnClickListener, OnTouchListener {
+public class CraveStripFragment<T> extends MiniFragment implements OnClickListener, OnTouchListener {
 
 	private Sku recommendation;
 	TextView itemRetailer;
@@ -53,7 +52,7 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 	RelativeLayout itemInfoFooter;
 	TextView cravePopupLabel;
 	CraveStripsFragment parent;
-	Scenario results;
+	T results;
 	private LinearLayout bottomButtons;
 	private ImageButton saveButton;
 	private ImageButton shareButton;
@@ -159,7 +158,7 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 		super.onActivityCreated(state);
 	}
 	
-	public void setRecommendation(Scenario results, Sku r) {
+	public void setRecommendation(T results, Sku r) {
 		if (recommendation != r || position != r.getRank()) {
 			this.results = results;
 			recommendation = r;
@@ -392,7 +391,8 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 	public void onClick(View v) {
 		switch(v.getId()) {
 		case R.id.item_button:
-			parent.showCravesFragmentForScenario(results, recommendation);
+			onShowZoomedCrave(results, recommendation);
+			//parent.showCravesFragmentForScenario(results, recommendation);
 			break;
 		case R.id.item_image:
 			if (parent != null) {
@@ -422,6 +422,8 @@ public class CraveStripFragment extends MiniFragment implements OnClickListener,
 		}
 	}
 	
+	protected void onShowZoomedCrave(T skuParent, Sku s) {}
+
 	public void raveItem(final boolean rave, final String raveId) {
 		//wishListParent.loaderUtils.showLoading((rave) ? "Raving this crave..." : "Removing your rave...");
 

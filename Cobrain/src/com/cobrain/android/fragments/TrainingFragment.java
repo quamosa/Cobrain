@@ -82,7 +82,6 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	
 	@Override
 	public void onDestroyView() {
-		controller = null;
 		save = null;
 		cravesFound = null;
 		question = null;

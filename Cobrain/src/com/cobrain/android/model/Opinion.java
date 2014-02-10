@@ -15,4 +15,8 @@ public class Opinion {
 	public boolean is(String signal) {
 		return this.signal != null && this.signal.equals(signal);
 	}
+
+	public void setSignal(String signal) {
+		this.signal = signal;
+	}
 }

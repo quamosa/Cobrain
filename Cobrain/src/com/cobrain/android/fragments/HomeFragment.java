@@ -31,7 +31,7 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		View v = inflater.inflate(R.layout.frg_home, null);
 		homePager = (ViewPager) v.findViewById(R.id.home_pager);
 		homePager.setOnPageChangeListener(this);
-		adapter = new HomePagerAdapter(getSherlockActivity().getSupportFragmentManager());
+		adapter = new HomePagerAdapter(getChildFragmentManager());
 		
 		homePager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.home_pager_margin_size));
 		//homePager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(R.color.CraveBorderColor)));
@@ -39,7 +39,7 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		adapter.add("Home", new CraveStripsFragment());
 		adapter.add("On Sale", new CraveStripsFragment());
 		adapter.add("My Private Rack", new SavedAndShareFragment());
-		adapter.add("My Shared Rack", RaveUserListFragment.newInstance(controller.getCobrain().getUserInfo().getUserId()));
+		adapter.add("My Shared Rack", WishListFragment.newInstance(controller.getCobrain().getUserInfo(), false));
 		//homePager.setOffscreenPageLimit(4);
 		homePager.setAdapter(adapter);
 		homePager.post(new Runnable(){

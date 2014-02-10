@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -20,15 +19,16 @@ import com.cobrain.android.adapters.SkuPagerAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.controllers.CraveStrip;
-import com.cobrain.android.controllers.ScenarioCraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
-import com.cobrain.android.loaders.ScenarioStripsLoader;
 import com.cobrain.android.loaders.OnLoadListener;
+import com.cobrain.android.loaders.SkuStripsLoader;
 import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.User;
 
-public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadListener<Scenario>, OnItemClickListener {
-	public static final String TAG = "CraveStripsFragment";
+public class FriendCraveStripsFragment extends CraveStripsFragment {
+	public static final String TAG = "FriendCraveStripsFragment";
 
 	SkuPagerAdapter craveAdapter;
 	CraveFilterLoader craveFilterLoader = new CraveFilterLoader();
@@ -42,7 +42,8 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 	SavedState savedState = new SavedState();
 	View comingsoon;
 	Menu menu;
-	ScenarioStripsLoader loader;
+	SkuStripsLoader loader;
+	User owner;
 
 	public class SavedState {
 		boolean saved;
@@ -105,7 +106,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		
 		View v = inflater.inflate(R.layout.frg_crave_strips_fragment, null);
 		craveAdapter = new SkuPagerAdapter(getChildFragmentManager(), this);
-		loader = new ScenarioStripsLoader();
+		loader = new SkuStripsLoader();
 
 		setPageTitle();
 		
@@ -125,14 +126,6 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		loader.initialize(this, craveStripList);
 	}
 	
-	void setupComingSoonView(View v) {
-		comingsoon = View.inflate(getActivity().getApplicationContext(), R.layout.view_coming_soon, null);
-		ViewGroup vg = (ViewGroup) v;
-		vg.addView(comingsoon, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		comingsoon.setClickable(true);
-		comingsoon.setVisibility(View.GONE);
-	}
-
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("categoryId", savedState.categoryId);
@@ -152,7 +145,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		if (controller != null) {
 			controller.getCobrain().checkLogin();
 			loaderUtils.dismiss();
-			loader.load();
+			loader.load(owner, "liked", "recommended");
 		}
 	}
 	
@@ -337,14 +330,8 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		
 	}
 
-	public void showCravesFragmentForScenario(Scenario scenario, Sku sku) {
-		for (int i = 0; i < loader.craveStrips.size(); i++) {
-			ScenarioCraveStrip strip = (ScenarioCraveStrip) loader.craveStrips.get(i);
-			if (strip.scenarioId == scenario.getId()) {
-				controller.showCraves(strip, sku, R.id.overlay_layout, true);
-				return;
-			}
-		}
+	public void showCravesFragmentForSkus(CraveStrip<Skus> strip, Sku sku) {
+		controller.showCraves(strip, sku, R.id.overlay_layout, true);
 	}
 	
 }	

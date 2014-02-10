@@ -252,10 +252,11 @@ public class UserInfo extends User {
 	}
 
 
-	public Skus getSkus(String userId, String signal, Integer categoryId, Boolean onSale) {
+	public Skus getSkus(User owner, String signal, Integer categoryId, Boolean onSale) {
+		if (owner == null) owner = this;
 		String url = context.getString(R.string.url_skus_get, context.getString(R.string.url_cobrain_api));
 		ArrayList<String> qs = new ArrayList<String>();
-		if (userId != null) qs.add("targetUser=" + userId);
+		qs.add("targetUser=" + owner.getId());
 		if (signal != null) qs.add("signal=" + signal);
 		if (categoryId != null) qs.add("categoryId=" + categoryId);
 		if (onSale != null) qs.add("onsale=" + onSale);
@@ -266,6 +267,7 @@ public class UserInfo extends User {
 
 		if (wr.go() == 200) {
 			Skus s = gson.fromJson(wr.getResponse(), Skus.class);
+			s.setOwner(owner);
 			return s;
 		}
 		else reportError("Could not get skus");
@@ -344,33 +346,34 @@ public class UserInfo extends User {
 	}
 
 	public boolean addToPrivateRack(Sku recommendation) {
-		return saveOpinion(recommendation.getOpinion().getId(), "saved", (String[])null);
+		return saveOpinion(recommendation.getOpinion(), "saved", (String[])null);
 	}
 	public boolean addToSharedRack(Sku recommendation) {
-		return saveOpinion(recommendation.getOpinion().getId(), "shared", (String[])null);
+		return saveOpinion(recommendation.getOpinion(), "shared", (String[])null);
 	}
 	public boolean dislikeProduct(Sku recommendation) {
-		return saveOpinion(recommendation.getOpinion().getId(), "disliked", (String[])null);
+		return saveOpinion(recommendation.getOpinion(), "disliked", (String[])null);
 	}
 	public boolean removeProduct(Sku recommendation) {
 		return removeOpinion(recommendation);
 	}
 	public boolean removeOpinion(Sku recommendation) {
-		return saveOpinion(recommendation.getOpinion().getId(), null, (String[])null);
+		return saveOpinion(recommendation.getOpinion(), null, (String[])null);
 	}
 	
-	public boolean saveOpinion(String opinionId, String status, String ... reasons) {
+	public boolean saveOpinion(Opinion opinion, String signal, String ... reasons) {
 		if (apiKey != null) {
-			String url = context.getString(R.string.url_opinions_put, context.getString(R.string.url_cobrain_api), opinionId);
+			String url = context.getString(R.string.url_opinions_put, context.getString(R.string.url_cobrain_api), opinion.getId());
 			String sreasons = "";
-			String json = String.format("{\"status\":\"%s\",\"reasons\":[%s]}",
-					status, sreasons);
+			String json = String.format("{\"signal\":\"%s\",\"reasons\":[%s]}",
+					signal, sreasons);
 
 			if (reasons != null) {
 				//TODO: not sure what reasons should look like yet!
 			}
 			WebRequest wr = new WebRequest().put(url).setContentType("application/json").setHeaders(apiKeyHeader());
 			if (wr.setBody(json).go() == 200) {
+				opinion.setSignal(signal);
 				return true;
 			}
 			else reportError("Could not save opinion");
@@ -381,7 +384,7 @@ public class UserInfo extends User {
 	public boolean raveProduct(User owner, Sku product) {
 		if (apiKey != null) {
 			String url = context.getString(R.string.url_raves_post, context.getString(R.string.url_cobrain_api));
-			String json = String.format("{\"for\":%s,\"sku\":{\"id\":%s}}",
+			String json = String.format("{\"_id\":\"%s\",\"sku\":{\"id\":%s}}",
 					owner.getId(), product.getId());
 
 			WebRequest wr = new WebRequest().post(url).setContentType("application/json").setHeaders(apiKeyHeader());
@@ -395,14 +398,14 @@ public class UserInfo extends User {
 	public boolean unraveProduct(User owner, Sku product) {
 		if (apiKey != null) {
 			String url = context.getString(R.string.url_raves_delete, context.getString(R.string.url_cobrain_api));
-			String json = String.format("{\"for\":%s,\"sku\":{\"id\":%s}}",
+			String json = String.format("{\"_id\":\"%s\",\"sku\":{\"id\":%s}}",
 					owner.getId(), product.getId());
 
 			WebRequest wr = new WebRequest().delete(url).setContentType("application/json").setHeaders(apiKeyHeader());
 			if (wr.setBody(json).go() == 200) {
 				return true;
 			}
-			else reportError("Could not rave product");
+			else reportError("Could not unrave product");
 		}
 		return false;
 	}

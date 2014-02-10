@@ -10,10 +10,7 @@ import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.Rave;
-import com.cobrain.android.model.v1.RecommendationsResults;
-import com.cobrain.android.model.v1.WishList;
-import com.cobrain.android.model.v1.WishListItem;
+import com.cobrain.android.model.Rave;
 import com.cobrain.android.utils.HelperUtils;
 import com.cobrain.android.utils.LoaderUtils;
 import android.graphics.Bitmap;
@@ -52,7 +49,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	RelativeLayout itemInfoFooter;
 	TextView cravePopupLabel;
 	BaseCobrainFragment parent;
-	RecommendationsResults results;
+	Skus results;
 	private LinearLayout bottomButtons;
 	private ImageButton saveButton;
 	private ImageButton shareButton;
@@ -171,7 +168,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		super.onActivityCreated(savedInstanceState);
 	}
 	
-	public void setRecommendation(RecommendationsResults results, Sku r) {
+	public void setRecommendation(Skus results, Sku r) {
 		this.results = results;
 		recommendation = r;
 		if (r != null) position = r.getRank();
@@ -394,18 +391,10 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			}
 			break;
 		case R.id.just_for_me_button: 
-			//save or unsave toggle
-			if (isPublished) {
-				shareRecommendation(recommendation, false);
-			}
-			else saveRecommendation(recommendation, !isSaved);
+			saveRecommendation(recommendation, !isSaved);
 			break;
 		case R.id.friends_can_see_button: 
-			//share or unshare toggle
-			if (isPublished) {
-				saveRecommendation(recommendation, false);
-			}
-			else shareRecommendation(recommendation, !isPublished);
+			shareRecommendation(recommendation, !isPublished);
 			break;
 		case R.id.item_rave_icon:
 			//rave toggle
@@ -455,19 +444,19 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	}
 
 	void refreshWishList() {
-		int itemId = wishListItem.getId();
-		wishList = getController().getCobrain().getUserInfo().getSkus(wishList.getOwner().getId(), "shared", null, null);
-
-		for (Sku item : wishList.get()) {
-			if (item.getId() == itemId) {
-				wishListItem = item;
-				wishListItems.set(position-1, wishListItem);
-				_iRavedThis = null;
-				break;
+		if (wishListItem != null) {
+			int itemId = wishListItem.getId();
+			wishList = getController().getCobrain().getUserInfo().getSkus(wishList.getOwner(), "shared", null, null);
+	
+			for (Sku item : wishList.get()) {
+				if (item.getId() == itemId) {
+					wishListItem = item;
+					wishListItems.set(position-1, wishListItem);
+					_iRavedThis = null;
+					break;
+				}
 			}
 		}
-		
-		
 	}
 
 	public void saveRecommendation(Sku recommendation, boolean save) {
@@ -498,13 +487,11 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				
 				if (save) {
 					if (ui.addToPrivateRack(recommendation)) {
-						isSaved = true;
 						return true;
 					}
 				}
 				else {
 					if (ui.removeProduct(recommendation)) {
-						isSaved = false;
 						return true;
 					}
 				}
@@ -534,13 +521,11 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				
 				if (isShared) {
 					if (ui.addToSharedRack(recommendation)) {
-						isSaved = true;
 						return true;
 					}
 				}
 				else {
 					if (ui.removeProduct(recommendation)) {
-						isSaved = false;
 						return true;
 					}
 				}

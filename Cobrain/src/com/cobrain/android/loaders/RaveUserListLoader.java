@@ -5,21 +5,20 @@ import java.util.List;
 
 import android.os.AsyncTask;
 
-import com.cobrain.android.adapters.FriendsListAdapter;
 import com.cobrain.android.adapters.RaveUserListAdapter;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.Rave;
-import com.cobrain.android.model.v1.WishList;
-import com.cobrain.android.model.v1.WishListItem;
+import com.cobrain.android.model.Rave;
 
 public class RaveUserListLoader {
 
 	RaveUserListAdapter adapter;
 	CobrainController controller;
-	private AsyncTask<Void, Void, ArrayList<Rave>> currentRequest;
-	private OnLoadListener<ArrayList<Rave>> onLoadListener;
+	private AsyncTask<Void, Void, List<Rave>> currentRequest;
+	private OnLoadListener<List<Rave>> onLoadListener;
 	ArrayList<Rave> items = new ArrayList<Rave>();
 
 	public void initialize(CobrainController controller,
@@ -38,22 +37,22 @@ public class RaveUserListLoader {
 		controller = null;
 	}
 
-	public void loadFriendList(final String itemId) {
+	public void loadFriendList(final int itemId) {
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 
-		currentRequest = new AsyncTask<Void, Void, ArrayList<Rave>>() {
+		currentRequest = new AsyncTask<Void, Void, List<Rave>>() {
 
 			@Override
-			protected ArrayList<Rave> doInBackground(Void... params) {
+			protected List<Rave> doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
 
 				if (u != null) {
-					WishList list = u.getCachedWishList();
+					Skus skus = u.getSkus(u, "shared", null, null);
 
-					if (list != null) {
-						for (WishListItem item : list.getItems()) {
-							if (item.getId().equals(itemId)) {
+					if (skus != null) {
+						for (Sku item : skus.get()) {
+							if (item.getId() == itemId) {
 								return item.getRaves();
 							}
 						}
@@ -64,7 +63,7 @@ public class RaveUserListLoader {
 			}
 
 			@Override
-			protected void onPostExecute(ArrayList<Rave> result) {
+			protected void onPostExecute(List<Rave> result) {
 				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				if (result != null) {
 					adapter.clear();
@@ -84,7 +83,7 @@ public class RaveUserListLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<ArrayList<Rave>> listener) {
+	public void setOnLoadListener(OnLoadListener<List<Rave>> listener) {
 		onLoadListener = listener;
 	}
 

@@ -21,28 +21,25 @@ import com.cobrain.android.R;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.minifragments.CraveStripFragment;
-import com.cobrain.android.minifragments.CraveStripHeaderInfoFragment;
-import com.cobrain.android.minifragments.CraveStripRefresherFragment;
-import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
 
-public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
+public class CraveStripPagerAdapter<T> extends MiniFragmentPagerAdapter {
 	
 	final int COUNT = 3;
 	final float WIDTH = 1f / COUNT;
 
-	private int page = 1;
-	private int perPage;
-	private int countOnThisPage;
-	private int count;
-	private List<Sku> recommendations;
-	private CraveStripsFragment parentFragment;
+	protected int page = 1;
+	protected int perPage;
+	protected int countOnThisPage;
+	protected int count;
+	protected List<Sku> recommendations;
+	protected CraveStripsFragment parentFragment;
 	private boolean destroyAll;
-	private Scenario results;
-	private HashMap<Integer, MiniFragment> fragments = new HashMap<Integer, MiniFragment>();
+	protected T results;
+	protected HashMap<Integer, MiniFragment> fragments = new HashMap<Integer, MiniFragment>();
 	Activity activity;
-	private int stripType;
-	private CraveStrip strip;
+	protected int stripType;
+	protected CraveStrip strip;
 
 	public CraveStripPagerAdapter(Activity activity, CraveStrip strip, CraveStripsFragment cravesFragment) {
 		super(activity);
@@ -92,40 +89,44 @@ public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 		activity = null;
 	}
 	
-	public void load(Scenario r) {
+	void loadSkus(List<Sku> s) {
+		//page = r.getPage();
+		//perPage = r.getPerPage();
+		//countOnThisPage = r.getCount();
+		//count = r.getTotal();
+		//countOnThisPage = Math.min(countOnThisPage, count);
+		page = 1;
+		perPage = 100;
+		countOnThisPage = count = s.size();
+	
+		List<Sku> products = s;
+		int position = (page - 1) * perPage;
+	
+		if (recommendations == null) 
+			recommendations = new ArrayList<Sku>(position + products.size());
+	
+		if (recommendations.size() == 0 && position == 0) {
+			recommendations.addAll(products);
+		}
+		else if (recommendations.size() <= position) {
+			while (recommendations.size() < position)
+				recommendations.add(null);
+	
+			recommendations.addAll(position, products);
+		}
+		else {
+			while (recommendations.size() < countOnThisPage)
+				recommendations.add(null);
+	
+			for (int i = position, in = 0; in < countOnThisPage; in++) {
+				recommendations.set(i++, products.get(in));
+			}
+		}
+	}
+	
+	public void load(T r) {
 		if (r != null) {
-			//page = r.getPage();
-			//perPage = r.getPerPage();
-			//countOnThisPage = r.getCount();
-			//count = r.getTotal();
-			//countOnThisPage = Math.min(countOnThisPage, count);
-			page = 1;
-			perPage = 100;
-			countOnThisPage = count = r.getSkus().size();
-
-			List<Sku> products = r.getSkus();
-			int position = (page - 1) * perPage;
-
-			if (recommendations == null) 
-				recommendations = new ArrayList<Sku>(position + products.size());
-
-			if (recommendations.size() == 0 && position == 0) {
-				recommendations.addAll(products);
-			}
-			else if (recommendations.size() <= position) {
-				while (recommendations.size() < position)
-					recommendations.add(null);
-
-				recommendations.addAll(position, products);
-			}
-			else {
-				while (recommendations.size() < countOnThisPage)
-					recommendations.add(null);
-
-				for (int i = position, in = 0; in < countOnThisPage; in++) {
-					recommendations.set(i++, products.get(in));
-				}
-			}
+			loadSkus( getSkus(r) );
 		}
 		else {
 			page = 1;
@@ -138,7 +139,9 @@ public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 		results = r;
 		clear();
 	}
-	
+
+	protected void onLoadSkus(T r) {}
+
 	public int getMaxPages() {
 		double d = Math.ceil(count/(double)perPage);
 		return (int)d;
@@ -153,49 +156,19 @@ public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 	@Override
 	public MiniFragment getItem(int position) {
 
-		int typ = 0;
-		int offset = 0;
-		MiniFragment f;
+		CraveStripFragment<T> csf = new CraveStripFragment<T>(getActivity(),  parentFragment);
 
-		if (position == (getCount()-1)) {
-			typ = 2;
-		}
-
-		if (stripType == CraveStrip.STRIP_TYPE_CRAVES_NOT_AVAILABLE) {
-			if (position == 0) {
-				typ = 1;
-			}
-			offset = 1;
-		}
+		if (recommendations == null) 
+			return csf;
 		
-		switch(typ) {
-		case 1:
-			f = new CraveStripHeaderInfoFragment(getActivity());
-			break;
+		if (recommendations.size() <= position)
+			return csf;
+		
+		csf.setRecommendation(results, recommendations.get(position));
+		
+		fragments.put(position, csf);
 
-		case 2:
-			f = new CraveStripRefresherFragment(getActivity(), strip);
-			break;
-			
-		default:
-			
-			int pos = position - offset;
-			CraveStripFragment csf = new CraveStripFragment(getActivity(),  parentFragment);
-
-			if (recommendations == null) 
-				return csf;
-			
-			if (recommendations.size() <= pos)
-				return csf;
-			
-			csf.setRecommendation(results, recommendations.get(pos));
-			
-			f = csf;
-		}
-
-		fragments.put(position, f);
-
-		return f;
+		return csf;
 	}	
 	
 	@Override
@@ -203,9 +176,13 @@ public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 		return WIDTH;
 	}
 
+	protected int getTotalCraves(T results) {
+		return 0;
+	}
+	
 	public void updateTitle(int position) {
 		if (results != null) {
-			int totalCraves = results.getSkus().size();
+			int totalCraves = getTotalCraves(results);
 			
 			//final TextView txt = rankForYouLabel;
 			String s;
@@ -286,15 +263,15 @@ public class CraveStripPagerAdapter extends MiniFragmentPagerAdapter {
 	}
 	
 	public Sku getRecommendation(int position) {
-		if (stripType == CraveStrip.STRIP_TYPE_CRAVES_NOT_AVAILABLE) {
-			position -= 1;
-		}
-		
 		return recommendations.get(position);
 	}
 
-	public Scenario getScenario() {
+	public T getParentObject() {
 		return results;
+	}
+
+	protected List<Sku> getSkus(T r) {
+		return null;
 	}
 
 }

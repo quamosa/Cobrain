@@ -5,24 +5,19 @@ import it.sephiroth.android.library.widget.AbsHListView;
 import com.cobrain.android.MiniFragment;
 import com.cobrain.android.R;
 import com.cobrain.android.minifragments.CraveStripFragment;
-
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-public class CraveStripPagerListAdapter extends ArrayAdapter<MiniFragment> {
+public class CraveStripPagerListAdapter<T> extends ArrayAdapter<MiniFragment> {
 
-	private static final int ITEM_TYPE_CRAVE = 0;
-	private static final int ITEM_TYPE_HEADER_INFO = 1;
-	private static final int ITEM_TYPE_REFRESHER = 2;
-
-	private CraveStripPagerAdapter pagerAdapter;
+	protected CraveStripPagerAdapter<T> pagerAdapter;
 	private int dimHeight;
 	private int dimWidth;
 
-	public CraveStripPagerListAdapter(Context context, CraveStripPagerAdapter pagerAdapter) {
+	public CraveStripPagerListAdapter(Context context, CraveStripPagerAdapter<T> pagerAdapter) {
 		super(context, 0);
 		setPagerAdapter(pagerAdapter);
 		dimWidth = context.getResources().getDisplayMetrics().widthPixels / 2;
@@ -34,7 +29,7 @@ public class CraveStripPagerListAdapter extends ArrayAdapter<MiniFragment> {
 		super(context, resource);
 	}
 
-	void setPagerAdapter(CraveStripPagerAdapter pagerAdapter) {
+	void setPagerAdapter(CraveStripPagerAdapter<T> pagerAdapter) {
 		this.pagerAdapter = pagerAdapter;
 		pagerAdapter.registerDataSetObserver(observer);
 	}
@@ -49,37 +44,17 @@ public class CraveStripPagerListAdapter extends ArrayAdapter<MiniFragment> {
 	}
 	
 	@Override
-	public int getViewTypeCount() {
-		return 3;
-	}
-	
-	@Override
-	public int getItemViewType(int position) {
-		MiniFragment f = pagerAdapter.getItem(position);
-
-		if (f instanceof com.cobrain.android.minifragments.CraveStripHeaderInfoFragment) {
-			return ITEM_TYPE_HEADER_INFO;
-		}
-
-		if (f instanceof com.cobrain.android.minifragments.CraveStripRefresherFragment) {
-			return ITEM_TYPE_REFRESHER;
-		}
-
-		return ITEM_TYPE_CRAVE;
-
-	}
-
-	@Override
 	public MiniFragment getItem(int position) {
 		return pagerAdapter.getItem(position);
 	}
 
-	private class ViewHolder {
+	protected class ViewHolder {
 		int position;
 		int type;
 		MiniFragment f;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
@@ -111,16 +86,18 @@ public class CraveStripPagerListAdapter extends ArrayAdapter<MiniFragment> {
 			ViewHolder vh = (ViewHolder) v.getTag();
 			vh.position = position;
 			
-			switch (vh.type) {
-			case ITEM_TYPE_CRAVE:
-				CraveStripFragment csf = (CraveStripFragment) vh.f;
-				csf.setRecommendation(pagerAdapter.getScenario(), pagerAdapter.getRecommendation(position));
-			}
+			onUpdateView(vh);
 		}
 
 		return v;
 	}
 
+	@SuppressWarnings("unchecked")
+	protected void onUpdateView(ViewHolder vh) {
+		CraveStripFragment<T> csf = (CraveStripFragment<T>) vh.f;
+		csf.setRecommendation(pagerAdapter.getParentObject(), pagerAdapter.getRecommendation(vh.position));
+	}
+	
 	DataSetObserver observer = new DataSetObserver() {
 
 		@Override

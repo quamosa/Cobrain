@@ -59,7 +59,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		loader.initialize(controller, adapter);
 		loader.setOnLoadListener(this);
 
-		setTitle("My Private Craves");
+		setTitle("My Private Rack");
 		
 		priceFilter = setupPriceFilter(v);
 		categoryFilter = setupCategoryFilter(v);
@@ -122,6 +122,12 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		return v;
 	}
 	
+	@Override
+	public void setTitle(CharSequence title) {
+		if (!(getParentFragment() instanceof HomeFragment))
+			super.setTitle(title);
+	}
+	
 	private Spinner setupCategoryFilter(View v) {
 		final Spinner s = (Spinner) v.findViewById(R.id.category_filter);
 		final CraveFilterLoader loader = new CraveFilterLoader();
@@ -131,10 +137,12 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	
 			@Override
 			public void onLoadStarted() {
+				silentMode = true;
 			}
 	
 			@Override
 			public void onLoadCompleted(CategoryTree r) {
+				silentMode = false;
 				loader.dispose();
 
 				CraveCategoryFilterAdapter adapter = new CraveCategoryFilterAdapter(getActivity().getApplicationContext(), R.layout.list_item_craves_filter, R.id.caption);
@@ -221,7 +229,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 
 		CraveCategoryFilterAdapter b = (CraveCategoryFilterAdapter) categoryFilter.getAdapter();
 		categoryFilter.setAdapter(null);
-		b.clear();
+		if (b != null) b.clear();
 		categoryFilter = null;
 		
 		state.save(saves, "saves");

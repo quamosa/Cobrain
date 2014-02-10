@@ -9,10 +9,11 @@ import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
 
 public class WishListLoader {
-	String listId;
+	User owner;
 	int page;
 	int categoryId = 1;
 	int countPerPage = 5; //50 no longer returns results
@@ -24,14 +25,14 @@ public class WishListLoader {
 	boolean onSale;
 	boolean showPrivateOrPublic; //private is true
 
-	public String getListId() {
-		return listId;
+	public User getListId() {
+		return owner;
 	}
 
-	public boolean setMyListId(String listId, boolean showPrivateOrPublic) {
-		if (listId != this.listId || showPrivateOrPublic != this.showPrivateOrPublic) {
+	public boolean setMyListId(User owner, boolean showPrivateOrPublic) {
+		if (owner != this.owner || showPrivateOrPublic != this.showPrivateOrPublic) {
 			this.showPrivateOrPublic = showPrivateOrPublic;
-			this.listId = listId;
+			this.owner = owner;
 			page = 0;
 			pagesLoaded.clear();
 			return true;
@@ -39,8 +40,8 @@ public class WishListLoader {
 		return false;
 	}
 	
-	public boolean setListId(String listId) {
-		return setMyListId(listId, false);
+	public boolean setListId(User owner) {
+		return setMyListId(owner, false);
 	}
 
 	public int getCategoryId() {
@@ -96,12 +97,12 @@ public class WishListLoader {
 		
 		if (this.page != page) {
 			if (!pagesLoaded.contains(page)) {
-				loadWishList(listId, countPerPage, page);
+				loadWishList(countPerPage, page);
 			}
 		}
 	}
 	
-	void loadWishList(final String userId, final int countPerPage, final int page) {
+	void loadWishList(final int countPerPage, final int page) {
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 		
 		currentRequest = new AsyncTask<Void, Void, List<Sku>>() {
@@ -115,7 +116,7 @@ public class WishListLoader {
 				List<Sku> items = null;
 				
 				if (u != null) {
-					r = u.getSkus(userId, showPrivateOrPublic ? "saved" : "shared", null, null);
+					r = u.getSkus(owner, showPrivateOrPublic ? "saved" : "shared", null, null);
 					items = r.get();
 				}
 				

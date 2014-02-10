@@ -7,45 +7,19 @@ import android.os.AsyncTask;
 import com.cobrain.android.adapters.CraveStripPagerAdapter;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
-import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.UserInfo;
 
-public class CraveStripLoader {
+public class CraveStripLoader<T> {
 	//int page;
-	int categoryId = 0;
 	int countPerPage = 25; //50 no longer returns results
-	CraveStripPagerAdapter adapter;
+	CraveStripPagerAdapter<T> adapter;
 	CobrainController controller;
-	OnLoadListener<Scenario> onLoadListener;
-	private AsyncTask<Void, Void, Scenario> currentRequest;
-	private ArrayList<Integer> pagesLoaded = new ArrayList<Integer>();
-	boolean onSale;
-
-	public int getCategoryId() {
-		return categoryId;
-	}
+	OnLoadListener<T> onLoadListener;
+	private AsyncTask<Void, Void, T> currentRequest;
+	protected ArrayList<Integer> pagesLoaded = new ArrayList<Integer>();
 
 	public boolean isPageLoaded(int page) {
 		return pagesLoaded.contains(page);
-	}
-	
-	public boolean setCategoryId(int categoryId) {
-		if (categoryId != this.categoryId) {
-			this.categoryId = categoryId;
-			//page = 0;
-			pagesLoaded.clear();
-			return true;
-		}
-		return false;
-	}
-	public boolean setOnSaleRecommendationsOnly(boolean onSale) {
-		if (this.onSale != onSale) {
-			this.onSale = onSale;
-			//page = 0;
-			pagesLoaded.clear();
-			return true;
-		}
-		return false;
 	}
 
 	public int getCountPerPage() {
@@ -60,12 +34,13 @@ public class CraveStripLoader {
 	//	return page;
 	//}
 	
-	public void initialize(CobrainController controller, CraveStripPagerAdapter adapter) {
+	public void initialize(CobrainController controller, CraveStripPagerAdapter<T> adapter) {
 		this.controller = controller;
 		this.adapter = adapter;
-		//page = 0;
-		categoryId = 0;
+		onInitialize();
 	}
+	
+	void onInitialize() {}
 	
 	public void dispose() {
 		cancel();
@@ -80,34 +55,27 @@ public class CraveStripLoader {
 		
 		//if (this.page != page) {
 			if (!pagesLoaded.contains(page)) {
-				loadRecommendations(categoryId, countPerPage, page);
+				performLoad(countPerPage, page);
 			}
 		//}
 	}
 	
-	void loadRecommendations(final int categoryId, final int countPerPage, final int page) {
+	void performLoad(final int countPerPage, final int page) {
 		pagesLoaded.add(page);
 
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 		
-		currentRequest = new AsyncTask<Void, Void, Scenario>() {
+		currentRequest = new AsyncTask<Void, Void, T>() {
 			@Override
-			protected Scenario doInBackground(Void... params) {
+			protected T doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
-				Scenario r = null;
 				
-				if (u != null) {
-					r = u.getScenario( categoryId );
-					//r = u.getRecommendations(categoryId, countPerPage, page, onSale);
-				}
-				//else Debug.waitForDebugger();
-				
-				return r;
+				return onPerformLoad(u);
 			}
 
 			@Override
-			protected void onPostExecute(Scenario result) {
+			protected void onPostExecute(T result) {
 				if (result != null) {
 					//int pg = result.getPage();
 					//CraveLoader.this.page = pg;
@@ -115,8 +83,8 @@ public class CraveStripLoader {
 				}
 				else {
 					pagesLoaded.remove((Integer)page);
-					CraveStripLoader.this.categoryId = 0;
 				}
+				onLoadCompleted(result);
 				adapter.load(result);
 				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				currentRequest = null;
@@ -125,6 +93,9 @@ public class CraveStripLoader {
 		}.execute();			
 	}
 
+	protected T onPerformLoad(UserInfo u) { return null; }
+	protected void onLoadCompleted(T result) {}
+
 	public void cancel() {
 		if (currentRequest != null) {
 			currentRequest.cancel(true);
@@ -132,7 +103,7 @@ public class CraveStripLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<Scenario> listener) {
+	public void setOnLoadListener(OnLoadListener<T> listener) {
 		onLoadListener = listener;
 	}
 

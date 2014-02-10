@@ -846,9 +846,9 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		List<Fragment> fragments = getSupportFragmentManager().getFragments();
 		if (fragments != null) {
 			for (Fragment fragment : fragments) {
-				if (fragment instanceof BaseCobrainFragment) {
+				if (f != fragment && fragment instanceof BaseCobrainFragment) {
 					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
-					bf.onFragmentAttached(f);
+					bf.dispatchOnFragmentAttached(f);
 				}
 			}
 		}
@@ -859,9 +859,9 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		List<Fragment> fragments = getSupportFragmentManager().getFragments();
 		if (fragments != null) {
 			for (Fragment fragment : fragments) {
-				if (fragment instanceof BaseCobrainFragment) {
+				if (f != fragment && fragment instanceof BaseCobrainFragment) {
 					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
-					bf.onFragmentDetached(f);
+					bf.dispatchOnFragmentDetached(f);
 				}
 			}
 		}

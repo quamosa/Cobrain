@@ -4,7 +4,7 @@ import com.cobrain.android.R;
 import com.cobrain.android.adapters.RaveUserListAdapter;
 import com.cobrain.android.loaders.RaveUserListLoader;
 import com.cobrain.android.model.Skus;
-import com.cobrain.android.model.v1.Rave;
+import com.cobrain.android.model.Rave;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,7 +16,7 @@ import android.widget.ListView;
 public class RaveUserListFragment extends BaseCobrainListFragment {
 
 	public static final String TAG = "RaveUserListFragment";
-	String itemId;
+	int skuId;
 	RaveUserListAdapter adapter;
 	RaveUserListLoader loader = new RaveUserListLoader();
 	
@@ -27,7 +27,7 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		itemId = getArguments().getString("itemId");
+		skuId = getArguments().getInt("skuId");
 		adapter = new RaveUserListAdapter(getActivity().getApplicationContext(), R.id.friend_name, loader.getItems(), this);
 		loader.initialize(controller, adapter);
 		setListAdapter(adapter);
@@ -45,7 +45,7 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 			@Override
 			protected Skus doInBackground(Object... params) {
 
-				return controller.getCobrain().getUserInfo().getSkus(rave.getUser().getId(), "shared", null, null);
+				return controller.getCobrain().getUserInfo().getSkus(rave.getUser(), "shared", null, null);
 			}
 
 			@Override
@@ -75,12 +75,12 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 	}
 
 	void update() {
-		loader.loadFriendList(itemId);
+		loader.loadFriendList(skuId);
 	}
 
-	public static Fragment newInstance(String userId) {
+	public static Fragment newInstance(int productId) {
 		Bundle args = new Bundle();
-		args.putString("userId", userId);
+		args.putInt("skuId", productId);
 		
 		RaveUserListFragment f = new RaveUserListFragment();
 		f.setArguments(args);

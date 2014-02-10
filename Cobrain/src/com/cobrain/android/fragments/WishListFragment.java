@@ -43,7 +43,7 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.CategoryTree;
 
 public class WishListFragment extends BaseCobrainFragment implements OnLoadListener<List<Sku>>, OnPageChangeListener, OnItemClickListener, OnNavigationListener {
-	public static final String TAG = "SharedCravesFragment";
+	public static final String TAG = "WishListFragment";
 
 	ViewPager cravePager;
 	WishListPagerAdapter craveAdapter;
@@ -69,6 +69,15 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		wishListOwner = owner;
 		this.showMyPrivateWishList = showMyPrivateWishList;
 	}
+
+	public WishListFragment() {
+	}
+
+	public static WishListFragment newInstance(User owner, boolean showMyPrivateWishList) {
+		WishListFragment f = new WishListFragment();
+		f.initialize(owner, showMyPrivateWishList);
+		return f;
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,7 +86,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		View v = inflater.inflate(R.layout.main_wishlist_frame, null);
 		loaderUtils.initialize((ViewGroup) v);
 		cravePager = (ViewPager) v.findViewById(R.id.crave_pager);
-		craveAdapter = new WishListPagerAdapter(getFragmentManager(), this);
+		craveAdapter = new WishListPagerAdapter(getChildFragmentManager(), this);
 		cravePager.setAdapter(craveAdapter);
 		craveLoader.initialize(controller, craveAdapter);
 		craveLoader.setOnLoadListener(this);
@@ -91,6 +100,12 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		return v;
 	}
 
+	
+	@Override
+	public void setTitle(CharSequence title) {
+		if (!(getParentFragment() instanceof HomeFragment))
+			super.setTitle(title);
+	}
 	
 	private void setupFilterMenu(LayoutInflater inflater) {
 		View v = inflater.inflate(R.layout.menu_craves_filter, null);
@@ -245,11 +260,11 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		
 		if (wishList != null) {
 			if (wishList.getOwner().getId().equals(controller.getCobrain().getUserInfo().getUserId())) {
-				setTitle("My " + ((showMyPrivateWishList) ? "Saved" : "Shared") + " Craves");			
+				setTitle("My " + ((showMyPrivateWishList) ? "Private" : "Shared") + " Rack");			
 			}
-			else setTitle(wishList.getOwner().getName() + "'s Craves");
+			else setTitle(wishList.getOwner().getName() + "'s Rack");
 
-			if (!setWishListId(wishList.getId())) {
+			if (!setWishListId(wishList.getOwner())) {
 				craveLoader.setPage(currentPage);
 			}
 		}
@@ -260,23 +275,23 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 					@Override
 					protected Skus doInBackground(Void... params) {
 						UserInfo ui = controller.getCobrain().getUserInfo();
-						return ui.getSkus(wishListOwner.getId(), "shared", null, null);
+						return ui.getSkus(wishListOwner, "shared", null, null);
 					}
 
 					@Override
 					protected void onPostExecute(Skus result) {
-						if (wishList != null) {
+						if (result != null) {
 							wishList = result;
 							update();
 						}
 						else {
-							if (wishList.getOwner().getId().equals(controller.getCobrain().getUserInfo().getUserId())) {
+							if (wishListOwner.getId().equals(controller.getCobrain().getUserInfo().getUserId())) {
 								onError("Could not load your craves");
 							}
-							else onError("Could not load " + wishList.getOwner().getName() + "'s craves");
+							else onError("Could not load " + wishListOwner.getName() + "'s craves");
 						}
 					}
-				};
+				}.execute();
 			}
 		}
 		
@@ -314,7 +329,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 
 	@Override
 	public void onLoadStarted() {
-		loaderUtils.showLoading("Loading your shared craves...");
+		loaderUtils.showLoading("Loading " + ((wishList.getOwner().getId() == controller.getCobrain().getUserInfo().getUserId()) ? "your" : (wishList.getOwner().getName() + "'s")) + " rack...");
 	}
 
 	@Override
@@ -396,8 +411,8 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		return cravesCategoryAdapter.getItem(cravesCategoryAdapter.getParent().getSelectedItemPosition());
 	}
 	
-	boolean setWishListId(String id) {
-		if (craveLoader.setMyListId(id, showMyPrivateWishList)) {
+	boolean setWishListId(User owner) {
+		if (craveLoader.setMyListId(owner, showMyPrivateWishList)) {
 			craveLoader.setPage(1);
 			cravePager.setCurrentItem(0, false);
 			return true;

@@ -1,4 +1,4 @@
-package com.cobrain.android.fragments;
+package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,22 +13,22 @@ import android.widget.RelativeLayout;
 
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.CraveStripListAdapter;
-import com.cobrain.android.adapters.CraveStripPagerAdapter;
-import com.cobrain.android.adapters.CraveStripPagerListAdapter;
+import com.cobrain.android.adapters.ScenarioStripPagerAdapter;
+import com.cobrain.android.adapters.ScenarioStripPagerListAdapter;
 import com.cobrain.android.controllers.CraveStrip;
-import com.cobrain.android.loaders.CraveFilterLoader;
-import com.cobrain.android.loaders.CraveStripLoader;
-import com.cobrain.android.loaders.OnLoadListener;
+import com.cobrain.android.controllers.ScenarioCraveStrip;
+import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.ScenarioItem;
 import com.cobrain.android.model.Scenarios;
 import com.cobrain.android.model.UserInfo;
 
-public class CraveStripsLoader {
+public class ScenarioStripsLoader {
 	CraveFilterLoader loader = new CraveFilterLoader();
 	CraveStripsFragment parent;
 	ListView craveStripList;
 	CraveStripListAdapter craveStripListAdapter;
-	ArrayList<CraveStrip> craveStrips = new ArrayList<CraveStrip>();
+	public ArrayList<CraveStrip> craveStrips = new ArrayList<CraveStrip>();
 	
 	public void initialize(CraveStripsFragment parent, ListView list) {
 		this.parent = parent;
@@ -116,11 +116,11 @@ public class CraveStripsLoader {
 	void scenariosToStrips(List<ScenarioItem> scenarios) {
 		if (scenarios != null) {
 			for (ScenarioItem s : scenarios) {
-				CraveStrip strip = new CraveStrip(craveStripListAdapter, parent);
+				ScenarioCraveStrip strip = new ScenarioCraveStrip(craveStripListAdapter, parent);
 	
 				//CraveStripGroupedPagerAdapter adapter = new CraveStripGroupedPagerAdapter(getActivity(), CravesFragment.this);
-				CraveStripPagerAdapter adapter = new CraveStripPagerAdapter(parent.getActivity(), strip, parent);
-				CraveStripLoader loader = new CraveStripLoader();
+				ScenarioStripPagerAdapter adapter = new ScenarioStripPagerAdapter(parent.getActivity(), strip, parent);
+				ScenarioStripLoader loader = new ScenarioStripLoader();
 				loader.initialize(parent.controller, adapter);
 	
 				strip.scenarioId = s.getId();
@@ -128,7 +128,7 @@ public class CraveStripsLoader {
 				strip.loader = loader;
 				//strip.pager = new com.cobrain.android.views.ViewPager(getActivity().getApplicationContext());
 	
-				CraveStripPagerListAdapter a = new CraveStripPagerListAdapter(parent.getActivity().getApplicationContext(), adapter);
+				ScenarioStripPagerListAdapter a = new ScenarioStripPagerListAdapter(parent.getActivity().getApplicationContext(), adapter);
 				strip.listAdapter = a;
 	
 				strip.list = new HListView(parent.getActivity().getApplicationContext());

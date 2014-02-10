@@ -3,25 +3,31 @@ package com.cobrain.android.model;
 import java.util.List;
 
 public class Feed {
-	int _id;
+	String _id;
 	String type;
-	int timestamp;
+	String timestamp;
 	User user;
-	List<Sku> skus;
+	List<String> skus;
 	
-	public int getId() {
+	public String getId() {
 		return _id;
 	}
 	public String getType() {
 		return type;
 	}
-	public int getTimestamp() {
+	public String getTimestamp() {
 		return timestamp;
 	}
 	public User getUser() {
 		return user;
 	}
-	public List<Sku> getSkus() {
+	public List<String> getSkuIds() {
 		return skus;
+	}
+	public boolean isType(String type) {
+		if (this.type != null) {
+			return this.type.equals(type);
+		}
+		return false;
 	}
 }

@@ -11,8 +11,6 @@ import com.cobrain.android.fragments.CraveFragment;
 import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
-import com.cobrain.android.model.v1.WishList;
-import com.cobrain.android.model.v1.WishListItem;
 
 public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 	private int page = 1;

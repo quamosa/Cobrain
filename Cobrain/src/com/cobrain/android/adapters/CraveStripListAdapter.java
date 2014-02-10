@@ -1,16 +1,9 @@
 package com.cobrain.android.adapters;
 
 import java.util.List;
-import com.cobrain.android.R;
-import com.cobrain.android.controllers.CraveStrip;
-import com.cobrain.android.fragments.CraveStripsFragment;
-import com.cobrain.android.loaders.FontLoader;
-import com.cobrain.android.model.v1.RecommendationsResults;
-import com.cobrain.android.utils.LoaderUtils;
+
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Typeface;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -19,16 +12,20 @@ import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cobrain.android.R;
+import com.cobrain.android.controllers.CraveStrip;
+import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.loaders.FontLoader;
+import com.cobrain.android.utils.LoaderUtils;
+
 public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements DialogInterface.OnClickListener {
 	LoaderUtils loader = new LoaderUtils();
-	CraveStripsFragment parent;
 	List<CraveStrip> items;
 	
 	public CraveStripListAdapter(Context context, int resource,
 			List<CraveStrip> items, CraveStripsFragment parent) {
 		super(context, resource, items);
 		this.items = items;
-		setParent(parent);
 	}
 	
 	@Override
@@ -37,15 +34,10 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 		}
 	}
 
-	public void setParent(CraveStripsFragment parent) {
-		this.parent = parent;
-	}
-
 	private class ViewHolder implements OnClickListener {
 		int position;
 		RelativeLayout layout;
 		TextView caption;
-		ViewPager pager;
 		
 		@Override
 		public void onClick(View v) {
@@ -64,7 +56,6 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 
 			vh = new ViewHolder();
 			vh.caption = (TextView) v.findViewById(R.id.caption);
-			//vh.pager = (ViewPager) v.findViewById(R.id.pager);
 			vh.layout = (RelativeLayout) v.findViewById(R.id.layout);
 			vh.caption.setTypeface(FontLoader.load(getContext(), "Doppio One.ttf"));
 

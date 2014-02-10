@@ -21,13 +21,11 @@ import android.widget.TextView;
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.CraveFragment;
-import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.fragments.CravesFragment;
 import com.cobrain.android.model.Sku;
-import com.cobrain.android.model.v1.Product;
-import com.cobrain.android.model.v1.RecommendationsResults;
+import com.cobrain.android.model.Skus;
 
-public class CravePagerAdapter extends FragmentStatePagerAdapter {
+public class SkuPagerAdapter extends FragmentStatePagerAdapter {
 	private int page = 1;
 	private int perPage;
 	private int countOnThisPage;
@@ -35,10 +33,10 @@ public class CravePagerAdapter extends FragmentStatePagerAdapter {
 	private List<Sku> recommendations;
 	private BaseCobrainFragment parentFragment;
 	private boolean destroyAll;
-	private RecommendationsResults results;
+	private Skus results;
 	private HashMap<Integer, CraveFragment> fragments = new HashMap<Integer, CraveFragment>();
 
-	public CravePagerAdapter(FragmentManager fm, BaseCobrainFragment cravesFragment) {
+	public SkuPagerAdapter(FragmentManager fm, BaseCobrainFragment cravesFragment) {
 		super(fm);
 		parentFragment = cravesFragment;
 	}

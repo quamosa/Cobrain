@@ -1,7 +1,11 @@
 package com.cobrain.android.fragments;
 
+import java.util.List;
+
 import android.app.Activity;
+import android.graphics.SurfaceTexture.OnFrameAvailableListener;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
@@ -175,9 +179,32 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		silentMode = silent;
 	}
 
-	public void onFragmentDetached(BaseCobrainFragment f) {
+	public void onFragmentDetached(BaseCobrainFragment f) {}
+	public void onFragmentAttached(BaseCobrainFragment f) {}
+	
+	public void dispatchOnFragmentDetached(BaseCobrainFragment f) {
+		onFragmentDetached(f);
+		List<Fragment> fragments = getChildFragmentManager().getFragments();
+		if (fragments != null) {
+			for (Fragment fragment : fragments) {
+				if (f != fragment && fragment instanceof BaseCobrainFragment) {
+					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
+					bf.dispatchOnFragmentDetached(f);
+				}
+			}
+		}
 	}
-	public void onFragmentAttached(BaseCobrainFragment f) {
+	public void dispatchOnFragmentAttached(BaseCobrainFragment f) {
+		onFragmentAttached(f);
+		List<Fragment> fragments = getChildFragmentManager().getFragments();
+		if (fragments != null) {
+			for (Fragment fragment : fragments) {
+				if (f != fragment && fragment instanceof BaseCobrainFragment) {
+					BaseCobrainFragment bf = (BaseCobrainFragment)fragment;
+					bf.dispatchOnFragmentAttached(f);
+				}
+			}
+		}
 	}
 
 }
