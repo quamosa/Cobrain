@@ -61,6 +61,8 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 	boolean thisIsMyList;
 	private User wishListOwner;
 
+	private AsyncTask<Void, Void, Skus> addTask;
+
 	public void initialize(Skus list, boolean showMyPrivateWishList) {
 		wishList = list;
 		this.showMyPrivateWishList = showMyPrivateWishList;
@@ -270,10 +272,10 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		}
 		else {
 			if (wishListOwner != null) {
-				new AsyncTask<Void, Void, Skus>() {
+				addAsyncTask(new AsyncTask<Object, Void, Skus>() {
 
 					@Override
-					protected Skus doInBackground(Void... params) {
+					protected Skus doInBackground(Object... params) {
 						UserInfo ui = controller.getCobrain().getUserInfo();
 						return ui.getSkus(wishListOwner, "shared", null, null);
 					}
@@ -291,7 +293,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 							else onError("Could not load " + wishListOwner.getName() + "'s craves");
 						}
 					}
-				}.execute();
+				}).execute();
 			}
 		}
 		

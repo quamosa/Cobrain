@@ -456,7 +456,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 					}
 				}
 				else {
-					if (ui.unraveProduct(wishList.getOwner(), wishListItem)) {
+					if (ui.unraveProduct(wishList.getOwner(), wishListItem, raveId)) {
 						//isRaved = rave;
 						refreshWishList();
 						return true;

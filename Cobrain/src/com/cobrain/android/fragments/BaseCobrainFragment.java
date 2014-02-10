@@ -1,8 +1,11 @@
 package com.cobrain.android.fragments;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.os.AsyncTask;
+import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -22,8 +25,14 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	boolean updateRequested;
 	StateSaver state = new StateSaver();
 	boolean silentMode;
+	ArrayList<AsyncTask> asyncTasks = new ArrayList<AsyncTask>();
 
 	public BaseCobrainFragment() {}
+
+	protected AsyncTask addAsyncTask(AsyncTask asyncTask) {
+		asyncTasks.add(asyncTask);
+		return asyncTask;
+	}
 
 	public class StateSaver {
 		Bundle savedState = new Bundle();
@@ -146,6 +155,12 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public void onDetach() {
 		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
+		for (AsyncTask task : asyncTasks) {
+			if (task.getStatus() != Status.FINISHED) {
+				task.cancel(true);
+			}
+		}
+		asyncTasks.clear();
 		controller.dispatchOnFragmentDetached(this);
 		abHide = null;
 		controller = null;

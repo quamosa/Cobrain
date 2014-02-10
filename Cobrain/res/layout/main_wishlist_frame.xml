@@ -1,47 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/White" >
 
-    <!-- LinearLayout
-        android:id="@+id/bottom_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" >
-
-        <Button
-            android:id="@+id/just_for_me_button"
-            style="@style/crave_purple_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableTop="@drawable/ic_launcher"
-            android:text="Just for Me" />
-
-        <Button
-            android:id="@+id/friends_can_see_button"
-            style="@style/crave_purple_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableTop="@drawable/ic_launcher"
-            android:text="Friends can See" />
-    </LinearLayout -->
-
-    <RelativeLayout
-        android:id="@+id/main_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-         >
-
-        <android.support.v4.view.ViewPager
+	     <android.support.v4.view.ViewPager
             android:id="@+id/crave_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </android.support.v4.view.ViewPager>
-    </RelativeLayout>
-    
 
 </RelativeLayout>

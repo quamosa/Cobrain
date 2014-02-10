@@ -181,7 +181,6 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:background="@drawable/invite_button_highlight"
-	        android:layout_alignParentBottom="true"
 	        android:paddingTop="10dp"
 	        android:paddingBottom="10dp"
 	         >
@@ -246,7 +245,6 @@
         android:paddingLeft="25dp"
         android:paddingRight="25dp"
         android:lineSpacingExtra="7dp"
-        android:layout_centerHorizontal="true"
         android:textColor="@color/FriendsListItemText"
         android:text="Invite friends to see their Shared Craves and Rave about the ones you think are best for them. The more you interact with your friends, the smarter your Cobrain becomes!"
         />

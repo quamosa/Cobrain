@@ -395,14 +395,12 @@ public class UserInfo extends User {
 		}
 		return false;
 	}
-	public boolean unraveProduct(User owner, Sku product) {
+	public boolean unraveProduct(User owner, Sku product, String raveId) {
 		if (apiKey != null) {
-			String url = context.getString(R.string.url_raves_delete, context.getString(R.string.url_cobrain_api));
-			String json = String.format("{\"_id\":\"%s\",\"sku\":{\"id\":%s}}",
-					owner.getId(), product.getId());
+			String url = context.getString(R.string.url_raves_delete, context.getString(R.string.url_cobrain_api), raveId);
 
 			WebRequest wr = new WebRequest().delete(url).setContentType("application/json").setHeaders(apiKeyHeader());
-			if (wr.setBody(json).go() == 200) {
+			if (wr.go() == 200) {
 				return true;
 			}
 			else reportError("Could not unrave product");

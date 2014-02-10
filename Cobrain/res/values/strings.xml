@@ -59,7 +59,7 @@
     <string name="url_skus_get">%1$s/skus</string>
     <string name="url_feed_get">%1$s/feed</string>
     <string name="url_raves_post">%1$s/raves</string>
-    <string name="url_raves_delete">%1$s/raves</string>
+    <string name="url_raves_delete">%1$s/raves/%2$s</string>
     
     <!-- v 1.0 -->
     <string name="url_recommendations_get">%1$s/v1/recommendations</string>
