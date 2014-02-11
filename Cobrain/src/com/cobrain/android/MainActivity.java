@@ -53,6 +53,7 @@ import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.utils.Analytics;
 import com.cobrain.android.utils.HelperUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.ExceptionParser;
@@ -235,6 +236,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Analytics.start(this);
         
         cobrain = new Cobrain(getApplicationContext());
 		cobrain.setOnLoggedInListener(this);
@@ -335,6 +338,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public void onLoggedIn(UserInfo ui) {
+		Analytics.sendEvent("Login-Logout", "Login", null, null);
+		
 		dismissDialog(); //dismiss an indeterminate progress dialog if we have one open
 		showMain(VIEW_HOME);
 	}
@@ -345,6 +350,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 			dismissDialog(); //dismiss an indeterminate progress dialog if we have one open
 			showLogin(null);
 			closeMenu(true);
+			Analytics.sendEvent("Login-Logout", "Logout", null, null);
 		}
 	}
 
@@ -398,6 +404,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		homeFragment = null;
 		isDestroying = true;
 		cobrain.logout(); //TODO: do we wait for this to finish or block and remove strict rules for network on ui thread
+
+		Analytics.stop(this);
 	}
 
 	@Override
@@ -813,7 +821,9 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public void setCurrentCobrainView(CobrainView cv) {
-		if (!isCobrainViewMenu(cv)) cobrainMainView = cv;
+		if (!isCobrainViewMenu(cv)) {
+			cobrainMainView = cv;
+		}
 		else cobrainMenuView = cv;
 		cobrainView = cv;
 	}

@@ -1,5 +1,6 @@
 package com.cobrain.android.fragments;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
@@ -26,8 +28,16 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	StateSaver state = new StateSaver();
 	boolean silentMode;
 	ArrayList<AsyncTask> asyncTasks = new ArrayList<AsyncTask>();
+	Field childFragmentManagerField;
 
-	public BaseCobrainFragment() {}
+	public BaseCobrainFragment() {
+		try {
+	        childFragmentManagerField = Fragment.class.getDeclaredField("mChildFragmentManager");
+	        childFragmentManagerField.setAccessible(true);
+	    }catch (Exception e){
+	    	e.printStackTrace();
+	    }
+	}
 
 	protected AsyncTask addAsyncTask(AsyncTask asyncTask) {
 		asyncTasks.add(asyncTask);
@@ -165,19 +175,27 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		abHide = null;
 		controller = null;
 		actionBar = null;
+		childFragmentManagerField = null;
+		
 		super.onDetach();
 	}
 
+	List<Fragment> getChildFragments() {
+
+		//try to get rid of random "No Activity" error that seems to occur when using viewpagers!
+        // dont want to create childfragmentmanager instances if we arent attaching any children to them!
+		try {
+            FragmentManager fm = (FragmentManager) childFragmentManagerField.get(this);
+            if (fm != null) return fm.getFragments();
+        }catch (Exception e){
+        	e.printStackTrace();
+        }
+		
+		return null;
+	}
+	
 	@Override
 	public void onClick(View v) {
-//		switch(v.getId()) {
-//		case R.id.navigation_button:
-//			controller.showNavigationMenu();
-//			break;
-//		case R.id.filter_button:
-//			controller.showFriendsMenu();
-//			break;
-//		}
 	}
 
 	@Override
@@ -198,7 +216,8 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	
 	public void dispatchOnFragmentDetached(BaseCobrainFragment f) {
 		onFragmentDetached(f);
-		List<Fragment> fragments = getChildFragmentManager().getFragments();
+		
+		List<Fragment> fragments = getChildFragments();
 		if (fragments != null) {
 			for (Fragment fragment : fragments) {
 				if (f != fragment && fragment instanceof BaseCobrainFragment) {
@@ -210,7 +229,8 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	}
 	public void dispatchOnFragmentAttached(BaseCobrainFragment f) {
 		onFragmentAttached(f);
-		List<Fragment> fragments = getChildFragmentManager().getFragments();
+
+		List<Fragment> fragments = getChildFragments();
 		if (fragments != null) {
 			for (Fragment fragment : fragments) {
 				if (f != fragment && fragment instanceof BaseCobrainFragment) {

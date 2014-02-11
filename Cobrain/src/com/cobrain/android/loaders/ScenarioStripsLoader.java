@@ -18,7 +18,6 @@ import com.cobrain.android.adapters.ScenarioStripPagerListAdapter;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.controllers.ScenarioCraveStrip;
 import com.cobrain.android.fragments.CraveStripsFragment;
-import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.ScenarioItem;
 import com.cobrain.android.model.Scenarios;
 import com.cobrain.android.model.UserInfo;
@@ -29,6 +28,7 @@ public class ScenarioStripsLoader {
 	ListView craveStripList;
 	CraveStripListAdapter craveStripListAdapter;
 	public ArrayList<CraveStrip> craveStrips = new ArrayList<CraveStrip>();
+	private AsyncTask<Void, Void, List<ScenarioItem>> currentRequest;
 	
 	public void initialize(CraveStripsFragment parent, ListView list) {
 		this.parent = parent;
@@ -37,6 +37,11 @@ public class ScenarioStripsLoader {
 	}
 	
 	public void dispose() {
+		if (currentRequest != null) {
+			currentRequest.cancel(true);
+			currentRequest = null;
+		}
+		
 		for (CraveStrip strip : craveStrips) {
 			strip.dispose();
 		}
@@ -64,7 +69,7 @@ public class ScenarioStripsLoader {
 	}
 
 	void loadScenarios() {
-		new AsyncTask<Void, Void, List<ScenarioItem>>() {
+		currentRequest = new AsyncTask<Void, Void, List<ScenarioItem>>() {
 
 			@Override
 			protected List<ScenarioItem> doInBackground(Void... params) {

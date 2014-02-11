@@ -6,12 +6,12 @@ import com.cobrain.android.R;
 import com.cobrain.android.drawables.EdgeFadeDrawable;
 
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.HomePagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
@@ -30,9 +30,14 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		
 		View v = inflater.inflate(R.layout.frg_home, null);
 		homePager = (ViewPager) v.findViewById(R.id.home_pager);
+		HomePagerTabStrip titleStrip = (HomePagerTabStrip) v.findViewById(R.id.home_pager_tab_strip);
+		
 		homePager.setOnPageChangeListener(this);
 		adapter = new HomePagerAdapter(getChildFragmentManager());
 		
+		titleStrip.setBackgroundColor(Color.BLACK);
+		titleStrip.setTextColor(Color.WHITE);
+		titleStrip.setTabIndicatorColor(Color.WHITE);
 		homePager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.home_pager_margin_size));
 		//homePager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(R.color.CraveBorderColor)));
 		homePager.setPageMarginDrawable(new EdgeFadeDrawable(getResources().getColor(R.color.CraveBorderColor)));

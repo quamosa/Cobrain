@@ -483,12 +483,14 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			int itemId = wishListItem.getId();
 			wishList = getController().getCobrain().getUserInfo().getSkus(wishList.getOwner(), "shared", null, null);
 	
-			for (Sku item : wishList.get()) {
-				if (item.getId() == itemId) {
-					wishListItem = item;
-					wishListItems.set(position-1, wishListItem);
-					_iRavedThis = null;
-					break;
+			if (wishList != null) {
+				for (Sku item : wishList.get()) {
+					if (item.getId() == itemId) {
+						wishListItem = item;
+						wishListItems.set(position-1, wishListItem);
+						_iRavedThis = null;
+						break;
+					}
 				}
 			}
 		}

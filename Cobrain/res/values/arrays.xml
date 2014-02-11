@@ -48,6 +48,32 @@
    	    <item>@drawable/ic_navigation_menu_share_and_rave</item>
    	    <item type="integer">3</item>
    	</array>
+
+	<array name="sku_categories">
+        <item type="string">All Categories</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">0</item>
+	    
+	    <item type="string">Tops</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">5</item>
+
+   	    <item type="string">Bottoms</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">1</item>
+
+   	    <item type="string">Accessories</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">4</item>
+   	    
+   	    <item type="string">Footwear</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">2</item>
+   	    
+   	    <item type="string">Underwear</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">3</item>
+   	</array>
 	
 	<array name="craves_category_menu_items">
         <item type="string"><![CDATA[<font color="#a0a0a0"><small>Personalized</small></font><br>Apparel]]></item>

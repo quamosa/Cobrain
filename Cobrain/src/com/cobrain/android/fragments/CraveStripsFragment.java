@@ -19,7 +19,6 @@ import com.cobrain.android.R;
 import com.cobrain.android.adapters.SkuPagerAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
-import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.controllers.ScenarioCraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.ScenarioStripsLoader;
@@ -195,7 +194,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 
 	@Override
 	public void onLoadStarted() {
-		loaderUtils.showLoading("Loading your craves...");
+		//loaderUtils.showLoading("Loading your craves...");
 	}
 
 	@Override
@@ -211,7 +210,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		else if (r.getSkus().size() == 0)
 			loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
 		else {
-			loaderUtils.dismissLoading();
+			//loaderUtils.dismissLoading();
 
 			if (savedState.isSaved()) {
 				//cravePager.setCurrentItem(savedState.position, false);

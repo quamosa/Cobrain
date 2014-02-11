@@ -47,7 +47,7 @@ public class HomePagerTabStrip extends PagerTitleStrip {
     private static final int TAB_PADDING = 16; // dp
     private static final int TAB_SPACING = 32; // dp
     private static final int MIN_TEXT_SPACING = TAB_SPACING + TAB_PADDING * 2; // dp
-    private static final int FULL_UNDERLINE_HEIGHT = 1; // dp
+    private static final int FULL_UNDERLINE_HEIGHT = 5; // dp
     private static final int MIN_STRIP_HEIGHT = 35 + 10; // dp
 
     private int mIndicatorColor;
@@ -258,13 +258,16 @@ public class HomePagerTabStrip extends PagerTitleStrip {
         super.onDraw(canvas);
 
         final int height = getHeight();
-        final int bottom = height;
+        int bottom = height;
+        
+        bottom -= mFullUnderlineHeight;
+        
         final int left = mCurrText.getLeft() - mTabPadding;
         final int right = mCurrText.getRight() + mTabPadding;
         final int top = bottom - mIndicatorHeight;
 
         mTabPaint.setColor(mTabAlpha << 24 | (mIndicatorColor & 0xFFFFFF));
-        //canvas.drawRect(left, top, right, bottom, mTabPaint);
+        canvas.drawRect(left, top, right, bottom, mTabPaint);
 
         if (mDrawFullUnderline) {
             mTabPaint.setColor(0xFF << 24 | (mIndicatorColor & 0xFFFFFF));
