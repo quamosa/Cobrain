@@ -142,11 +142,17 @@ public class LoaderUtils {
 		a.setDuration(500);
 		v.startAnimation(a);
 	}
-	
+
+	public static void hide(View v, AnimationListener listener) {
+		hide(v, true, false, listener);
+	}
 	public static void hide(View v) {
-		hide(v, true, false);
+		hide(v, true, false, null);
 	}
 	public static void hide(final View v, boolean animate, final boolean gone) {
+		hide(v, animate, gone, null);
+	}
+	public static void hide(final View v, boolean animate, final boolean gone, final AnimationListener listener) {
 		if (v.getVisibility() != View.VISIBLE) return;
 		
 		Animation ca = v.getAnimation();
@@ -171,6 +177,7 @@ public class LoaderUtils {
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				v.setVisibility((gone) ? View.GONE : View.INVISIBLE);
+				if (listener != null) listener.onAnimationEnd(animation);
 			}
 		});
 		a.setDuration(250);

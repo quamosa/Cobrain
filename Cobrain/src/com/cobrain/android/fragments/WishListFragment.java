@@ -256,6 +256,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		super.onActivityCreated(savedInstanceState);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void update() {
 		controller.getCobrain().checkLogin();
 		loaderUtils.dismiss();
@@ -272,7 +273,7 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		}
 		else {
 			if (wishListOwner != null) {
-				addAsyncTask(new AsyncTask<Object, Void, Skus>() {
+				addAsyncTask("wishList", new AsyncTask<Object, Void, Skus>() {
 
 					@Override
 					protected Skus doInBackground(Object... params) {

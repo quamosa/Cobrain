@@ -117,7 +117,7 @@ public class WishListLoader {
 				
 				if (u != null) {
 					r = u.getSkus(owner, showPrivateOrPublic ? "saved" : "shared", null, null);
-					items = r.get();
+					if (r != null) items = r.get();
 				}
 				
 				return items;

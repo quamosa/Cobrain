@@ -41,6 +41,7 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		homePager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.home_pager_margin_size));
 		//homePager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(R.color.CraveBorderColor)));
 		homePager.setPageMarginDrawable(new EdgeFadeDrawable(getResources().getColor(R.color.CraveBorderColor)));
+		adapter.add("Animation!", new PersonalizationAnimationFragment());
 		adapter.add("Home", new CraveStripsFragment());
 		adapter.add("On Sale", new CraveStripsFragment());
 		adapter.add("My Private Rack", new SavedAndShareFragment());

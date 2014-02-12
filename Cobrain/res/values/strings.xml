@@ -75,7 +75,7 @@
     <string name="url_lists_items_post">%1$s/v1/lists/%2$s/items</string>
     <string name="url_lists_item_publish_put">%1$s/v1/lists/%2$s/items/%3$s</string>
     <string name="url_lists_item_del">%1$s/v1/lists/%2$s/items/%3$s</string>
-    <string name="url_category_get">%1$s/v1/categories/%2$s</string>
+    <string name="url_category_get">%1$s/categories/%2$s</string>
     <string name="url_lists_rave_post">%1$s/v1/lists/%2$s/items/%3$s/raves</string>
     <string name="url_lists_rave_delete">%1$s/v1/lists/%2$s/items/%3$s/raves/%4$s</string>
     <string name="url_hashed_phone_post">%1$s/account/phone</string>

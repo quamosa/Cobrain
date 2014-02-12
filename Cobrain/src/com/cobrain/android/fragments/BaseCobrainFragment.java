@@ -1,7 +1,7 @@
 package com.cobrain.android.fragments;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -27,7 +27,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	boolean updateRequested;
 	StateSaver state = new StateSaver();
 	boolean silentMode;
-	ArrayList<AsyncTask> asyncTasks = new ArrayList<AsyncTask>();
+	HashMap<String, AsyncTask> asyncTasks = new HashMap<String, AsyncTask>();
 	Field childFragmentManagerField;
 
 	public BaseCobrainFragment() {
@@ -39,9 +39,17 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	    }
 	}
 
-	protected AsyncTask addAsyncTask(AsyncTask asyncTask) {
-		asyncTasks.add(asyncTask);
+	public AsyncTask addAsyncTask(String key, AsyncTask asyncTask) {
+		asyncTasks.put(key, asyncTask);
 		return asyncTask;
+	}
+	public void cancelAsyncTask(String key) {
+		AsyncTask task = asyncTasks.remove(key);
+		if (task != null) {
+			if (task.getStatus() != Status.FINISHED) {
+				task.cancel(true);
+			}
+		}
 	}
 
 	public class StateSaver {
@@ -165,7 +173,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public void onDetach() {
 		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
-		for (AsyncTask task : asyncTasks) {
+		for (AsyncTask task : asyncTasks.values()) {
 			if (task.getStatus() != Status.FINISHED) {
 				task.cancel(true);
 			}
