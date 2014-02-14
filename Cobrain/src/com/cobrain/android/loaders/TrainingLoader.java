@@ -16,42 +16,48 @@ import com.cobrain.android.R;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
+import com.cobrain.android.model.Opinion;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.v1.Product;
-import com.cobrain.android.model.v1.Training;
-import com.cobrain.android.model.v1.TrainingResult;
 import com.cobrain.android.utils.LoaderUtils;
 
 public class TrainingLoader {
 
+	private static final int CRAVES_NEEDED = 5;
 	private CobrainController controller;
 	private AsyncTask currentRequest;
-	private Training training;
 	public ArrayList<TrainingItem> trainingItems = new ArrayList<TrainingItem>();
 	public boolean multiSelect = true;
 	OnSelectedListener selectedListener;
+	int cravesCompleted;
+	int currentSelects;
 	
 	public interface OnSelectedListener {
-		void onSelected(View v, boolean selected);
+		void onSelected(View v, int selected);
 	}
 	
 	public class TrainingItem implements OnClickListener, OnImageLoadListener {
 		ImageView image;
-		ImageView checkbox;
+		ImageView checkboxLiked;
+		ImageView checkboxDisliked;
 		ProgressBar progress;
-		boolean selected;
+		int selected;
 		int id;
 		View parent;
 		HashMap<Integer, View> viewCache = new HashMap<Integer, View>();
+		Opinion opinion;
 		
 		public void add(View v, int id) {
 			v = v.findViewById(id);
 			parent = v;
 
 			image = (ImageView) v.findViewById(R.id.training_image);
-			image.setOnClickListener(this);
 			
-			checkbox = (ImageView) v.findViewById(R.id.training_checkbox_icon);
+			checkboxLiked = (ImageView) v.findViewById(R.id.training_checkbox_liked_icon);
+			checkboxDisliked = (ImageView) v.findViewById(R.id.training_checkbox_disliked_icon);
+			checkboxLiked.setOnClickListener(this);
+			checkboxDisliked.setOnClickListener(this);
 
 			progress = (ProgressBar) v.findViewById(R.id.training_progress);
 
@@ -87,33 +93,61 @@ public class TrainingLoader {
 			ImageLoader.load(url, image, this);
 		}
 		
-		public void setSelected(boolean selected) {
+		public void setSelected(int selected) {
 			if (this.selected != selected) {
 				if (!multiSelect)
 					for (TrainingItem ti : trainingItems)
-						if (ti != this) ti.setSelected(false);
+						if (ti != this) ti.setSelected(0);
 				this.selected = selected;
 				//checkbox.setVisibility((selected) ? View.VISIBLE : View.GONE);
-				checkbox.setImageResource((selected) ? R.drawable.ic_training_checkbox_selected : R.drawable.ic_training_checkbox);
+				switch(selected) {
+				case 0:
+					checkboxLiked.setImageResource(R.drawable.ic_training_checkbox_liked);
+					checkboxDisliked.setImageResource(R.drawable.ic_training_checkbox_disliked);
+					break;
+				case 1:
+					checkboxLiked.setImageResource(R.drawable.ic_training_checkbox_liked_selected);
+					checkboxDisliked.setImageResource(R.drawable.ic_training_checkbox_disliked);
+					break;
+				case 2:
+					checkboxLiked.setImageResource(R.drawable.ic_training_checkbox_liked);
+					checkboxDisliked.setImageResource(R.drawable.ic_training_checkbox_disliked_selected);
+					break;
+				}
 				onSelected(image, selected);
 			}
 		}
 
-		public boolean isSelected() {
+		/*public boolean isSelected() {
 			return selected;
-		}
+		}*/
 		
 		public void dispose() {
+			opinion = null;
 			viewCache.clear();
-			image.setOnClickListener(null);
 			image = null;
-			checkbox = null;
+			checkboxLiked.setOnClickListener(null);
+			checkboxDisliked.setOnClickListener(null);
+			checkboxLiked = null;
+			checkboxDisliked = null;
 			parent = null;
 		}
 
 		@Override
 		public void onClick(View v) {
-			setSelected(!selected); //toggle it
+			int sel = selected;
+			
+			switch (v.getId()) {
+			case R.id.training_checkbox_liked_icon:
+				if (sel == 1) sel = 0;
+				else sel = 1;
+				break;
+			case R.id.training_checkbox_disliked_icon:
+				if (sel == 2) sel = 0;
+				else sel = 2;
+				break;
+			}
+			setSelected(sel); //toggle it
 		}
 
 		@Override
@@ -128,7 +162,18 @@ public class TrainingLoader {
 
 	}
 
-	void onSelected(View v, boolean selected) {
+	void onSelected(View v, int selected) {
+		ArrayList<TrainingItem> items = getTrainingItems();
+
+		int selects = 0;
+		
+		for (TrainingItem item : items) {
+			if (item.selected == 1) {
+				selects++;
+			}
+		}
+		currentSelects = selects;
+		
 		if (selectedListener != null) selectedListener.onSelected(v, selected);
 	}
 	
@@ -142,7 +187,7 @@ public class TrainingLoader {
 	
 	public void clearSelections() {
 		for (TrainingItem ti : trainingItems)
-			ti.setSelected(false);
+			ti.setSelected(0);
 	}
 
 	public void clear() {
@@ -159,43 +204,20 @@ public class TrainingLoader {
 			protected Boolean doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
+				String signal;
 				
 				if (u != null) {
-					ArrayList<Integer> ids = new ArrayList<Integer>();
-
-					for (TrainingItem ti : trainingItems)
-						if (ti.selected) ids.add(ti.id);
-
-					if (ids.size() > 0) {
-						return u.saveTrainingAnswers(training.getId(), ids);
+					for (TrainingItem ti : trainingItems) {
+						switch(ti.selected){
+						case 1: signal = "liked"; break;
+						case 2: signal = "disliked"; break;
+						default: signal = "null";
+						}
+						u.saveOpinion(ti.opinion, signal);
 					}
+					
 					return true;
 				}
-				
-				return false;
-			}
-
-			@Override
-			protected void onPostExecute(Boolean result) {
-				if (listener != null) listener.onLoadCompleted(result);
-				currentRequest = null;
-			}
-			
-		}.execute();
-		
-	}
-
-	public void skipChoices(final OnLoadListener<Boolean> listener) {
-		if (listener != null) listener.onLoadStarted();
-		
-		currentRequest = new AsyncTask<Void, Void, Boolean>() {
-			@Override
-			protected Boolean doInBackground(Void... params) {
-				Cobrain c = controller.getCobrain();
-				UserInfo u = c.getUserInfo();
-				
-				if (u != null)
-					return u.skipTraining(training.getId());
 				
 				return false;
 			}
@@ -220,36 +242,51 @@ public class TrainingLoader {
 		trainingItems.add(ti);
 	}
 
-	public void loadTraining(final boolean refresh, final OnLoadListener<TrainingResult> listener) {
+	public int getCravesRemaining() {
+		int remaining = CRAVES_NEEDED - getCravesLiked();
+		if (remaining < 0) remaining = 0;
+		return remaining;
+	}
+	public int getCravesLiked() {
+		return cravesCompleted + currentSelects;
+	}
+
+	
+	public void loadTraining(final boolean refresh, final OnLoadListener<Skus> listener) {
 		if (listener != null) listener.onLoadStarted();
 		
-		currentRequest = new AsyncTask<Void, Void, TrainingResult>() {
+		currentRequest = new AsyncTask<Void, Void, Skus>() {
 			@Override
-			protected TrainingResult doInBackground(Void... params) {
+			protected Skus doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
-				TrainingResult tr = null;
+				Skus tr = null;
 				
 				if (u != null) {
-					tr = u.getTrainings(refresh);
-					if (tr != null) {
-						training = tr.getTraining();
-					}
+					tr = u.getSkus(u, "training", null, null, 4, 1 /*(!refresh) ? 1 : 2*/);
+					Skus liked = u.getSkus(u, "liked", null, null);
+					if (liked != null) cravesCompleted = liked.get().size();
 				}
 				
 				return tr;
 			}
 
 			@Override
-			protected void onPostExecute(TrainingResult result) {
+			protected void onPostExecute(Skus result) {
 				if (listener != null) listener.onLoadCompleted(result);
 				if (result != null) {
 					int i = 0;
-					for (Product p : result.getTraining().getChoices()) {
+					for (Sku p : result.get()) {
+						if (isCancelled()) return;
 						String url = p.getImageURL();
 						TrainingItem ti = trainingItems.get(i++);
+						ti.opinion = p.getOpinion();
 						ti.id = p.getId();
-						ti.setSelected(false);
+						if (ti.opinion.is("liked")) 							
+							ti.setSelected(1);
+						else if (ti.opinion.is("disliked")) 
+							ti.setSelected(2);
+						else ti.setSelected(0);
 						ti.setImageUrl(url);
 						String[] price = p.getPriceLabel().split("\\.", 2);
 						ti.setText(R.id.training_description, p.getName().toUpperCase(Locale.US));

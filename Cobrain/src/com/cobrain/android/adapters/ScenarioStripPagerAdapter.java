@@ -34,11 +34,13 @@ public class ScenarioStripPagerAdapter extends CraveStripPagerAdapter<Scenario> 
 			typ = 2;
 		}
 
-		if (stripType == CraveStrip.STRIP_TYPE_CRAVES_NOT_AVAILABLE) {
+		switch(stripType) {
+		case CraveStrip.STRIP_TYPE_CRAVES_NOT_AVAILABLE:
 			if (position == 0) {
 				typ = 1;
 			}
 			offset = 1;
+			break;
 		}
 		
 		switch(typ) {
@@ -49,15 +51,15 @@ public class ScenarioStripPagerAdapter extends CraveStripPagerAdapter<Scenario> 
 		case 2:
 			f = new CraveStripRefresherFragment(getActivity(), strip);
 			break;
-			
+		
 		default:
 			
 			int pos = position - offset;
 			CraveStripFragment<Scenario> csf = new CraveStripFragment<Scenario>(getActivity(),  parentFragment) {
 
 				@Override
-				protected void onShowZoomedCrave(Scenario skuParent, Sku s) {
-					parentFragment.showCravesFragmentForScenario(skuParent, s);
+				protected void onShowZoomedCrave(Scenario skuParent, Sku sku) {
+					parentFragment.showZoomedCraveStrip(strip, sku);
 				}
 				
 			};
@@ -80,17 +82,7 @@ public class ScenarioStripPagerAdapter extends CraveStripPagerAdapter<Scenario> 
 
 	@Override
 	public int getCount() {
-		//return count;
-
-		int cnt = 0;
-
-		if (recommendations != null) {
-			cnt += ((page-1) * perPage) + countOnThisPage;
-
-			cnt = Math.max(recommendations.size(), cnt);
-			cnt = Math.min(cnt, count);
-			if (cnt < 0) cnt = 0;
-		}
+		int cnt = super.getCount();
 
 		cnt++;
 		if (stripType == CraveStrip.STRIP_TYPE_CRAVES_NOT_AVAILABLE) {

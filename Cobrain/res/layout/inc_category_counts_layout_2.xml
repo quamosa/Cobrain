@@ -11,7 +11,7 @@
         android:id="@+id/category_checkmark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
         android:src="@drawable/ic_training_animation_checkmark" />
 
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="10dp"
         android:gravity="right"
-        android:text="442"
+        android:text="42"
         android:textColor="#00be9b"
         android:textSize="17sp" />
 
@@ -29,7 +29,7 @@
         android:id="@+id/category_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tops"
+        android:text="Bottoms"
         android:textSize="17sp" />
 
 </LinearLayout>

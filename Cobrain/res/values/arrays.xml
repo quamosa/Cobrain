@@ -50,9 +50,11 @@
    	</array>
 
 	<array name="sku_categories">
+	    <!-- 
         <item type="string">All Categories</item>
    	    <item>@drawable/ic_category_menu_apparel</item>
    	    <item type="integer">0</item>
+	     -->
 	    
 	    <item type="string">Tops</item>
    	    <item>@drawable/ic_category_menu_apparel</item>

@@ -3,7 +3,6 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="menu_shadow_width">60dp</dimen>
     <dimen name="crave_padding">15dp</dimen>
 	<dimen name="button_size">50dp</dimen>
 	<dimen name="friend_menu_icon_size">30dp</dimen>
@@ -14,7 +13,8 @@
 
 	<dimen name="friends_list_item_padding">4dp</dimen>
 	
-	<dimen name="friends_list_item_marginLeft">40dp</dimen>
+    <dimen name="menu_shadow_width">35dp</dimen>
+	<dimen name="friends_list_item_marginLeft">25dp</dimen>
 	<dimen name="raves_list_item_marginLeft">50dp</dimen>
 	
 	<dimen name="filter_menu_item_padding">12dp</dimen>
@@ -34,4 +34,6 @@
 	<dimen name="avatar_corner_radius">5dp</dimen>
 	
 	<dimen name="home_pager_margin_size">27dp</dimen>
+	
+	<dimen name="category_count_width">30dp</dimen>
 </resources>

@@ -19,14 +19,17 @@ import com.cobrain.android.R;
 import com.cobrain.android.adapters.SkuPagerAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
+import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.controllers.ScenarioCraveStrip;
+import com.cobrain.android.controllers.SkuCraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.ScenarioStripsLoader;
 import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 
-public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadListener<Scenario>, OnItemClickListener {
+public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnLoadListener<T>, OnItemClickListener {
 	public static final String TAG = "CraveStripsFragment";
 
 	SkuPagerAdapter craveAdapter;
@@ -42,6 +45,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 	View comingsoon;
 	Menu menu;
 	ScenarioStripsLoader loader;
+	boolean onSale;
 
 	public class SavedState {
 		boolean saved;
@@ -121,7 +125,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 
 	void setupCraveStrips(View v) {
 		ListView craveStripList = (ListView) v.findViewById(R.id.crave_strip_list);
-		loader.initialize(this, craveStripList);
+		loader.initialize(this, craveStripList, onSale);
 	}
 	
 	void setupComingSoonView(View v) {
@@ -151,6 +155,9 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		if (controller != null) {
 			controller.getCobrain().checkLogin();
 			loaderUtils.dismiss();
+			if (!onSale) {
+				loader.addHeaderStrip();
+			}
 			loader.load();
 		}
 	}
@@ -173,8 +180,10 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		savedState.selectedCategoryNavigationPosition = actionBar.getSelectedNavigationIndex();
 		savedState.save();
 		
-		craveAdapter.dispose();
-		craveAdapter = null;
+		if (craveAdapter != null) {
+			craveAdapter.dispose();
+			craveAdapter = null;
+		}
 
 		if (craveFilterAdapter != null) {
 			craveFilterAdapter.clear();
@@ -198,7 +207,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 	}
 
 	@Override
-	public void onLoadCompleted(Scenario r) {
+	public void onLoadCompleted(T r) {
 		if (r == null) {
 			loaderUtils.showEmpty("We had a problem loading your craves. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
@@ -207,8 +216,9 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 				}
 			});
 		}
-		else if (r.getSkus().size() == 0)
-			loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
+		else if ((r instanceof Scenario) && ((Scenario)r).getSkus().size() == 0) {
+			//loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
+		}
 		else {
 			//loaderUtils.dismissLoading();
 
@@ -336,7 +346,7 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 		
 	}
 
-	public void showCravesFragmentForScenario(Scenario scenario, Sku sku) {
+	/*public void showCravesFragmentForScenario(Scenario scenario, Sku sku) {
 		for (int i = 0; i < loader.craveStrips.size(); i++) {
 			ScenarioCraveStrip strip = (ScenarioCraveStrip) loader.craveStrips.get(i);
 			if (strip.scenarioId == scenario.getId()) {
@@ -344,6 +354,16 @@ public class CraveStripsFragment extends BaseCobrainFragment implements OnLoadLi
 				return;
 			}
 		}
+	}*/
+
+	public void showZoomedCraveStrip(CraveStrip strip, Sku sku) {
+		controller.showCraves(strip, sku, R.id.overlay_layout, true);
 	}
-	
+
+	public static CraveStripsFragment<?> newInstance(boolean onSale) {
+		CraveStripsFragment<?> f = new CraveStripsFragment<Object>();
+		f.onSale = onSale;
+		return f;
+	}
+
 }	

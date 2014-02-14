@@ -29,6 +29,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	boolean silentMode;
 	HashMap<String, AsyncTask> asyncTasks = new HashMap<String, AsyncTask>();
 	Field childFragmentManagerField;
+	boolean detached;
 
 	public BaseCobrainFragment() {
 		try {
@@ -124,6 +125,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	public void onAttach(Activity activity) {
 		controller = (CobrainController) activity;
 		controller.showOptionsMenu(true);
+		detached = false;
 		actionBar = controller.getSupportActionBar();
 		abHide = new View(activity.getApplicationContext());
 		controller.dispatchOnFragmentAttached(this);
@@ -172,6 +174,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	
 	@Override
 	public void onDetach() {
+		detached = true;
 		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
 		for (AsyncTask task : asyncTasks.values()) {
 			if (task.getStatus() != Status.FINISHED) {

@@ -63,13 +63,9 @@
 		
 		   <com.cobrain.android.views.RoundedImageView
 		       android:id="@+id/user_avatar"
-		       android:layout_width="@dimen/avatar_size"
-		       android:layout_height="@dimen/avatar_size"
+		       style="@style/avatar_style"
 		       android:layout_centerVertical="true"
 		       android:layout_marginLeft="@dimen/navigation_menu_item_marginLeft"
-		       android:background="#bbb"
-		       app:corner_radius="@dimen/avatar_corner_radius"
-		       app:round_background="true"
 		        />
 	   
 	   		   <TextView

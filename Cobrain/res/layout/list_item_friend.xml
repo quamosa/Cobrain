@@ -55,11 +55,9 @@
 
    <com.cobrain.android.views.RoundedImageView
        android:id="@+id/friend_avatar"
-       android:layout_width="@dimen/avatar_size"
-       android:layout_height="@dimen/avatar_size"
+       style="@style/avatar_style"
        android:layout_centerVertical="true"
        android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
-       app:corner_radius="@dimen/avatar_corner_radius"
         />
 
 </com.cobrain.android.views.StateFullView>

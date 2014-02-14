@@ -23,10 +23,8 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
@@ -107,10 +105,10 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 	public CravesFragment() {}
 	
-	private CravesFragment(CraveStrip strip, Sku sku) {
+	private CravesFragment(CraveStrip<?> strip, Sku sku) {
 		skus = new ArrayList<Sku>();
 		pageTitle = "<small><small>" + strip.caption + "</small></small>";
-		skus.addAll( strip.getRecommendations() );
+		skus.addAll( strip.getSkus() );
 		savedState.position = skus.indexOf(sku);
 	}
 

@@ -12,6 +12,7 @@ public class AnimationStepper {
 	HashMap<Integer, Integer> stepStates = new HashMap<Integer, Integer>();
 	HashMap<String, Timer> timers = new HashMap<String, Timer>();
 	boolean running;
+	private static String STATE_TIMER_KEY = "State.Timer.$$$";
 
 	OnAnimationStep listener;
 	
@@ -45,7 +46,7 @@ public class AnimationStepper {
 		public long duration() {
 			return (System.nanoTime() - startTime) / 1000000;
 		}
-		public boolean expired(int duration) {
+		public boolean elapsed(int duration) {
 			return duration() >= duration;
 		}
 	}
@@ -101,6 +102,7 @@ public class AnimationStepper {
 	public int nextState() {
 		int state = getState() + 1;
 		stepStates.put(step, state);
+		timer(STATE_TIMER_KEY).reset();
 		return state;
 	}
 	
@@ -108,6 +110,7 @@ public class AnimationStepper {
 		if (running) {
 			if (this.step > 0) endStep(this.step);
 			stepStates.put(step, 0);
+			timer(STATE_TIMER_KEY).reset();
 			startTime = System.nanoTime();
 			this.step = step;
 			runCounter = 0;
@@ -141,6 +144,14 @@ public class AnimationStepper {
 	public boolean nextStep(int duration) {
 		if (getStepTime() >= duration) {
 			nextStep();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean nextState(int duration) {
+		if (timer(STATE_TIMER_KEY).elapsed(duration)) {
+			nextState();
 			return true;
 		}
 		return false;

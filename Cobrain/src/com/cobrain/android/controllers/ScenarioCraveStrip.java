@@ -11,27 +11,28 @@ public class ScenarioCraveStrip extends CraveStrip<Scenario> {
 	public static final int STRIP_TYPE_CRAVES = 0;
 	public static final int STRIP_TYPE_CRAVES_NOT_AVAILABLE = 1;
 	
-	boolean on = false;
 	public int scenarioId;
 
 	@Override
 	void onLoadWasCompleted(Scenario r) {
-		String whyText;
-		
-		on = !on;
+		String whyText = null;
 
-		//if (r.getSkus().size() >= 20) {
-		if (on) {
+		if (r != null) {
+			whyText = r.getWhyText();
+		}
+		
+		if (r != null && r.getSkus().size() >= 20) {
 			type = STRIP_TYPE_CRAVES;
-			if (r != null) whyText = r.getWhyText();
-			else whyText = "Was not able to get Cobrain loves for you... please try refreshing your list.";
 		}
 		else {
 			type = STRIP_TYPE_CRAVES_NOT_AVAILABLE;
-			whyText = "Here are some recommendations just for you!";
+			if (r == null) {
+				whyText = "Was not able to find new Craves for you... please try refreshing your list.";
+			}
+			//whyText = "While your Cobrain finds new Craves for you, check out these popular items";
 		}
 		
-		if (!whyText.equals(caption)) {
+		if (whyText != null && !whyText.equals(caption)) {
 			caption = whyText;
 			allStripsAdapter.notifyDataSetChanged();
 		}

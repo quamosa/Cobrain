@@ -35,6 +35,7 @@ import com.cobrain.android.fragments.BrowserFragment;
 import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.fragments.ContactListFragment;
 import com.cobrain.android.fragments.CravesFragment;
+import com.cobrain.android.fragments.FriendCraveStripsFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.fragments.HomeFragment;
 import com.cobrain.android.fragments.MainFragment;
@@ -670,6 +671,20 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
+	public void showFriendsSharedRack(User owner, List<Integer> skus) {
+		FriendCraveStripsFragment f = FriendCraveStripsFragment.newInstance(owner, skus);
+		showFragment(f, FriendCraveStripsFragment.TAG, false);
+	}
+	
+	void showFragment(BaseCobrainFragment f, String tag, boolean addToBackStack) {
+		setCurrentCobrainView(f);
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        if (addToBackStack) tr.addToBackStack(tag);
+        tr.replace(R.id.content_frame, f, tag)
+        	.commitAllowingStateLoss();
+	}
+
+	@Override
 	public void showWishList(Skus list, boolean showMyPrivateItems, boolean addToStack) {
 		WishListFragment training = new WishListFragment();
 		training.initialize(list, showMyPrivateItems);
@@ -682,9 +697,9 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showWishList(User owner, boolean showMyPrivateItems, boolean addToStack) {
+	public void showWishList(User owner, boolean showMyPrivateItems, List<Integer> skuIds, boolean addToStack) {
 		WishListFragment training = new WishListFragment();
-		training.initialize(owner, showMyPrivateItems);
+		training.initialize(owner, showMyPrivateItems, skuIds);
 		setCurrentCobrainView(training);
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
@@ -876,4 +891,5 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 			}
 		}
 	}
+
 }

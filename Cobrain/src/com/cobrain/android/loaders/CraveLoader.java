@@ -99,7 +99,7 @@ public class CraveLoader {
 				List<Sku> r = null;
 				
 				if (u != null) {
-					Scenario s = u.getScenario(categoryId);
+					Scenario s = u.getScenario(categoryId, false);
 					if (s != null) r = s.getSkus();
 					//r = u.getRecommendations(categoryId, countPerPage, page, onSale);
 				}

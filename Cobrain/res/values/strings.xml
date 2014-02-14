@@ -10,11 +10,13 @@
     <!-- string name="username">walter@cobrain.com</string>
     <string name="password">walterwalter</string-->
     <string name="forgot_password_link"><small><u><B>Forgot Password?</B></u></small></string>
-    <string name="rank_for_you"><![CDATA[<small>#%1$d of %2$d Craves for You (<font color="#000"><small>Teach for More</small></font>)</small>]]></string>
-    <string name="rank_for_you_empty"><![CDATA[<small>0 Craves (<font color="#000"><small>Teach for More</small></font>)</small>]]></string>
+    <string name="rank_for_you"><![CDATA[<small>#%1$d of %2$d Craves]]></string>
+    <string name="rank_for_you_empty"><![CDATA[<small>0 Craves]]></string>
     <string name="item_out_of_num_items">out of %1$,d apparel items</string>
     <string name="item_out_of_num_item">out of 1 apparel item</string>
     <string name="craves_found"><![CDATA[<b><font color="#00BE9B">%1$d</font> Craves Found</b>]]></string>
+    <string name="invite_sms_subject">Join me at Cobrain!</string>
+    <string name="invite_sms_body">%1$s wants your opinion on their apparel Craves, download the free Cobrain app %2$s to help them out!</string>
     
     <!-- feed strings -->
     <string name="friend_likes_own"><![CDATA[<font color=\"#%2$x\">%1$s</font> liked a new item]]></string>
@@ -32,9 +34,9 @@
     <string name="sms_invite_validation_number_prd">+1(202)4994992</string>
     <!--  -->
     
-    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_dev</item>
-    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_dev</item>
-    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_dev</item>
+    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_qa</item>
+    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_qa</item>
+    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_qa</item>
 
     <string name="url_about_us">%1$s/about-us</string>
 

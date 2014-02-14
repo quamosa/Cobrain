@@ -7,7 +7,7 @@ public class Feed {
 	String type;
 	String timestamp;
 	User user;
-	List<String> skus;
+	List<Integer> skus;
 	
 	public String getId() {
 		return _id;
@@ -21,7 +21,7 @@ public class Feed {
 	public User getUser() {
 		return user;
 	}
-	public List<String> getSkuIds() {
+	public List<Integer> getSkuIds() {
 		return skus;
 	}
 	public boolean isType(String type) {

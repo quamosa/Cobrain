@@ -37,6 +37,7 @@ public class PersonalizationAnimationLoader {
 	AccelerateInterpolator acceleration = new AccelerateInterpolator(1);
 	ArrayList<View> cravesFoundViews = new ArrayList<View>();
 	int categoryCountViewIndex;
+	boolean logosCached;
 
 	public PersonalizationAnimationLoader(PersonalizationAnimationFragment f) {
 		parent = f;
@@ -47,10 +48,11 @@ public class PersonalizationAnimationLoader {
 		for (Bitmap logo : logos)
 			logo.recycle();
 		logos.clear();
+		logosCached = false;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void cacheLogos(final Context c, final AnimationStepper stepper) {
+	public void cacheLogos(final Context c, final AnimationStepper stepper) {
 		parent.addAsyncTask( "cacheLogos", new AsyncTask<Object, Void, Void>() {
 
 			@Override
@@ -67,8 +69,8 @@ public class PersonalizationAnimationLoader {
 						logos.add(bmp);
 					}
 					
-					stepper.nextState();
-
+					logosCached = true;
+					
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -80,12 +82,11 @@ public class PersonalizationAnimationLoader {
 	}
 	
 	public void flipMerchants(final AnimationStepper stepper, int step, int counter) {
-		if (counter == 0) {
-			cacheLogos(parent.getActivity(), stepper);
-		}
-		else if (counter > 50 && stepper.inState(0)) {
-			stepper.nextStep();
-		}
+		//else if (counter > 50 && stepper.inState(0)) {
+		//	stepper.nextStep();
+		//}
+		
+		if (stepper.inState(0) && logosCached) stepper.nextState();
 		
 		//start flipping when all logos have been cached
 		//every 5 secs increase merchant logo flipping speed
@@ -96,6 +97,8 @@ public class PersonalizationAnimationLoader {
 				View pv = parent.getView();
 				pv.findViewById(R.id.merchant_logo_layout).setVisibility(View.VISIBLE);
 				LinearLayout container = (LinearLayout) pv.findViewById(R.id.category_counts_container);
+				container.setVisibility(View.VISIBLE);
+				container = (LinearLayout) pv.findViewById(R.id.category_counts_list_container);
 				container.setVisibility(View.VISIBLE);
 				parent.logo.setImageBitmap(logos.get(logoPosition));
 				
@@ -112,8 +115,8 @@ public class PersonalizationAnimationLoader {
 				}
 			}
 			if (stepper.getState() > 2) {
-				//we will fully accelerate in 15 seconds;
-				float pos = (stepper.getStepTime() - lastTime) / (15 * 1000f);
+				//we will fully accelerate in 7 seconds;
+				float pos = (stepper.getStepTime() - lastTime) / (5 * 1000f);
 				
 				if (pos > 1) {
 					if (stepper.inState(3)) {
@@ -124,7 +127,7 @@ public class PersonalizationAnimationLoader {
 	
 				if (stepper.inState(4)) {
 					pos = 1;
-					if (stepper.timeHasPassed(lastTime, 5*1000)) {
+					if (stepper.timeHasPassed(lastTime, (int)(2.5*1000))) {
 						LoaderUtils.hide(parent.logo, true, false, new AnimationListener() {
 							
 							@Override
@@ -244,7 +247,7 @@ public class PersonalizationAnimationLoader {
 
 			Timer timer = stepper.timer("cravesFound.2");
 			
-			if (timer.expired(3*1000)) {
+			if (timer.elapsed((int)(.5*1000))) {
 				if (categoryCountViewIndex < cravesFoundViews.size()) {
 					timer.reset();
 					View v = cravesFoundViews.get(categoryCountViewIndex++);
@@ -280,6 +283,9 @@ public class PersonalizationAnimationLoader {
 		case 4:
 			break;
 		case 5:
+			stepper.nextState((int) (1*1000));
+			break;
+		case 6:
 			stepper.nextStep();
 		}
 	}
@@ -290,7 +296,7 @@ public class PersonalizationAnimationLoader {
 		caption.setText("Searching through millions of products...");
 
 		Context con = parent.getActivity().getApplicationContext();
-		LinearLayout container = (LinearLayout) pv.findViewById(R.id.category_counts_container);
+		LinearLayout container = (LinearLayout) pv.findViewById(R.id.category_counts_list_container);
 		LayoutInflater inflater = parent.getActivity().getLayoutInflater();
 		pv.findViewById(R.id.merchant_logo_layout).setVisibility(View.GONE);
 
@@ -307,7 +313,7 @@ public class PersonalizationAnimationLoader {
 				tv.setText( formatter.format( total ) );
 				tv = (TextView) v.findViewById(R.id.category_name);
 				tv.setText( items.getString(i + 0) );
-				v.setVisibility(View.GONE);
+				v.setVisibility(View.INVISIBLE);
 				cravesFoundViews.add(v);
 				container.addView(v);
 			}

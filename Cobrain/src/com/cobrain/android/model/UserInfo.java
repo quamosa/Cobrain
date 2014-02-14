@@ -251,21 +251,26 @@ public class UserInfo extends User {
 		return false;
 	}
 
-
 	public Skus getSkus(User owner, String signal, Integer categoryId, Boolean onSale) {
+		return getSkus(owner, signal, categoryId, onSale, null, null);
+	}
+
+	public Skus getSkus(User owner, String signal, Integer categoryId, Boolean onSale, Integer perPage, Integer page) {
 		if (owner == null) owner = this;
 		String url = context.getString(R.string.url_skus_get, context.getString(R.string.url_cobrain_api));
 		ArrayList<String> qs = new ArrayList<String>();
 		qs.add("targetUser=" + owner.getId());
 		if (signal != null) qs.add("signal=" + signal);
 		if (categoryId != null) qs.add("categoryId=" + categoryId);
-		if (onSale != null) qs.add("onsale=" + onSale);
+		if (onSale != null) qs.add("onSale=" + onSale);
+		if (perPage != null) qs.add("perPage=" + perPage);
+		if (page != null) qs.add("page=" + page);
 		if (qs.size() > 0) {
 			url += "?" + TextUtils.join("&", qs);
 		}
 		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
 
-		if (wr.go() == 200) {
+		if (wr.setTimeout(20 * 1000).go() == 200) {
 			Skus s = gson.fromJson(wr.getResponse(), Skus.class);
 			s.setOwner(owner);
 			return s;
@@ -286,10 +291,11 @@ public class UserInfo extends User {
 		return null;
 	}
 	
-	public Scenario getScenario(int id) {
+	public Scenario getScenario(int id, boolean refresh) {
 		String url = context.getString(R.string.url_scenario_get, context.getString(R.string.url_cobrain_api), id);
+		if (refresh) url += "?refresh=true";
 		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
-
+		
 		if (wr.go() == 200) {
 			Scenario s = gson.fromJson(wr.getResponse(), Scenario.class);
 			return s;

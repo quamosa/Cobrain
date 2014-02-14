@@ -42,11 +42,17 @@
 			    android:background="@drawable/border_transparent"
 			    >
 				<ImageView 
-				    android:id="@+id/training_checkbox_icon"
+				    android:id="@+id/training_checkbox_disliked_icon"
+				    android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+				    android:src="@drawable/ic_training_checkbox_disliked"
+				    />
+				<ImageView 
+				    android:id="@+id/training_checkbox_liked_icon"
 				    android:layout_width="wrap_content"
 				    android:layout_height="wrap_content"
 				    android:layout_alignParentRight="true"
-				    android:src="@drawable/ic_training_checkbox"
+				    android:src="@drawable/ic_training_checkbox_liked"
 				    />
 		
 			</RelativeLayout>

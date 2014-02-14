@@ -42,7 +42,7 @@ import android.view.ViewConfiguration;
 public class HomePagerTabStrip extends PagerTitleStrip {
     private static final String TAG = "PagerTabStrip";
 
-    private static final int INDICATOR_HEIGHT = 3; // dp
+    private static final int INDICATOR_HEIGHT = 5; // dp
     private static final int MIN_PADDING_BOTTOM = INDICATOR_HEIGHT + 3; // dp
     private static final int TAB_PADDING = 16; // dp
     private static final int TAB_SPACING = 32; // dp
@@ -259,8 +259,6 @@ public class HomePagerTabStrip extends PagerTitleStrip {
 
         final int height = getHeight();
         int bottom = height;
-        
-        bottom -= mFullUnderlineHeight;
         
         final int left = mCurrText.getLeft() - mTabPadding;
         final int right = mCurrText.getRight() + mTabPadding;

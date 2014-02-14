@@ -1,10 +1,6 @@
 package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import it.sephiroth.android.library.widget.HListView;
 import android.os.AsyncTask;
 import android.view.ViewGroup.LayoutParams;
@@ -13,16 +9,11 @@ import android.widget.RelativeLayout;
 
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.CraveStripListAdapter;
-import com.cobrain.android.adapters.ScenarioStripPagerAdapter;
-import com.cobrain.android.adapters.ScenarioStripPagerListAdapter;
 import com.cobrain.android.adapters.SkusStripPagerAdapter;
 import com.cobrain.android.adapters.SkusStripPagerListAdapter;
 import com.cobrain.android.controllers.CraveStrip;
-import com.cobrain.android.fragments.BaseCobrainFragment;
-import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.controllers.SkuCraveStrip;
 import com.cobrain.android.fragments.FriendCraveStripsFragment;
-import com.cobrain.android.model.ScenarioItem;
-import com.cobrain.android.model.Scenarios;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
@@ -31,8 +22,8 @@ public class SkuStripsLoader {
 	CraveFilterLoader loader = new CraveFilterLoader();
 	FriendCraveStripsFragment parent;
 	ListView craveStripList;
-	CraveStripListAdapter craveStripListAdapter;
-	public ArrayList<CraveStrip> craveStrips = new ArrayList<CraveStrip>();
+	CraveStripListAdapter<Skus> craveStripListAdapter;
+	public ArrayList<CraveStrip<Skus>> craveStrips = new ArrayList<CraveStrip<Skus>>();
 	
 	public void initialize(FriendCraveStripsFragment parent, ListView list) {
 		this.parent = parent;
@@ -41,7 +32,7 @@ public class SkuStripsLoader {
 	}
 	
 	public void dispose() {
-		for (CraveStrip strip : craveStrips) {
+		for (CraveStrip<Skus> strip : craveStrips) {
 			strip.dispose();
 		}
 		craveStrips.clear();
@@ -63,7 +54,7 @@ public class SkuStripsLoader {
 		}
 	}
 	
-	public void load(final User owner, final String ... signal ) {
+	public void load(final User owner, final String caption[], final String signal[] ) {
 		new AsyncTask<Void, Void, Skus>() {
 
 			@Override
@@ -71,9 +62,9 @@ public class SkuStripsLoader {
 				UserInfo u = parent.controller.getCobrain().getUserInfo();
 				Skus s;
 				
-				for (String sig : signal) {
-					s = u.getSkus(owner, sig, null, null);
-					addSkuStrip( s );
+				for (int i = 0; i < signal.length; i++) {
+					s = u.getSkus(owner, signal[i], null, null);
+					addSkuStrip( caption[i], s );
 				}
 				
 				return null;
@@ -88,21 +79,23 @@ public class SkuStripsLoader {
 	}
 	
 	void setup() {
-		craveStripListAdapter = new CraveStripListAdapter(parent.getActivity().getApplicationContext(), R.id.caption, craveStrips, null);
+		craveStripListAdapter = new CraveStripListAdapter<Skus>(parent.getActivity().getApplicationContext(), R.id.caption, craveStrips, null);
 	}
 
 	void loadStrips() {
-		for (CraveStrip strip : craveStrips) {
+		for (CraveStrip<Skus> strip : craveStrips) {
 			strip.load();
 		}
 		craveStripList.setAdapter(craveStripListAdapter);
 	}
 
-	void addSkuStrip(Skus skus) {
-		CraveStrip strip = new CraveStrip(craveStripListAdapter, parent);
-
+	void addSkuStrip(String caption, Skus skus) {
+		SkuCraveStrip strip = new SkuCraveStrip(craveStripListAdapter, parent);
+		strip.skus = skus;
+		strip.caption = caption;
+		
 		SkusStripPagerAdapter adapter = new SkusStripPagerAdapter(parent.getActivity(), strip, parent);
-		CraveStripLoader loader = new CraveStripLoader();
+		SkuStripLoader loader = new SkuStripLoader();
 		loader.initialize(parent.controller, adapter);
 
 		strip.adapter = adapter;

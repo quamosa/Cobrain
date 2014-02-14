@@ -42,6 +42,10 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		listItems.add(item);
 		if (notify) notifyDataSetChanged();
 	}
+	public Sku get(int index) {
+		if (listItems == null) return null;
+		return listItems.get(index);
+	}
 
 	public void load(Skus r, List<Sku> items, boolean append) {
 		load(r, items, append, true);

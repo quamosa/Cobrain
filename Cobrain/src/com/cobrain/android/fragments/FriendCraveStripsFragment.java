@@ -1,12 +1,13 @@
 package com.cobrain.android.fragments;
 
+import java.util.List;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -20,14 +21,12 @@ import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
-import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.loaders.SkuStripsLoader;
-import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.User;
 
-public class FriendCraveStripsFragment extends CraveStripsFragment {
+public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 	public static final String TAG = "FriendCraveStripsFragment";
 
 	SkuPagerAdapter craveAdapter;
@@ -44,6 +43,16 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 	Menu menu;
 	SkuStripsLoader loader;
 	User owner;
+	List<Integer> skus;
+	ListView craveStripList;
+
+	public static FriendCraveStripsFragment newInstance(User owner, List<Integer> skus) {
+		FriendCraveStripsFragment f = new FriendCraveStripsFragment();
+		f.owner = owner;
+		f.skus = skus;
+		return f;
+	}
+	
 
 	public class SavedState {
 		boolean saved;
@@ -72,7 +81,7 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 	}
 
 	void setPageTitle() {
-		setTitle("Cobrain");
+		setTitle(owner.getName() + "'s Craves");
 	}
 
 	@Override
@@ -82,7 +91,9 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 			if (home != null) {
 				home.homePager.setVisibility(View.VISIBLE);
 			}
-			else getView().setVisibility(View.VISIBLE);
+			else {
+				craveStripList.setVisibility(View.VISIBLE);
+			}
 			setPageTitle();
 		}
 	}
@@ -94,7 +105,7 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 			if (home != null) {
 				home.homePager.setVisibility(View.GONE);
 			}
-			else getView().setVisibility(View.GONE);
+			else craveStripList.setVisibility(View.GONE);
 		}
 	}
 
@@ -104,7 +115,8 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 		
 		setHasOptionsMenu(true);
 		
-		View v = inflater.inflate(R.layout.frg_crave_strips_fragment, null);
+		View v = inflater.inflate(R.layout.frg_friend_crave_strips_fragment, null);
+		craveStripList = (ListView) v.findViewById(R.id.crave_strip_list);
 		craveAdapter = new SkuPagerAdapter(getChildFragmentManager(), this);
 		loader = new SkuStripsLoader();
 
@@ -122,7 +134,6 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 	}
 
 	void setupCraveStrips(View v) {
-		ListView craveStripList = (ListView) v.findViewById(R.id.crave_strip_list);
 		loader.initialize(this, craveStripList);
 	}
 	
@@ -135,17 +146,25 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		//FIXME: update();
 		loaderUtils.initialize((ViewGroup) getView());
+		update();
 
 		super.onActivityCreated(savedInstanceState);
 	}
+
+	final String[] signals = new String[] {"shared", "recommended"};
 
 	public void update() {
 		if (controller != null) {
 			controller.getCobrain().checkLogin();
 			loaderUtils.dismiss();
-			loader.load(owner, "liked", "recommended");
+
+			String[] captions = new String[] {
+					owner.getName() + " wants your opinion on these Craves",
+					"Would " + owner.getName() + " like these Craves?"
+					};
+
+			loader.load(owner, captions, signals);
 		}
 	}
 	
@@ -156,11 +175,14 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 
 	@Override
 	public void onDestroyView() {
+		
 		if (loader != null) {
 			loader.dispose();
 			loader = null;
 		}
-		
+
+		craveStripList = null;
+
 		//savedState.categoryId = craveLoader.getCategoryId();
 		//savedState.position = cravePager.getCurrentItem();
 		//savedState.page = getCurrentCravesPage(savedState.position);
@@ -192,17 +214,18 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 	}
 
 	@Override
-	public void onLoadCompleted(Scenario r) {
+	public void onLoadCompleted(Skus r) {
 		if (r == null) {
-			loaderUtils.showEmpty("We had a problem loading your craves. Click here to try loading them again.");
+			loaderUtils.showEmpty("We had a problem loading your friend's craves. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
 					update();
 				}
 			});
 		}
-		else if (r.getSkus().size() == 0)
-			loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
+		else if (r.get().size() == 0) {
+			//loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
+		}
 		else {
 			loaderUtils.dismissLoading();
 
@@ -333,5 +356,5 @@ public class FriendCraveStripsFragment extends CraveStripsFragment {
 	public void showCravesFragmentForSkus(CraveStrip<Skus> strip, Sku sku) {
 		controller.showCraves(strip, sku, R.id.overlay_layout, true);
 	}
-	
+
 }	

@@ -33,15 +33,15 @@ public class CraveStripPagerAdapter<T> extends MiniFragmentPagerAdapter {
 	protected int countOnThisPage;
 	protected int count;
 	protected List<Sku> recommendations;
-	protected CraveStripsFragment parentFragment;
+	protected CraveStripsFragment<T> parentFragment;
 	private boolean destroyAll;
 	protected T results;
 	protected HashMap<Integer, MiniFragment> fragments = new HashMap<Integer, MiniFragment>();
 	Activity activity;
 	protected int stripType;
-	protected CraveStrip strip;
+	protected CraveStrip<T> strip;
 
-	public CraveStripPagerAdapter(Activity activity, CraveStrip strip, CraveStripsFragment cravesFragment) {
+	public CraveStripPagerAdapter(Activity activity, CraveStrip<T> strip, CraveStripsFragment<T> cravesFragment) {
 		super(activity);
 		parentFragment = cravesFragment;
 		setCraveStrip(strip);
@@ -53,7 +53,7 @@ public class CraveStripPagerAdapter<T> extends MiniFragmentPagerAdapter {
 		destroyAll = false;
 	}
 
-	public boolean setCraveStrip(CraveStrip strip) {
+	public boolean setCraveStrip(CraveStrip<T> strip) {
 		boolean changed = false;
 		
 		if (this.strip != strip) {
@@ -74,7 +74,7 @@ public class CraveStripPagerAdapter<T> extends MiniFragmentPagerAdapter {
 		return this.stripType;
 	}
 	
-	public void setAdapter(CraveStripPagerListAdapter a) {
+	public void setAdapter(CraveStripPagerListAdapter<T> a) {
 		a.setPagerAdapter(this);
 	}
 	
@@ -125,6 +125,8 @@ public class CraveStripPagerAdapter<T> extends MiniFragmentPagerAdapter {
 	}
 	
 	public void load(T r) {
+		results = r;
+		clear();
 		if (r != null) {
 			loadSkus( getSkus(r) );
 		}
@@ -136,8 +138,7 @@ public class CraveStripPagerAdapter<T> extends MiniFragmentPagerAdapter {
 				recommendations = null;
 			}
 		}
-		results = r;
-		clear();
+		notifyDataSetChanged();
 	}
 
 	protected void onLoadSkus(T r) {}
@@ -244,11 +245,6 @@ public class CraveStripPagerAdapter<T> extends MiniFragmentPagerAdapter {
 			cnt = Math.max(recommendations.size(), cnt);
 			cnt = Math.min(cnt, count);
 			if (cnt < 0) cnt = 0;
-		}
-
-		cnt++;
-		if (stripType == CraveStrip.STRIP_TYPE_CRAVES_NOT_AVAILABLE) {
-			cnt++;
 		}
 
 		return cnt;

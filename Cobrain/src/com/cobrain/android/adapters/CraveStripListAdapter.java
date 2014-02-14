@@ -1,5 +1,6 @@
 package com.cobrain.android.adapters;
 
+import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
@@ -18,12 +19,12 @@ import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.loaders.FontLoader;
 import com.cobrain.android.utils.LoaderUtils;
 
-public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements DialogInterface.OnClickListener {
+public class CraveStripListAdapter<T> extends ArrayAdapter<CraveStrip<T>> implements DialogInterface.OnClickListener {
 	LoaderUtils loader = new LoaderUtils();
-	List<CraveStrip> items;
+	List<CraveStrip<T>> items;
 	
 	public CraveStripListAdapter(Context context, int resource,
-			List<CraveStrip> items, CraveStripsFragment parent) {
+			List<CraveStrip<T>> items, CraveStripsFragment<T> parent) {
 		super(context, resource, items);
 		this.items = items;
 	}
@@ -63,15 +64,20 @@ public class CraveStripListAdapter extends ArrayAdapter<CraveStrip> implements D
 		}
 		else vh = (ViewHolder) v.getTag();
 		
-		CraveStrip strip = getItem(position);
+		CraveStrip<T> strip = getItem(position);
 
-		vh.caption.setText(strip.caption);
+		if (strip.caption != null) {
+			vh.caption.setVisibility(View.VISIBLE);
+			vh.caption.setText(strip.caption);
+		}
+		else vh.caption.setVisibility(View.GONE);
+		
 		removeAllViews(vh.layout);
 		addView(vh.layout, strip.container, lp);
 
 		return v;
 	}
-	
+
 	void removeAllViews(ViewGroup v) {
 		for (int i = 0; i < v.getChildCount(); i++) {
 			View c = v.getChildAt(i);

@@ -774,8 +774,9 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                         downX = motionEvent.getRawX();
                         downPosition = childPosition;
 
-                        //FIXME: frontView.setClickable(!opened.get(downPosition));
-                        //FIXME: frontView.setLongClickable(!opened.get(downPosition));
+                        //frontView.setClickable(!opened.get(downPosition));
+                        //frontView.setLongClickable(!opened.get(downPosition));
+                        swipeListView.getParent().requestDisallowInterceptTouchEvent(true);
 
                         velocityTracker = VelocityTracker.obtain();
                         velocityTracker.addMovement(motionEvent);

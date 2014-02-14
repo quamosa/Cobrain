@@ -91,6 +91,13 @@ public class HelperUtils {
 			return word.substring (0,1).toUpperCase() + 
 					word.substring(1).toLowerCase();
 		}
+
+		public static String plural(int count, String string) {
+			if (count != 1) {
+				string += "s";
+			}
+			return string;
+		}
 	}
 
 	public static class Bitmaps {

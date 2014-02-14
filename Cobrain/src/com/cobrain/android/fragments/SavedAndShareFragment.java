@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cobrain.android.R;
-import com.cobrain.android.adapters.CraveCategoryFilterAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.adapters.SavedAndShareAdapter;
@@ -175,12 +174,12 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 		ArrayList<NavigationMenuItem> menuItems = new ArrayList<NavigationMenuItem>();
 		NavigationMenuItem mi = new NavigationMenuItem();
 
-		mi.id = 0;
+		mi.id = 1;
 		mi.caption = mi.label = mi.labelCopy = "All Prices";
 		menuItems.add(mi);
 
 		mi = new NavigationMenuItem();
-		mi.id = 1;
+		mi.id = 2;
 		mi.caption = mi.label = mi.labelCopy = "On Sale";
 		menuItems.add(mi);
 
@@ -193,7 +192,7 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				loader.applyPriceFilter(id == 1);
+				loader.applyPriceFilter(id == 2);
 			}
 
 			@Override

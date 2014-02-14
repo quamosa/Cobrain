@@ -3,6 +3,7 @@ package com.cobrain.android.controllers;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -89,7 +90,7 @@ public class Cobrain {
 		public void showForgotPassword(String email);
 		public void showLogin(String loginUrl);
 		void hideSoftKeyBoard();
-		public void showWishList(User owner, boolean showMyPrivateItems, boolean addToBackStack);
+		public void showWishList(User owner, boolean showMyPrivateItems, List<Integer> skuIds, boolean addToBackStack);
 		public void showWishList(Skus list, boolean showMyPrivateItems, boolean addToBackStack);
 		public void showErrorDialog(String message);
 		public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack);
@@ -103,10 +104,11 @@ public class Cobrain {
 		public TextView getSubTitleView();
 		public TextView getTitleView();
 		public void showDefaultActionBar();
-		public void showCraves(CraveStrip strip, Sku sku, int containerId, boolean addToBackStack);
+		public void showCraves(CraveStrip<?> strip, Sku sku, int containerId, boolean addToBackStack);
 		public void dispatchOnFragmentAttached(BaseCobrainFragment f);
 		public void dispatchOnFragmentDetached(BaseCobrainFragment f);
 		public void setCurrentCobrainView(CobrainView cv);
+		public void showFriendsSharedRack(User owner, List<Integer> skuIds);
 	}
 	
 	public interface CobrainView {
@@ -692,5 +694,9 @@ public class Cobrain {
 
 	public Context getContext() {
 		return context;
+	}
+
+	public boolean isMe(User owner) {
+		return owner != null && userInfo != null && owner.getId().equals( userInfo.getId() );
 	}
 }

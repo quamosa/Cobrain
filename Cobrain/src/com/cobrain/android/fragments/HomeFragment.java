@@ -41,11 +41,10 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		homePager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.home_pager_margin_size));
 		//homePager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(R.color.CraveBorderColor)));
 		homePager.setPageMarginDrawable(new EdgeFadeDrawable(getResources().getColor(R.color.CraveBorderColor)));
-		adapter.add("Animation!", new PersonalizationAnimationFragment());
-		adapter.add("Home", new CraveStripsFragment());
-		adapter.add("On Sale", new CraveStripsFragment());
-		adapter.add("My Private Rack", new SavedAndShareFragment());
-		adapter.add("My Shared Rack", WishListFragment.newInstance(controller.getCobrain().getUserInfo(), false));
+		adapter.add("HOME RACK", new CraveStripsFragment());
+		adapter.add("SALE RACK", CraveStripsFragment.newInstance(true));
+		adapter.add("MY PRIVATE RACK", new SavedAndShareFragment());
+		adapter.add("MY SHARED RACK", WishListFragment.newInstance(controller.getCobrain().getUserInfo(), false));
 		//homePager.setOffscreenPageLimit(4);
 		homePager.setAdapter(adapter);
 		homePager.post(new Runnable(){
@@ -54,10 +53,19 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 			        onPageSelected(0);
 			    }
 			});
-		
+
+		//showPersonalizationAnimation();
+
 		return v;
 	}
 
+	void showPersonalizationAnimation() {
+		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
+		getFragmentManager().beginTransaction()
+			.add(R.id.overlay_layout, f, PersonalizationAnimationFragment.TAG)
+			.commitAllowingStateLoss();
+	}
+	
 	private class FragmentHolder {
 		String title;
 		Fragment fragment;

@@ -136,8 +136,8 @@ public class WishListLoader {
 					WishListLoader.this.page = pg;
 					pagesLoaded.add(pg);
 				}
-				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				adapter.load(r, result, (page > 1));
+				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				r = null;
 				currentRequest = null;
 			}

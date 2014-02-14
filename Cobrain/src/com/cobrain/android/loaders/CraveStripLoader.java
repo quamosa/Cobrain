@@ -17,6 +17,7 @@ public class CraveStripLoader<T> {
 	OnLoadListener<T> onLoadListener;
 	private AsyncTask<Void, Void, T> currentRequest;
 	protected ArrayList<Integer> pagesLoaded = new ArrayList<Integer>();
+	public boolean refresh;
 
 	public boolean isPageLoaded(int page) {
 		return pagesLoaded.contains(page);
@@ -70,8 +71,9 @@ public class CraveStripLoader<T> {
 			protected T doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
-				
-				return onPerformLoad(u);
+				T t = onPerformLoad(u);
+				refresh = false;
+				return t;
 			}
 
 			@Override

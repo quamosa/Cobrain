@@ -51,7 +51,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 	RelativeLayout craveInfoHeader;
 	RelativeLayout itemInfoFooter;
 	TextView cravePopupLabel;
-	CraveStripsFragment parent;
+	CraveStripsFragment<T> parent;
 	T results;
 	private LinearLayout bottomButtons;
 	private ImageButton saveButton;
@@ -88,7 +88,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 	public CraveStripFragment() {
 	}
 	
-	public CraveStripFragment(Activity a, CraveStripsFragment parent) {
+	public CraveStripFragment(Activity a, CraveStripsFragment<T> parent) {
 		super(a);
 		this.parent = parent;
 	}
@@ -111,7 +111,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 		
 		View v;
 		
-		v = inflater.inflate(R.layout.crave_strip_frame, null);
+		v = inflater.inflate(R.layout.frg_crave_strip_frame, null);
 		itemImage = (ImageView) v.findViewById(R.id.item_image);
 		itemRetailer = (TextView) v.findViewById(R.id.item_merchant);
 		itemDescription = (TextView) v.findViewById(R.id.item_description);
@@ -223,7 +223,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 			
 			int raves = recommendation.getRaves().size();
 			if (raves > 0) {
-				raveCount.setText(raves);
+				raveCount.setText(String.valueOf(raves));
 				ravesLayout.setVisibility(View.VISIBLE);
 			}
 			else ravesLayout.setVisibility(View.GONE);

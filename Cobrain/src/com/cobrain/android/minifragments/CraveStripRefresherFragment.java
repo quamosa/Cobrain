@@ -25,7 +25,7 @@ public class CraveStripRefresherFragment extends MiniFragment implements OnClick
 	@Override
 	public View onCreateView(Bundle inState, LayoutInflater inflater,
 			ViewGroup container) {
-		View v = inflater.inflate(R.layout.crave_strip_refresher_frame, null);
+		View v = inflater.inflate(R.layout.frg_crave_strip_refresher_frame, null);
 		
 		refresh = (Button) v.findViewById(R.id.refresh);
 		refresh.setOnClickListener(this);

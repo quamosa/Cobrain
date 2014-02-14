@@ -17,7 +17,7 @@ public class ScenarioStripPagerListAdapter extends CraveStripPagerListAdapter<Sc
 	
 	@Override
 	public int getViewTypeCount() {
-		return 3;
+		return 4;
 	}
 	
 	@Override

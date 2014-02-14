@@ -4,17 +4,23 @@ import com.cobrain.android.R;
 import com.cobrain.android.controllers.AnimationStepper;
 import com.cobrain.android.controllers.AnimationStepper.OnAnimationStep;
 import com.cobrain.android.loaders.PersonalizationAnimationLoader;
+import com.cobrain.android.utils.LoaderUtils;
+
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PersonalizationAnimationFragment extends BaseCobrainFragment implements OnAnimationStep {
 	
+	public static final String TAG = "PersonalizationAnimationFragment";
 	private LinearLayout containerLayout;
 	AnimationStepper anim;
 	private TextView caption;
@@ -33,7 +39,7 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
 		logo = (ImageView) v.findViewById(R.id.merchant_logo);
 		logo.setVisibility(View.INVISIBLE);
 		anim = new AnimationStepper(this);
-		anim.setStepCount(5);
+		anim.setStepCount(100);
 		
 		v.findViewById(R.id.progress).setOnClickListener(new OnClickListener() {
 			
@@ -56,12 +62,13 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
 
 	@Override
 	public void onDestroyView() {
+		anim.dispose();
+		anim = null;
 		loader.dispose();
 		loader = null;
 		logo = null;
 		caption = null;
 		containerLayout = null;
-		anim = null;
 		super.onDestroyView();
 	}
 
@@ -83,22 +90,24 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
 	}
 
 	@Override
-	public void onAnimationStep(AnimationStepper stepper, int step, int counter) {
+	public void onAnimationStep(final AnimationStepper stepper, int step, int counter) {
+		if (caption == null) return; //make sure we haven't destroyed ourselves whilst animating
+		
 		switch(step) {
 		case 1: //
+			if (counter == 0) {
+				loader.cacheLogos(getActivity(), stepper);
+			}
 			caption.setText("Personalization is starting...");
-			stepper.nextStep(5 * 1000);
+			stepper.nextStep(3 * 1000);
 			break;
 		case 2:
+			caption.setText("Evaluating products at every merchant");
 			loader.flipMerchants(stepper, step, counter);
-			if (stepper.getState() >= 4) {
-				caption.setText("Scanning 1,323,432 products...");
-			}
-			else
-				caption.setText("Discovering products at every merchant");
 			break;
 		case 3:
-			stepper.nextStep(1*1000);
+			caption.setText("Considering 1,323,432 products...");
+			stepper.nextStep(2 * 1000);
 			break;
 		case 4:
 			loader.cravesFound(stepper, step, counter);
@@ -106,9 +115,32 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
 		case 5:
 			caption.setText("Ranking your Craves...");
 			if (stepper.nextStep(5*1000)) {
-				caption.setText("done for now..");
+				
+				LoaderUtils.hide(getView(), new AnimationListener() {
+					
+					@Override
+					public void onAnimationStart(Animation animation) {}
+					
+					@Override
+					public void onAnimationRepeat(Animation animation) {}
+					
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						new Handler().post(new Runnable () {
+							public void run() {
+								stepper.nextStep();
+							}
+						});
+					}
+				});
+				
+				stepper.nextStep();
 			}
 			break;
+		case 8:
+			PersonalizationAnimationFragment.this.getFragmentManager().beginTransaction()
+			.remove(this).commitAllowingStateLoss();
+			stepper.stop();
 		}
 	}
 

@@ -12,16 +12,16 @@ import com.cobrain.android.adapters.CraveStripListAdapter;
 import com.cobrain.android.adapters.CraveStripPagerAdapter;
 import com.cobrain.android.loaders.CraveStripLoader;
 import com.cobrain.android.loaders.OnLoadListener;
-import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
 
 public class CraveStrip<T> {
 
 	public static final int STRIP_TYPE_CRAVES = 0;
 	public static final int STRIP_TYPE_CRAVES_NOT_AVAILABLE = 1;
+	public static final int STRIP_TYPE_HEADER = 2;
 	
 	public String caption;
-	public CraveStripListAdapter allStripsAdapter;
+	public CraveStripListAdapter<T> allStripsAdapter;
 	public CraveStripPagerAdapter<T> adapter;
 	public CraveStripLoader<T> loader;
 	public ViewPager pager;
@@ -47,7 +47,7 @@ public class CraveStrip<T> {
 
 	void onLoadWasCompleted(T r) {}
 	
-	public CraveStrip(CraveStripListAdapter allStripsAdapter, OnLoadListener<T> listener) {
+	public CraveStrip(CraveStripListAdapter<T> allStripsAdapter, OnLoadListener<T> listener) {
 		this.allStripsAdapter = allStripsAdapter;
 		this.listener = listener;
 	}
@@ -79,8 +79,10 @@ public class CraveStrip<T> {
 	public void load() {
 		//if (pager.getAdapter() != adapter) {
 		if (list.getAdapter() != listAdapter) {
-			onLoad(loader);
-			loader.loadPage(1);
+			if (loader != null) {
+				onLoad(loader);
+				loader.loadPage(1);
+			}
 
 			list.setAdapter((ListAdapter) listAdapter);
 			//pager.setAdapter(adapter);
@@ -89,10 +91,11 @@ public class CraveStrip<T> {
 
 	public void refresh() {
 		loader.clearPages();
+		loader.refresh = true;
 		loader.loadPage(1);
 	}
 
-	public List<Sku> getRecommendations() {
+	public List<Sku> getSkus() {
 		return adapter.getRecommendations();
 	}
 

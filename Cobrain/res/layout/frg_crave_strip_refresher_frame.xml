@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:layout_gravity="center"
+    android:padding="3dp"
+     >
+
+      <RelativeLayout
+          android:id="@+id/border_for_image"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:background="@drawable/crave_border"
+          android:gravity="center" >
+
+          <ImageView
+              android:id="@+id/imageView1"
+              android:layout_centerHorizontal="true"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:src="@drawable/ic_home_rack_crave_refresh" />
+
+          <TextView
+              android:id="@+id/textView2"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/textView1"
+              android:padding="10dp"
+              android:textColor="#000"
+              android:textSize="13sp"
+              android:gravity="center"
+              android:text="Remember to Save the Craves you like to your Private Rack" />
+          
+          <TextView
+              android:id="@+id/textView1"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+			android:layout_alignTop="@id/imageView1"
+			android:layout_alignLeft="@id/imageView1"
+			android:layout_alignRight="@id/imageView1"
+			android:layout_alignBottom="@id/imageView1"
+              android:layout_marginTop="28dp"
+              android:textColor="#fff"
+              android:textSize="11.5sp"
+              android:gravity="center"
+              android:text="Get me new Craves" />
+      </RelativeLayout>
+
+                            	     <Button
+  	         android:id="@+id/refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/border_for_image"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/sel_crave_strip_item" />
+      
+</RelativeLayout>

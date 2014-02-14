@@ -47,13 +47,13 @@
 	
 	            <include
 	                android:id="@+id/training_image_1"
-					layout="@layout/training_image_frame_with_info"
+					layout="@layout/inc_training_image_frame_with_info"
 	                style="@style/training_image_1"
 	                 />
 	
 	            <include
 	                android:id="@+id/training_image_2"
-					layout="@layout/training_image_frame_with_info"
+					layout="@layout/inc_training_image_frame_with_info"
 	                style="@style/training_image_2" />
 	
 	        </TableRow>
@@ -85,12 +85,12 @@
 	
 	            <include
 	                android:id="@+id/training_image_3"
-					layout="@layout/training_image_frame_with_info"
+					layout="@layout/inc_training_image_frame_with_info"
 	                style="@style/training_image_3" />
 	
 	            <include
 	                android:id="@+id/training_image_4"
-					layout="@layout/training_image_frame_with_info"
+					layout="@layout/inc_training_image_frame_with_info"
 	                style="@style/training_image_4" />
 	        </TableRow>
 	    </TableLayout>

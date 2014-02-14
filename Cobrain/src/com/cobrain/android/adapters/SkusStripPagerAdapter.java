@@ -7,12 +7,13 @@ import com.cobrain.android.MiniFragment;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.fragments.CraveStripsFragment;
 import com.cobrain.android.minifragments.CraveStripFragment;
+import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
 
 public class SkusStripPagerAdapter extends CraveStripPagerAdapter<Skus> {
 
-	public SkusStripPagerAdapter(Activity activity, CraveStrip strip, CraveStripsFragment cravesFragment) {
+	public SkusStripPagerAdapter(Activity activity, CraveStrip<Skus> strip, CraveStripsFragment<Skus> cravesFragment) {
 		super(activity, strip, cravesFragment);
 	}
 	
@@ -26,7 +27,12 @@ public class SkusStripPagerAdapter extends CraveStripPagerAdapter<Skus> {
 
 		MiniFragment f;
 
-		CraveStripFragment<Skus> csf = new CraveStripFragment<Skus>(getActivity(),  parentFragment);
+		CraveStripFragment<Skus> csf = new CraveStripFragment<Skus>(getActivity(),  parentFragment) {
+			@Override
+			protected void onShowZoomedCrave(Skus skuParent, Sku s) {
+				parentFragment.showZoomedCraveStrip(strip, s);
+			}
+		};
 
 		if (recommendations == null) 
 			return csf;

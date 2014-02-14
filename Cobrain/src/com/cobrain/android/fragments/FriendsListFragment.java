@@ -7,6 +7,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.FeedListAdapter;
 import com.cobrain.android.adapters.FriendsListAdapter;
@@ -178,7 +180,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 			@Override
 			public void onLoadCompleted(Feeds r) {
-				int height = getResources().getDimensionPixelSize(R.dimen.min_feed_list_height);
+				int height = LayoutParams.WRAP_CONTENT; //getResources().getDimensionPixelSize(R.dimen.min_feed_list_height);
 		        if (r != null) {
 		        	if (r.getFeeds().size() > 2) {
 		        		View item = feedsAdapter.getView(0, null, menu);
@@ -186,7 +188,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		        			item.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		        		}
 		        		item.measure(0, 0);
-		        		height = (int) (2.5 * item.getMeasuredHeight());
+		        		height = (int) (2.25 * item.getMeasuredHeight());
 		        	}
 		        }
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) menu.getLayoutParams();
@@ -351,8 +353,9 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 							invite.setEnabled(true);
 							
 							if (cobrainUrl != null) {
-								String message = String.format("I sent you a Cobrain Crave.  Download the app: %s", cobrainUrl);
-								startSMSIntent(contact.number, "Join me at Cobrain!", message);
+								String subject = getString(R.string.invite_sms_subject);
+								String message = getString(R.string.invite_sms_body, controller.getCobrain().getUserInfo().getName(), cobrainUrl);
+								startSMSIntent(contact.number, subject, message);
 							}
 						}
 					}).go(true);
@@ -478,7 +481,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			}
 			
 			if (friend.isAccepted()) {
-				showWishList(friend.getUser(), false);
+				showWishList(friend.getUser(), null, false);
 				controller.setMenuItemSelected((ListView)parent, position, true);
 			}
 			else {
@@ -489,12 +492,12 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			controller.setMenuItemSelected((ListView)parent, position, true);
 
 			Feed f = feedsAdapter.getItem(position);
-					 
+
 			if (f.isType("friend_likes_own")) {
-				showWishList(f.getUser(), false);
+				showWishList(f.getUser(), f.getSkuIds(), false);
 			}
 			else if (f.isType("friend_raves_mine")) {
-				showWishList(controller.getCobrain().getUserInfo(), false);
+				showWishList(controller.getCobrain().getUserInfo(), f.getSkuIds(), false);
 			}
 			
 		}
@@ -533,8 +536,11 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		dialog.show(getChildFragmentManager(), FriendAcceptDialog.TAG);
 	}
 
-	void showWishList(User owner, boolean showMyPrivateItems) {
-		controller.showWishList(owner, showMyPrivateItems, false);
+	void showWishList(User owner, List<Integer> skuIds, boolean showMyPrivateItems) {
+		if (!controller.getCobrain().isMe(owner)) {
+			controller.showFriendsSharedRack(owner, skuIds);
+		}
+		else controller.showWishList(owner, showMyPrivateItems, skuIds, false);
 		controller.closeMenu(true);
 	}
 

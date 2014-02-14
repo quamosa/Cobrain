@@ -8,12 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -141,12 +135,11 @@ public class SkuPagerAdapter extends FragmentStatePagerAdapter {
 		if (recommendations != null) {
 			int totalCraves = recommendations.size();
 			
-			//final TextView txt = rankForYouLabel;
 			String s;
 			
 			if (recommendations.size() > position && count > position && recommendations.get(position) != null) 
 				s = parentFragment.getString(R.string.rank_for_you,
-						position + 1/*recommendations.get(position).getRank()*/, 
+						position + 1, 
 						totalCraves
 						);
 			else
@@ -155,32 +148,7 @@ public class SkuPagerAdapter extends FragmentStatePagerAdapter {
 			final TextView txt = parentFragment.getCobrainController().getSubTitleView();
 			txt.setVisibility(View.VISIBLE);
 			txt.setText(Html.fromHtml(s));
-			txt.setMovementMethod(LinkMovementMethod.getInstance());
-			
-			Spannable buf = (Spannable) txt.getText();
-			ForegroundColorSpan[] spans = buf.getSpans(0, txt.length(), ForegroundColorSpan.class);
-			int start = buf.getSpanStart(spans[0]);
-			int end = buf.getSpanEnd(spans[0]);
-			final int linkColor = parentFragment.getResources().getColor(R.color.SeaGreen);
-
-			ClickableSpan cs = new ClickableSpan() {
-				@Override
-				public void onClick(View widget) {
-					//parentFragment.showTeachMyCobrain();
-				}
-
-				@Override
-				public void updateDrawState(TextPaint ds) {
-					ds.linkColor = linkColor;
-					super.updateDrawState(ds);
-					ds.setUnderlineText(false);
-					ds.setFakeBoldText(true);
-				}
-			};
-			
-			buf.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 		}
-		
 	}
 	
 	@Override

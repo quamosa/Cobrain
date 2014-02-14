@@ -168,7 +168,7 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 			break;
 		case 3: //my shared craves
 			//TODO: do I need to refresh the cache first?
-			controller.showWishList(controller.getCobrain().getUserInfo(), false, false);
+			controller.showWishList(controller.getCobrain().getUserInfo(), false, null, false);
 			controller.closeMenu(true);
 			break;
 		case 4: //nerve center

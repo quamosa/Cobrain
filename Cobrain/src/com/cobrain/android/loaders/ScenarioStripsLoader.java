@@ -5,9 +5,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import it.sephiroth.android.library.widget.AbsHListView;
 import it.sephiroth.android.library.widget.HListView;
 import android.os.AsyncTask;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -29,10 +34,12 @@ public class ScenarioStripsLoader {
 	CraveStripListAdapter craveStripListAdapter;
 	public ArrayList<CraveStrip> craveStrips = new ArrayList<CraveStrip>();
 	private AsyncTask<Void, Void, List<ScenarioItem>> currentRequest;
+	private boolean onSale;
 	
-	public void initialize(CraveStripsFragment parent, ListView list) {
+	public void initialize(CraveStripsFragment parent, ListView list, boolean onSale) {
 		this.parent = parent;
 		craveStripList = list;
+		this.onSale = onSale;
 		setup();
 	}
 	
@@ -118,6 +125,40 @@ public class ScenarioStripsLoader {
 		craveStripList.setAdapter(craveStripListAdapter);
 	}
 
+	public void addHeaderStrip() {
+		ScenarioCraveStrip strip = new ScenarioCraveStrip(craveStripListAdapter, parent);
+		strip.type = ScenarioCraveStrip.STRIP_TYPE_HEADER;
+		strip.list = new HListView(parent.getActivity().getApplicationContext());
+		strip.list.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		strip.list.setDivider(null);
+		strip.list.setTag(strip);
+		strip.list.setSelector(R.drawable.sel_transparent);
+		strip.listAdapter = new ArrayAdapter(parent.getActivity().getApplicationContext(), 0) {
+
+			@Override
+			public int getCount() {
+				return 1;
+			}
+
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View v = convertView;
+				if (v == null) {
+					LayoutInflater inflater = LayoutInflater.from(getContext());
+					v = inflater.inflate(R.layout.frg_home_rack_header, parent, false);
+					int w = getContext().getResources().getDisplayMetrics().widthPixels;
+					v.getLayoutParams().width = w;
+				}
+				return v;
+			}
+			
+		};
+		strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
+		strip.container.addView(strip.list);
+		
+		craveStrips.add(strip);
+	}
+	
 	void scenariosToStrips(List<ScenarioItem> scenarios) {
 		if (scenarios != null) {
 			for (ScenarioItem s : scenarios) {
@@ -127,6 +168,7 @@ public class ScenarioStripsLoader {
 				ScenarioStripPagerAdapter adapter = new ScenarioStripPagerAdapter(parent.getActivity(), strip, parent);
 				ScenarioStripLoader loader = new ScenarioStripLoader();
 				loader.initialize(parent.controller, adapter);
+				loader.setOnSaleRecommendationsOnly(onSale);
 	
 				strip.scenarioId = s.getId();
 				strip.adapter = adapter;
