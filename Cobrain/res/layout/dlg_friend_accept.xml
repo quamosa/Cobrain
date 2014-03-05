@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="30dp"
+     >
+
+    <RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_centerInParent="true"
+	     >
+	   <com.cobrain.android.views.RoundedImageView
+	       android:id="@+id/user_avatar"
+	       style="@style/avatar_friend_accept_style"
+	       android:layout_centerHorizontal="true"
+	        />
+   
+   		   <TextView
+	       android:id="@+id/user_name"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_marginTop="25dp"
+	       android:layout_marginLeft="25dp"
+	       android:layout_marginRight="25dp"
+	       android:layout_marginBottom="10dp"
+	       android:gravity="center_horizontal"
+	        android:layout_below="@+id/user_avatar"
+	       android:layout_centerHorizontal="true"
+	       android:textSize="15sp"
+           android:textColor="#000"
+	       android:text="@string/friend_accept_caption" />
+
+  	        <TextView
+            android:id="@+id/accept_user"
+            style="@style/invite_button"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:text="Accept Request"
+            android:textStyle="bold"
+            />
+  		   		   
+   		   <TextView
+	       android:id="@+id/dismiss_user"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:gravity="center_horizontal"
+	        android:layout_below="@+id/accept_user"
+	       android:layout_centerHorizontal="true"
+	       android:textSize="12sp"
+           android:textColor="#000"
+	       android:text="@string/friend_dismiss_link" />
+   		   		   
+	</RelativeLayout>
+
+</RelativeLayout>

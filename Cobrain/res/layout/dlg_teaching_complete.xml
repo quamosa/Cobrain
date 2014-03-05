@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout 
+        android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="#eee"
+	    android:orientation="vertical" >
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:padding="5dp"
+	        android:gravity="center"
+        	android:textColor="#000"
+	        android:textSize="15sp"
+	        android:textStyle="bold"
+	        android:text="Teaching is complete!" />
+    		
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:orientation="vertical"
+        >
+        
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:layout_marginTop="10dp"
+	        android:gravity="center"
+	        android:textSize="19sp"
+	        android:textColor="#000"
+	        android:text="Good job, we're learning your tastes" />
+	
+	        <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:layout_marginTop="20dp"
+	        android:gravity="center"
+	        android:textColor="#000"
+	        android:textSize="14sp"
+	        android:text="Are you ready to continue to your Cobrain, or would you like to keep teaching?" />
+	    
+	</LinearLayout>
+	
+    <LinearLayout
+        android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:gravity="center"
+	    android:layout_margin="20dp"
+	    android:orientation="vertical"
+        >
+	     <TextView
+	    android:id="@+id/done"
+	         style="@style/invite_button"
+	         android:layout_width="wrap_content"
+		    android:layout_height="40dp"
+		    android:layout_marginBottom="15dp"
+	         android:padding="10dp"
+		    android:textSize="15sp"
+	    android:text="Continue to my Cobrain"
+	         android:textStyle="bold"
+	         />        
+
+	     	<Button
+	         android:id="@+id/keep_teaching"
+	    android:layout_width="wrap_content"
+	    android:layout_height="40dp"
+	    android:layout_gravity="center_horizontal"
+	    android:background="@drawable/sel_tastemaker_button_back"
+         android:padding="10dp"
+	    android:textSize="15sp"
+	         android:text="Keep Teaching"
+	    android:textColor="@drawable/sel_tastemaker_button_text" />
+	     	
+    </LinearLayout>
+    
+</LinearLayout>
