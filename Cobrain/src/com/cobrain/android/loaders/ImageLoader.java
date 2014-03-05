@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import com.cobrain.android.utils.HelperUtils;
+import com.cobrain.android.utils.LoaderUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -258,15 +259,13 @@ public class ImageLoader {
     }
     
 	public void cancel(ImageView view) {
+		if (!(view.getTag() instanceof AsyncLoader)) return;
+		
     	AsyncLoader loader = (AsyncLoader) view.getTag();
     	if (loader != null) {
             view.setTag(null);
             loader.mOnLoadListener = null;
-            Animation a = view.getAnimation();
-            if (a != null) {
-            	a.setAnimationListener(null);
-            	a.cancel();
-            }
+            LoaderUtils.cancelAnimation(view);
             /*
              * if (loader.stream != null) {
             	try {

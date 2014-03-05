@@ -31,7 +31,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 	private static final boolean debug = false;
 	private final String RAVE_INFO = "<font color='#9ec5e7'>%s</font> RAVED THIS";
 	private final String RAVE_INFO_WITH_FRIENDS = "<font color='#9ec5e7'>%s</font> AND <font color='#9ec5e7'>%s FRIEND%s</font> RAVED THIS";
-	private boolean flinging = true;
+	private boolean flinging = false;
 	
 	LoaderUtils loader = new LoaderUtils();
 	SavedAndShareFragment parent;

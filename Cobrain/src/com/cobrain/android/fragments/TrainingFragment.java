@@ -59,6 +59,11 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	}
 	
 	@Override
+	public int getMenuItemId() {
+		return 1;
+	}
+
+	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		update(false);
 		super.onActivityCreated(savedInstanceState);

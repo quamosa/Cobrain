@@ -410,12 +410,11 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	}
 	
 	void showEmpty() {
-
-		if (loader.isFiltered()) {
+		if (loader.totalUnfilteredCount == 0) 
+			loaderUtils.showEmpty("Your 1st " + (signal.equals("saved") ? "Private" : "Shared") + " Crave will appear here. Save the Craves you love so you can find them later!");
+		else {
 			loaderUtils.dismiss();
-			return;
 		}
-		loaderUtils.showEmpty("Your 1st " + (signal.equals("saved") ? "Private" : "Shared") + " Crave will appear here. Save the Craves you love so you can find them later!");
 	}
 
 	@Override

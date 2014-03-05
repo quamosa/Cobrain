@@ -118,6 +118,10 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		}
 	};
 	
+	public int getMenuItemId() {
+		return -1;
+	}
+	
 	Handler handler;
 
 	public Handler getHandler() {
@@ -145,6 +149,10 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		actionBar = controller.getSupportActionBar();
 		abHide = new View(activity.getApplicationContext());
 		controller.dispatchOnFragmentAttached(this);
+		int menuItemId = getMenuItemId();
+		if (menuItemId != -1) {
+			controller.setMenuItemSelected(String.valueOf(menuItemId));
+		}
 		super.onAttach(activity);
 	}
 

@@ -118,8 +118,8 @@ public class SkuStripsLoader {
 		strip.list.setTag(strip);
 		strip.list.setSelector(R.drawable.sel_transparent);
 		
-		strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
-		strip.container.addView(strip.list);
+		//strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
+		//strip.container.addView(strip.list);
 
 		craveStrips.add(strip);
 	}
