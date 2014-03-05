@@ -75,7 +75,6 @@ public class BrowserFragment extends BaseCobrainFragment {
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		update();
 		super.onActivityCreated(savedInstanceState);
 	}
 

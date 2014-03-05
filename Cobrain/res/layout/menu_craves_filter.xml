@@ -12,7 +12,6 @@
         android:layout_below="@+id/header"
         android:drawablePadding="13dp"
         android:paddingTop="7dp"
-        android:paddingBottom="7dp"
         android:paddingLeft="@dimen/filter_menu_item_leftpadding"
         android:paddingRight="@dimen/filter_menu_item_leftpadding"
         android:text="Apparel"
@@ -24,10 +23,16 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_below="@+id/category"
-		android:cacheColorHint="#00000000"
+		android:padding="10dp"
 		android:listSelector="@android:color/transparent" 
 		android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
+
+         android:fadingEdge="vertical"
+         android:requiresFadingEdge="vertical"
+         android:fadingEdgeLength="@dimen/list_fading_edge"
+         android:cacheColorHint="@color/CraveFilterMenu"
+        
         tools:listitem="@layout/list_item_craves_filter" >
     </ListView>
 </com.cobrain.android.views.MyRelativeLayout>

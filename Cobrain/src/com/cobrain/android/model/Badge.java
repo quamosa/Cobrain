@@ -1,22 +1,25 @@
 package com.cobrain.android.model;
 
 public class Badge {
-	int _id;
+	public final static String TASTEMAKER = "tastemaker";
+	public final static String TRENDSETTER = "trendsetter";
+	
+	String _id;
 	String code;
-	String title;
-	int created_at;
+	String name;
+	String created_at;
 	int priority;
 	
-	public int getId() {
+	public String getId() {
 		return _id;
 	}
 	public String getCode() {
 		return code;
 	}
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
-	public int getCreatedAt() {
+	public String getCreatedAt() {
 		return created_at;
 	}
 	public int getPriority() {

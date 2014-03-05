@@ -2,9 +2,11 @@ package com.cobrain.android.adapters;
 
 import java.util.List;
 import com.cobrain.android.R;
+import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
+import com.cobrain.android.model.Badge;
 import com.cobrain.android.model.Feed;
 import com.cobrain.android.utils.LoaderUtils;
 import com.cobrain.anroid.dialogs.FriendDeleteDialog;
@@ -15,11 +17,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FeedListAdapter extends ArrayAdapter<Feed> {
+	private static final int ITEM_LAYOUT_ID = R.layout.list_item_feed;
 	LoaderUtils loader = new LoaderUtils();
 	FriendsListFragment parent;
 	List<Feed> items;
@@ -31,7 +35,16 @@ public class FeedListAdapter extends ArrayAdapter<Feed> {
 	}*/
 
 	ColorDrawable color = new ColorDrawable();
+	private int avatarSize;
+	private ImageLoader avatarLoader;
 
+	public int getItemHeight() {
+		View item = View.inflate(getContext(), ITEM_LAYOUT_ID, null);
+		item.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		item.measure(0, 0);
+		return item.getMeasuredHeight();
+	}
+	
 	OnImageLoadListener listener = new OnImageLoadListener() {
 
 		@Override
@@ -41,8 +54,8 @@ public class FeedListAdapter extends ArrayAdapter<Feed> {
 
 		@Override
 		public void onLoad(String url, ImageView view, Bitmap b,
-				boolean fromCache) {
-			LoaderUtils.show(view, !fromCache);
+				int fromCache) {
+			LoaderUtils.show(view, fromCache == ImageLoader.CACHE_NONE);
 		}
 		
 	};
@@ -53,6 +66,9 @@ public class FeedListAdapter extends ArrayAdapter<Feed> {
 		this.items = items;
 		setParent(parent);
 		color.setColor(context.getResources().getColor(R.color.FriendsColor));
+		avatarSize = (int) context.getResources().getDimension(R.dimen.avatar_feeds_size);
+		avatarSize = (int) context.getResources().getDimension(R.dimen.avatar_friends_size);
+		avatarLoader = new ImageLoader("feed", (4*avatarSize*avatarSize) * 50);
 	}
 	
 	public void setParent(FriendsListFragment parent) {
@@ -63,6 +79,9 @@ public class FeedListAdapter extends ArrayAdapter<Feed> {
 		int position;
 		TextView feed;
 		ImageView avatar;
+		ImageView badge;
+		int paddingTop;
+		int paddingBottom;
 	}
 
 	@Override
@@ -71,11 +90,14 @@ public class FeedListAdapter extends ArrayAdapter<Feed> {
 		ViewHolder vh;
 
 		if (v == null) {
-			v = View.inflate(parent.getContext(), R.layout.list_item_feed, null);
+			v = View.inflate(parent.getContext(), ITEM_LAYOUT_ID, null);
 
 			vh = new ViewHolder();
 			vh.feed = (TextView) v.findViewById(R.id.feed_entry);
 			vh.avatar = (ImageView) v.findViewById(R.id.friend_avatar);
+			vh.badge = (ImageView) v.findViewById(R.id.friend_badge);
+			vh.paddingTop = v.getPaddingTop();
+			vh.paddingBottom = v.getPaddingBottom();
 
 			v.setTag(vh);
 		}
@@ -92,9 +114,25 @@ public class FeedListAdapter extends ArrayAdapter<Feed> {
 		if (resId != 0) {
 			message = c.getResources().getString(resId, feed.getUser().getName(), color.getColor() & 0xffffff);
 		}
-		
-		vh.avatar.setImageDrawable(color);
-		ImageLoader.load(feed.getUser().getAvatarUrl(), vh.avatar, listener) ;
+
+		if (feed.getUser().hasBadge(Badge.TASTEMAKER)) {
+			v.setPadding(0, 0, 0, 2);
+			vh.badge.setImageResource(R.drawable.ic_badge_tastemaker);
+			vh.badge.setVisibility(View.VISIBLE);
+		}
+		else
+			if (feed.getUser().hasBadge(Badge.TRENDSETTER)) {
+				v.setPadding(0, 0, 0, 2);
+				vh.badge.setImageResource(R.drawable.ic_badge_trendsetter);
+				vh.badge.setVisibility(View.VISIBLE);
+			}
+			else {
+				v.setPadding(0, vh.paddingTop, 0, vh.paddingBottom);
+				vh.badge.setVisibility(View.GONE);
+			}
+
+		//vh.avatar.setImageDrawable(color);
+		avatarLoader.load(feed.getUser().getAvatarUrl(), vh.avatar, avatarSize, avatarSize, listener) ;
 		vh.feed.setText(Html.fromHtml(message));
 		vh.position = position;
 		

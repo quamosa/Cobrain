@@ -99,15 +99,16 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
 				loader.cacheLogos(getActivity(), stepper);
 			}
 			caption.setText("Personalization is starting...");
-			stepper.nextStep(3 * 1000);
+			stepper.nextStep((int)(1.5 * 1000));
 			break;
 		case 2:
 			caption.setText("Evaluating products at every merchant");
 			loader.flipMerchants(stepper, step, counter);
 			break;
 		case 3:
-			caption.setText("Considering 1,323,432 products...");
-			stepper.nextStep(2 * 1000);
+			//caption.setText("Considering 1,323,432 products...");
+			//stepper.nextStep(2 * 1000);
+			stepper.nextStep();
 			break;
 		case 4:
 			loader.cravesFound(stepper, step, counter);

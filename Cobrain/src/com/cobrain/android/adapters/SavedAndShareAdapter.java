@@ -2,7 +2,6 @@ package com.cobrain.android.adapters;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.SavedAndShareFragment;
 import com.cobrain.android.loaders.ImageLoader;
@@ -15,7 +14,7 @@ import com.cobrain.android.utils.LoaderUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.text.Html;
+import android.graphics.Paint;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
@@ -29,11 +28,14 @@ import android.widget.TextView;
 public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 	private static final int VIEWTYPE_SAVED_AND_SHARE = 0;
 	private static final int VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES = 1;
+	private static final boolean debug = false;
 	private final String RAVE_INFO = "<font color='#9ec5e7'>%s</font> RAVED THIS";
 	private final String RAVE_INFO_WITH_FRIENDS = "<font color='#9ec5e7'>%s</font> AND <font color='#9ec5e7'>%s FRIEND%s</font> RAVED THIS";
+	private boolean flinging = true;
 	
 	LoaderUtils loader = new LoaderUtils();
 	SavedAndShareFragment parent;
+	public boolean isShared;
 
 	public SavedAndShareAdapter(Context context, int resource, SavedAndShareFragment parent) {
 		super(context, resource);
@@ -70,9 +72,10 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 	
 	@Override
 	public int getItemViewType(int position) {
-		Sku item = getItem(position);
-		int typ = (item.getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES : VIEWTYPE_SAVED_AND_SHARE;
-		return typ;
+		//Sku item = getItem(position);
+		//int typ = (item.getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES : VIEWTYPE_SAVED_AND_SHARE;
+		//return typ;
+		return VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES;
 	}
 
 	@Override
@@ -116,6 +119,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 		View privateLayout;
 		View removeLayout;
 		View ravesLayout;
+		TextView salePrice;
 
 		@Override
 		public void onClick(View v) {
@@ -163,11 +167,13 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 			public void onLoadCompleted(Integer r) {
 				parent.getLoaderUtils().dismissLoading();
 				if (r > 0) {
-					if (r == 2) {
+					if (!isShared && r == 1) {
 						parent.removeCrave(position);
 					}
-					shareLayout.setVisibility(View.GONE);
-					privateLayout.setVisibility(View.VISIBLE);
+					else {
+						shareLayout.setVisibility(View.GONE);
+						privateLayout.setVisibility(View.VISIBLE);
+					}
 				}
 			}
 			
@@ -183,9 +189,14 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 			@Override
 			public void onLoadCompleted(Integer r) {
 				parent.getLoaderUtils().dismissLoading();
-				if (r > 0) { 
-					shareLayout.setVisibility(View.VISIBLE);
-					privateLayout.setVisibility(View.GONE);
+				if (r > 0) {
+					if (isShared) {
+						parent.removeCrave(position);
+					}
+					else {
+						shareLayout.setVisibility(View.VISIBLE);
+						privateLayout.setVisibility(View.GONE);
+					}
 				}
 			}
 			
@@ -216,7 +227,8 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 			vh.info = (TextView) v.findViewById(R.id.item_info);
 			vh.merchant = (TextView) v.findViewById(R.id.item_retailer);
 			vh.price = (TextView) v.findViewById(R.id.item_price);
-			vh.rave = (TextView) v.findViewById(R.id.rave_info);
+			vh.salePrice = (TextView) v.findViewById(R.id.item_sale_price);
+			vh.rave = (TextView) v.findViewById(R.id.rave_count);
 			vh.shareLayout = v.findViewById(R.id.share_layout);
 			vh.privateLayout = v.findViewById(R.id.private_layout);
 			vh.removeLayout = v.findViewById(R.id.remove_layout);
@@ -259,18 +271,33 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 		}
 
 		if (vtyp == VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES) {
-			CharSequence raveInfo = getRaveInfo(position);
-			vh.rave.setText(raveInfo);
+			if (p.getRaves().size() > 0 || debug) {
+				vh.ravesLayout.setVisibility(View.VISIBLE);
+				CharSequence raveInfo = getRaveInfo(position);
+				vh.rave.setText(raveInfo);
+			}
+			else vh.ravesLayout.setVisibility(View.GONE);
+		}
+
+		if (p.isOnSale()) {
+			vh.price.setPaintFlags(vh.price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			vh.salePrice.setVisibility(View.VISIBLE);
+			vh.salePrice.setText(p.getSalePriceFormatted());
+		}
+		else {
+			vh.price.setPaintFlags(vh.price.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+			vh.salePrice.setVisibility(View.INVISIBLE);
 		}
 		
 		if (p.getImageURL() != null) { 
 			int w = vh.image.getMeasuredWidth();
 			int h = vh.image.getMeasuredHeight();
-			ImageLoader.load(p.getImageURL(), vh.image, w, h, new OnImageLoadListener() {
+			ImageLoader.get.load(p.getImageURL(), vh.image, w, h, new OnImageLoadListener() {
+
 				@Override
-				public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
+				public void onLoad(String url, ImageView view, Bitmap b, int fromCache) {
 					//showProgress(false);
-					LoaderUtils.show(view, !fromCache);
+					LoaderUtils.show(view, fromCache == ImageLoader.CACHE_NONE && !flinging);
 				}
 	
 				@Override
@@ -286,16 +313,11 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 	private CharSequence getRaveInfo(int position) {
 		String raveInfo;
 		List<Rave> raves = getItem(position).getRaves();
-		String name = raves.get(0).getUser().getName().toUpperCase(Locale.US);
-		int otherRaves = raves.size() - 1;
-		
-		if (otherRaves > 0) {
-			raveInfo = String.format(RAVE_INFO_WITH_FRIENDS, name, otherRaves, (otherRaves > 1) ? "S" : "");
+		if (debug) {
+			raveInfo = String.valueOf(Math.random() * 24);
 		}
-		else
-			raveInfo = String.format(RAVE_INFO, name);
-
-		return Html.fromHtml(raveInfo);
+		else raveInfo = String.valueOf(raves.size());
+		return raveInfo;
 	}
 
 	public void remove(int position) {

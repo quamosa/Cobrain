@@ -42,16 +42,7 @@ public class ScenarioStripLoader extends CraveStripLoader<Scenario> {
 		Scenario r = null;
 		
 		if (u != null) {
-			r = u.getScenario( categoryId , refresh );
-			if (onSale) {
-				int i = 0;
-				while(i < r.getSkus().size()) {
-					if (!r.getSkus().get(i).isOnSale()) {
-						r.getSkus().remove(i);
-					}
-					else i++;
-				}
-			}
+			r = u.getScenario( categoryId , onSale, refresh );
 		}
 		return r;
 	}

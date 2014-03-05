@@ -5,12 +5,15 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -27,8 +30,6 @@ import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class Cobrain {
-	final String SHARED_PREFS_COBRAIN = "cobrain";
-
 	private String email;
 	private String username;
 	private String password;
@@ -37,9 +38,11 @@ public class Cobrain {
 	private UserInfo userInfo;
 	private OnLoggedInListener loggedInListener;
 	private Context context;
+	public CobrainSharedPreferences sharedPreferences;
 	
 	public Cobrain(Context c) {
 		context = c;
+		sharedPreferences = new CobrainSharedPreferences(c);
 	}
 	
 	public String getEmail() {
@@ -75,6 +78,7 @@ public class Cobrain {
 		public void showProgressDialog(String title, String message);
 		public void dismissDialog();
 		public void showHome();
+		public void showHome(int initialTab, boolean showPersonalizationAnimation);
 		public void showMain(int defaultView);
 		public void showSavedAndShare();
 		public void showTeachMyCobrain(boolean addToBackStack);
@@ -90,8 +94,9 @@ public class Cobrain {
 		public void showForgotPassword(String email);
 		public void showLogin(String loginUrl);
 		void hideSoftKeyBoard();
-		public void showWishList(User owner, boolean showMyPrivateItems, List<Integer> skuIds, boolean addToBackStack);
-		public void showWishList(Skus list, boolean showMyPrivateItems, boolean addToBackStack);
+		public void showWishList(User owner, boolean showPrivateItems, List<Integer> skuIds, boolean addToBackStack);
+		public void showWishList(Skus list, boolean showPrivateItems, boolean addToBackStack);
+		public void showWishList(Skus skus, Sku sku, boolean showPrivateItems, int containerId, boolean addToBackStack);
 		public void showErrorDialog(String message);
 		public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack);
 		public void showContactList(ContactSelectedListener listener);
@@ -99,6 +104,7 @@ public class Cobrain {
 		public CobrainView getShown();
 		public void showRavesUserList(String itemId);
 		public void setMenuItemSelected(View v, int position, boolean selected);
+		public void setMenuItemSelected(String id);
 		public void setSubTitle(CharSequence title);
 		public void setTitle(CharSequence title);
 		public TextView getSubTitleView();
@@ -109,6 +115,13 @@ public class Cobrain {
 		public void dispatchOnFragmentDetached(BaseCobrainFragment f);
 		public void setCurrentCobrainView(CobrainView cv);
 		public void showFriendsSharedRack(User owner, List<Integer> skuIds);
+	}
+	
+	public interface CobrainMenuView {
+		public ListAdapter getAdapter(int type);
+		public ListView getMenu(int type);
+		public int getMenuItemPosition(int type, String id);
+		public int getMenuTypeCount();
 	}
 	
 	public interface CobrainView {
@@ -126,8 +139,92 @@ public class Cobrain {
 
 		public abstract CobrainController getCobrainController();
 
+		public boolean getSilentMode();
+
 		//public void showFilterMenu(View menuItem);
 	}
+
+	public class CobrainSharedPreferences {
+		final String SHARED_PREFS_COBRAIN = "cobrain";
+
+		SharedPreferences prefs;
+		Editor editPrefs;
+		boolean isGlobal;
+
+		public CobrainSharedPreferences(Context context, boolean isGlobal) {
+			prefs = context.getSharedPreferences(SHARED_PREFS_COBRAIN, Context.MODE_PRIVATE);
+			this.isGlobal = isGlobal;
+		}
+		
+		public CobrainSharedPreferences(Context context) {
+			prefs = context.getSharedPreferences(SHARED_PREFS_COBRAIN, Context.MODE_PRIVATE);
+			edit();
+		}
+
+		@SuppressLint("CommitPrefEdits")
+		public CobrainSharedPreferences edit() {
+			editPrefs = prefs.edit();
+			return this;
+		}
+		public void commit() {
+			editPrefs.commit();
+		}
+		public void apply() {
+			editPrefs.apply();
+		}
+		public void remove() {
+			editPrefs.apply();
+		}
+		
+		String getKey(String key) {
+			if (isGlobal) return key;
+			String prefix = context.getString(R.string.url_cobrain_api);
+			return prefix + ((apiKey == null) ? "" : ":" + apiKey) + ":" + key;
+		}
+		
+		public CobrainSharedPreferences putString(String key, String value) {
+			key = getKey(key);
+			editPrefs.putString(key, value);
+			return this;
+		}
+		public CobrainSharedPreferences putInt(String key, int value) {
+			key = getKey(key);
+			editPrefs.putInt(key, value);
+			return this;
+		}
+		public CobrainSharedPreferences putLong(String key, long value) {
+			key = getKey(key);
+			editPrefs.putLong(key, value);
+			return this;
+		}
+		public CobrainSharedPreferences putBoolean(String key, boolean value) {
+			key = getKey(key);
+			editPrefs.putBoolean(key, value);
+			return this;
+		}
+		public CobrainSharedPreferences clear() {
+			editPrefs.clear();
+			return this;
+		}
+		
+		public String getString(String key, String defValue) {
+			key = getKey(key);
+			return prefs.getString(key, defValue);
+		}
+		public int getInt(String key, int defValue) {
+			key = getKey(key);
+			return prefs.getInt(key, defValue);
+		}
+		public long getLong(String key, long defValue) {
+			key = getKey(key);
+			return prefs.getLong(key, defValue);
+		}
+		public boolean getBoolean(String key, boolean defValue) {
+			key = getKey(key);
+			return prefs.getBoolean(key, defValue);
+		}
+
+	};
 
 	public UserInfo getUserInfo() {
 		return userInfo;
@@ -370,7 +467,7 @@ public class Cobrain {
 					}
 					break;
 				default:
-					onLogin(false);
+					onLogin(false, null);
 				}
 			}
 			
@@ -432,7 +529,7 @@ public class Cobrain {
 					}
 					break;
 				default:
-					onLogin(false);
+					onLogin(false, null);
 				}
 			}
 			
@@ -463,14 +560,35 @@ public class Cobrain {
 		WebRequest wr = new WebRequest().post(url).setFormFields(fields);
 		switch(wr.go()) {
 			case 200:
+				String message = null;
 				boolean success = wr.getHeaders().containsKey("api-key");
-				if (success) apiKey = wr.getHeaders().get("api-key"); else apiKey = null;
+
+				if (success) apiKey = wr.getHeaders().get("api-key"); 
+				else
+					{
+						apiKey = null;
+						//parse error message
+						
+						String contentType = wr.getHeaders().get("Content-Type");
+						if (contentType == null || !contentType.equals("application/json")) {
+							String response = wr.getResponse();
+							final String div = "<div class=\"alert\">";
+							final String divend = "</div>";
+							int a = response.indexOf(div);
+							if (a != -1) {
+								int b = response.indexOf(divend, a);
+								if (b != -1) {
+									message = response.substring(a + div.length(), b - 1);
+								}
+							}
+						}
+					}
 	
-				onLogin(success);
+				onLogin(success, message);
 	
 				break;
 			default:
-				onLogin(false);
+				onLogin(false, null);
 		}
 		
 		//lets logout after the login so we can clear out our session
@@ -490,7 +608,7 @@ public class Cobrain {
 		}
 	}
 	
-	void onLogin(boolean success) {
+	void onLogin(boolean success, String message) {
 		if (success) {
 			signIn(apiKey);
 			if (userInfo.apiKey != null) {
@@ -509,7 +627,8 @@ public class Cobrain {
 				loggedInListener.onLoggedIn(userInfo);
 			}
 			else {
-				loggedInListener.onFailure("We had a problem trying to log you in. Please try again.");
+				if (message == null) message = "We had a problem trying to log you in. Please try again.";
+				loggedInListener.onFailure(message);
 			}
 		}
 	}
@@ -640,6 +759,7 @@ public class Cobrain {
 			userInfo.dispose();
 			userInfo = null;
 		}
+		sharedPreferences = null;
 		loggedInListener = null;
 	}
 
@@ -651,24 +771,26 @@ public class Cobrain {
 	}
 
 	void saveApiKey() {
-		String prefix = context.getString(R.string.url_cobrain_api);
-		Editor edit = getEditableSharedPrefs();
-		edit.putString(prefix + ":apiKey", apiKey);
-		edit.commit();
+		CobrainSharedPreferences prefs = getSharedPrefs();
+		prefs.edit();
+		String _apiKey = apiKey;
+		apiKey = null;
+		prefs.putString("apiKey", _apiKey);
+		prefs.commit();
+		apiKey = _apiKey;
 	}
 	
-	public SharedPreferences getSharedPrefs() {
-		SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS_COBRAIN, Context.MODE_PRIVATE);
-		return prefs;
+	public CobrainSharedPreferences getSharedPrefs() {
+		return sharedPreferences;
 	}
-	
-	public Editor getEditableSharedPrefs() {
-		return getSharedPrefs().edit();
+	public CobrainSharedPreferences getGlobalSharedPrefs() {
+		return new CobrainSharedPreferences(context, true);
 	}
 	
 	public boolean restoreLogin(final Runnable runWhenLoggedIn) {
-		String prefix = context.getString(R.string.url_cobrain_api);
-		apiKey = getSharedPrefs().getString(prefix + ":apiKey", null);
+		apiKey = null;
+		apiKey = getSharedPrefs().getString("apiKey", null);
+		
 		if (apiKey != null) {
 			new AsyncTask<Void, Void, Void>() {
 
@@ -699,4 +821,5 @@ public class Cobrain {
 	public boolean isMe(User owner) {
 		return owner != null && userInfo != null && owner.getId().equals( userInfo.getId() );
 	}
+
 }

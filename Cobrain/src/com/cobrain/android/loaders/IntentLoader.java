@@ -1,5 +1,6 @@
 package com.cobrain.android.loaders;
 
+import com.cobrain.android.MainActivity;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.service.web.WebRequest;
 
@@ -25,7 +26,15 @@ public class IntentLoader {
 	
 	public boolean processAnyIntents(Activity activity) {
 		Intent i = activity.getIntent();
+
 		if (i != null) {
+			String action = i.getAction();
+			
+			if (MainActivity.ACTION_SIGNUP.equals(action)) {
+				controller.showSignup(null);
+				return true;
+			}
+			
 			Uri uri = i.getData();
 			if (uri != null && uri.getHost().contains("cobrain.com")) {
 				if (uri.getPath().equals("/mobile/download")) {

@@ -21,12 +21,23 @@
 
 	   <com.cobrain.android.views.RoundedImageView
 	       android:id="@+id/friend_avatar"
-	       style="@style/avatar_style"
+	       style="@style/avatar_feeds_style"
 	       android:layout_centerVertical="true"
 	       android:layout_marginLeft="@dimen/friends_list_item_marginLeft"
 	        />
-      
-   <TextView
+	<ImageView 
+	    android:id="@+id/friend_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/friend_avatar"
+        android:layout_marginTop="@dimen/avatar_feeds_badge_marginTop"
+        android:layout_marginLeft="@dimen/avatar_feeds_badge_marginLeft"
+	    android:src="@drawable/ic_badge_trendsetter"
+	    android:visibility="gone"
+	    />
+
+		   
+   <CheckedTextView
        android:id="@+id/feed_entry"
        style="@style/navigation_menu_font"
        android:layout_width="wrap_content"
@@ -38,6 +49,7 @@
        android:layout_marginRight="10dp"
        android:ellipsize="end"
        android:textColor="#fff"
+       android:textSize="13sp"
        android:text="@string/blah" />
 
    <!-- RelativeLayout 

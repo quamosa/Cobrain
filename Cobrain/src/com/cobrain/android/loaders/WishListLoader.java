@@ -11,6 +11,7 @@ import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.utils.HelperUtils;
 
 public class WishListLoader {
 	User owner;
@@ -48,11 +49,15 @@ public class WishListLoader {
 		return categoryId;
 	}
 
+	public void clearPagesLoaded() {
+		page = 0;
+		pagesLoaded.clear();
+	}
+	
 	public boolean setCategoryId(int categoryId) {
 		if (categoryId != this.categoryId) {
 			this.categoryId = categoryId;
-			page = 0;
-			pagesLoaded.clear();
+			clearPagesLoaded();
 			return true;
 		}
 		return false;
@@ -60,8 +65,7 @@ public class WishListLoader {
 	public boolean setOnSaleRecommendationsOnly(boolean onSale) {
 		if (this.onSale != onSale) {
 			this.onSale = onSale;
-			page = 0;
-			pagesLoaded.clear();
+			clearPagesLoaded();
 			return true;
 		}
 		return false;
@@ -87,6 +91,7 @@ public class WishListLoader {
 	public void dispose() {
 		cancel();
 		controller = null;
+		owner = null;
 		adapter = null;
 		onLoadListener = null;
 	}
@@ -111,6 +116,8 @@ public class WishListLoader {
 			
 			@Override
 			protected List<Sku> doInBackground(Void... params) {
+				if (HelperUtils.Tasks.asyncTaskCancel(this, controller == null)) return null;
+				
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
 				List<Sku> items = null;
@@ -131,13 +138,15 @@ public class WishListLoader {
 
 			@Override
 			protected void onPostExecute(List<Sku> result) {
-				if (result != null) {
-					int pg = 1; //result.getPage();
-					WishListLoader.this.page = pg;
-					pagesLoaded.add(pg);
+				if (adapter != null) {
+					if (result != null) {
+						int pg = 1; //result.getPage();
+						WishListLoader.this.page = pg;
+						pagesLoaded.add(pg);
+					}
+					adapter.load(r, result, (page > 1));
+					if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				}
-				adapter.load(r, result, (page > 1));
-				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				r = null;
 				currentRequest = null;
 			}

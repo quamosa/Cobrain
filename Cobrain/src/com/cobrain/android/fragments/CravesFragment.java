@@ -384,7 +384,6 @@ public class CravesFragment extends BaseCobrainFragment implements OnLoadListene
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		update();
 		super.onActivityCreated(savedInstanceState);
 	}
 

@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -24,12 +25,13 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	public LoaderUtils loaderUtils = new LoaderUtils();
 	ActionBar actionBar;
 	View abHide;
-	boolean updateRequested;
 	StateSaver state = new StateSaver();
-	boolean silentMode;
+	boolean silentMode = true;
 	HashMap<String, AsyncTask> asyncTasks = new HashMap<String, AsyncTask>();
 	Field childFragmentManagerField;
 	boolean detached;
+	public boolean autoUpdate = true;
+	public BaseCobrainFragment parent;
 
 	public BaseCobrainFragment() {
 		try {
@@ -96,7 +98,10 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		public void restore(ListView list, String key) {
 			int index = getInt(key + ".index", 0);
 			int top = getInt(key + ".top", 0);
-			if (list != null) list.setSelectionFromTop(index, top);
+			if (list != null) {
+				if (list.getCount() > 0)
+					list.setSelectionFromTop(index, top);
+			}
 		}
 		public void save(ListView list, String key) {
 			int index = list.getFirstVisiblePosition();
@@ -107,20 +112,31 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		}
 	}
 
-	public void requestUpdate() {
-		updateRequested = true;
-	}
-	public boolean checkForUpdate() {
-		if (updateRequested) {
-			updateRequested = false;
+	private Runnable updateRunnable = new Runnable() {
+		public void run() {
 			update();
-			return true;
 		}
-		return false;
-	}
-	public void update() {
+	};
+	
+	Handler handler;
+
+	public Handler getHandler() {
+		if (handler == null) handler = new Handler();
+		return handler;
 	}
 	
+	public void update() {
+		boolean updated = onUpdate();
+		if (!updated) {
+			//TODO: if not updated try again in 2 seconds
+			getHandler().postDelayed(updateRunnable, 2 * 1000);
+		}
+	}
+
+	protected boolean onUpdate() {
+		return true;
+	}
+
 	@Override
 	public void onAttach(Activity activity) {
 		controller = (CobrainController) activity;
@@ -143,12 +159,30 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	}
 	
 	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		if (autoUpdate)
+			update();
+
+		super.onActivityCreated(savedInstanceState);
+	}
+
+	@Override
 	public void setTitle(CharSequence title) {
+		if (parent != null) parent.setTitle(this, title);
+		else controller.setTitle(title);
+	}
+
+	public void setTitle(BaseCobrainFragment child, CharSequence title) {
 		controller.setTitle(title);
 	}
+	public void setSubTitle(BaseCobrainFragment child, CharSequence title) {
+		controller.setSubTitle(title);
+	}
+
 	@Override
 	public void setSubTitle(CharSequence title) {
-		controller.setSubTitle(title);
+		if (parent != null) parent.setSubTitle(this, title);
+		else controller.setSubTitle(title);
 	}
 	@Override
 	public CobrainController getCobrainController() {
@@ -173,20 +207,28 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	}
 	
 	@Override
-	public void onDetach() {
-		detached = true;
-		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
-		for (AsyncTask task : asyncTasks.values()) {
+	public void onPause() {
+		super.onPause();
+		
+		for (@SuppressWarnings("rawtypes") AsyncTask task : asyncTasks.values()) {
 			if (task.getStatus() != Status.FINISHED) {
 				task.cancel(true);
 			}
 		}
 		asyncTasks.clear();
+	}
+	
+	@Override
+	public void onDetach() {
+		detached = true;
+		handler = null;
+		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
 		controller.dispatchOnFragmentDetached(this);
 		abHide = null;
 		controller = null;
 		actionBar = null;
 		childFragmentManagerField = null;
+		parent = null;
 		
 		super.onDetach();
 	}
@@ -195,6 +237,8 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 
 		//try to get rid of random "No Activity" error that seems to occur when using viewpagers!
         // dont want to create childfragmentmanager instances if we arent attaching any children to them!
+		if (childFragmentManagerField == null) return null;
+		
 		try {
             FragmentManager fm = (FragmentManager) childFragmentManagerField.get(this);
             if (fm != null) return fm.getFragments();
@@ -250,6 +294,11 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean getSilentMode() {
+		return silentMode;
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,6 +19,7 @@ import com.cobrain.android.adapters.SkuPagerAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.controllers.CraveStrip;
+import com.cobrain.android.controllers.SkuCraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.SkuStripsLoader;
 import com.cobrain.android.model.Sku;
@@ -134,7 +134,7 @@ public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 	}
 
 	void setupCraveStrips(View v) {
-		loader.initialize(this, craveStripList);
+		loader.initialize(this, craveStripList, this);
 	}
 	
 	@Override
@@ -147,7 +147,6 @@ public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		loaderUtils.initialize((ViewGroup) getView());
-		update();
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -210,31 +209,12 @@ public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 
 	@Override
 	public void onLoadStarted() {
-		loaderUtils.showLoading("Loading your craves...");
+		loaderUtils.showLoading("Loading " + owner.getName() + "'s craves...");
 	}
 
 	@Override
 	public void onLoadCompleted(Skus r) {
-		if (r == null) {
-			loaderUtils.showEmpty("We had a problem loading your friend's craves. Click here to try loading them again.");
-			loaderUtils.setOnClickListener(new OnClickListener () {
-				public void onClick(View v) {
-					update();
-				}
-			});
-		}
-		else if (r.get().size() == 0) {
-			//loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");
-		}
-		else {
-			loaderUtils.dismissLoading();
-
-			if (savedState.isSaved()) {
-				//cravePager.setCurrentItem(savedState.position, false);
-				savedState.restored();
-			}
-			
-		}
+		loaderUtils.dismissLoading();
 	}
 
 
@@ -353,8 +333,13 @@ public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 		
 	}
 
-	public void showCravesFragmentForSkus(CraveStrip<Skus> strip, Sku sku) {
-		controller.showCraves(strip, sku, R.id.overlay_layout, true);
+	@Override
+	public void showZoomedCraveStrip(CraveStrip strip, Sku sku) {
+		controller.showWishList(((SkuCraveStrip)strip).skus, sku, false, R.id.content_frame, true);
 	}
 
+/*	public void showCravesFragmentForSkus(CraveStrip<Skus> strip, Sku sku) {
+		controller.showCraves(strip, sku, R.id.overlay_layout, true);
+	}
+*/
 }	

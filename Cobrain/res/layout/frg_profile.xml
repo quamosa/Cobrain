@@ -18,7 +18,7 @@
              android:layout_height="wrap_content"
              android:layout_marginBottom="10dp"
              android:textColor="#000"
-             android:text="Name" />
+             android:text="Your Name" />
 
          <EditText
              android:id="@+id/name"
@@ -35,7 +35,7 @@
              android:layout_marginBottom="10dp"
              android:layout_marginTop="20dp"
              android:textColor="#000"
-             android:text="Zip Code" />
+             android:text="Your Zipcode" />
 
          <EditText
              android:id="@+id/zipcode"
@@ -52,9 +52,18 @@
              android:layout_marginBottom="10dp"
              android:layout_marginTop="20dp"
              android:textColor="#000"
-             android:text="Apparel" />
+             android:text="Apparel For" />
 
-         <RadioGroup
+		<Spinner 
+        android:id="@+id/gender"
+        style="@style/edit_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gender_label"
+        android:entries="@array/profile_gender_names"
+    	/>
+				
+         <!-- RadioGroup
              android:id="@+id/gender"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
@@ -82,13 +91,13 @@
                  android:layout_height="wrap_content"
                  android:text="None"
                  android:textColor="#000" />
-         </RadioGroup>
+         </RadioGroup-->
          
          <Button
              android:id="@+id/save_account_button"
-             style="@style/login_button"
+	        style="@style/purple_button"
              android:layout_below="@+id/gender"
-             android:text="SAVE" />
+             android:text="UPDATE" />
      </RelativeLayout>
 
 </ScrollView>

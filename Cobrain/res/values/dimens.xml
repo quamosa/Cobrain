@@ -6,7 +6,8 @@
     <dimen name="crave_padding">15dp</dimen>
 	<dimen name="button_size">50dp</dimen>
 	<dimen name="friend_menu_icon_size">30dp</dimen>
-
+	<dimen name="list_fading_edge">15dp</dimen>
+	
 	<dimen name="navigation_menu_divider_height">0.75dp</dimen>
 	<dimen name="navigation_menu_item_padding">12dp</dimen>
 	<dimen name="navigation_menu_item_marginLeft">25dp</dimen>
@@ -32,7 +33,18 @@
 	
 	<dimen name="avatar_size">47dp</dimen>
 	<dimen name="avatar_corner_radius">5dp</dimen>
-	
+	<dimen name="avatar_friend_accept_size">120dp</dimen>
+	<dimen name="avatar_friend_accept_corner_radius">20dp</dimen>
+	<dimen name="avatar_friend_accept_badge_marginTop">113dp</dimen>
+	<dimen name="avatar_friend_accept_badge_marginLeft">-6dp</dimen>
+		
+	<dimen name="avatar_friends_size">40dp</dimen>
+	<dimen name="avatar_friends_badge_marginTop">33dp</dimen>
+	<dimen name="avatar_feeds_size">30dp</dimen>
+	<dimen name="avatar_feeds_badge_marginTop">23dp</dimen>
+	<dimen name="avatar_feeds_badge_marginLeft">-6dp</dimen>
+	<dimen name="avatar_friends_badge_marginLeft">-6dp</dimen>
+			
 	<dimen name="home_pager_margin_size">27dp</dimen>
 	
 	<dimen name="category_count_width">30dp</dimen>

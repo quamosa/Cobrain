@@ -43,7 +43,6 @@ public class MainFragment extends BaseCobrainFragment {
 
 		}
 		
-		controller.hideSoftKeyBoard();
 		controller.showDefaultActionBar();
 
 		int defaultView = getArguments().getInt("defaultView");

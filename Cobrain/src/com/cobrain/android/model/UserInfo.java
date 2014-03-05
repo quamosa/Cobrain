@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
-import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -27,6 +26,12 @@ import com.google.gson.reflect.TypeToken;
 public class UserInfo extends User {
 	private static final String TAG = "UserInfo";
 	private static boolean DEBUG = true;
+
+	public interface OnUserInfoChanged {
+		public void onUserInfoChanged(UserInfo ui);
+	}
+	
+	ArrayList<OnUserInfoChanged> listeners = new ArrayList<UserInfo.OnUserInfoChanged>();
 
 	/*
 	if (DEBUG) {
@@ -73,13 +78,12 @@ public class UserInfo extends User {
 	@SerializedName("hashed_phone_number")
 	private String hashedPhone;
 
-	private ArrayList<String> notifications;
-	
 	public interface OnSignedInListener {
 		public void onSignedIn(boolean success);
 	}
 
 	public void dispose() {
+		listeners.clear();
 		listCache.clear();
 	}
 	
@@ -93,10 +97,6 @@ public class UserInfo extends User {
 	public boolean testBaseUrl(String url) {
 		WebRequest wr = new WebRequest();
 		return wr.get(url).go() == 200;
-	}
-
-	public ArrayList<String> getNotifications() {
-		return notifications;
 	}
 
 	public String getUserId() {
@@ -121,7 +121,7 @@ public class UserInfo extends User {
 	/**
 	 * this blocks and should not run on UI Thread
 	 */
-	boolean fetchUserInfo() {
+	public boolean fetchUserInfo() {
 		String url = context.getString(R.string.url_profile_get, context.getString(R.string.url_cobrain_api));
 		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
 
@@ -137,6 +137,10 @@ public class UserInfo extends User {
 			me.zipcode = ui.zipcode;
 			me.signInCount = ui.signInCount;
 			me.hashedPhone = ui.hashedPhone;
+			me.notifications = ui.notifications;
+			me.badges = ui.badges;
+			me.checklist = ui.checklist;
+			onUserInfoChange(this);
 			//notifications?
 
 			return true;
@@ -144,6 +148,20 @@ public class UserInfo extends User {
 		else reportError("Could not fetch user info");
 		
 		return false;
+	}
+
+	private void onUserInfoChange(UserInfo userInfo) {
+		for (OnUserInfoChanged l : listeners) {
+			l.onUserInfoChanged(this);
+		}
+	}
+	
+	public void registerUserInfoChangedListener(OnUserInfoChanged listener) {
+		if (!listeners.contains(listener))
+			listeners.add(listener);
+	}
+	public void unregisterUserInfoChangedListener(OnUserInfoChanged listener) {
+		listeners.remove(listener);
 	}
 
 	/**
@@ -233,6 +251,55 @@ public class UserInfo extends User {
 		}).go(true);
 	}
 	
+	public boolean addNotification(String notification) {
+		if (notifications.contains(notification)) {
+			return true;
+		}
+		notifications.add(notification);
+		if (saveNotifications()) {
+			return true;
+		}
+		//remove it
+		notifications.remove(notification);
+		return false;
+	}
+	
+	public boolean removeNotification(String notification) {
+		if (notification == null) return true;
+		if (!notifications.contains(notification)) {
+			return true;
+		}
+		notifications.remove(notification);
+		if (saveNotifications()) {
+			return true;
+		}
+		//put it back
+		notifications.add(notification);
+		return false;
+	}
+	
+	boolean saveNotifications() {
+		if (apiKey != null) {
+
+			String s = "";
+			for (String notification : notifications) {
+				if (s.length() > 0) s += ", ";
+				s += "\"" + notification + "\"";
+			}
+			
+			String url = context.getString(R.string.url_profile_put, context.getString(R.string.url_cobrain_api));
+			WebRequest wr = new WebRequest().put(url).setHeaders(apiKeyHeader()).setContentType("application/json")
+					.setBody("{\"notifications\": [" + s + "]}");
+
+			if (wr.go() == 200) {
+				return true;
+			}
+			else reportError("Could not save notifications");
+		}
+		
+		return false;
+	}
+
 	public boolean saveProfile(String name, String zipcode, String gender) {
 		if (apiKey != null) {
 			String url = context.getString(R.string.url_profile_put, context.getString(R.string.url_cobrain_api));
@@ -272,7 +339,27 @@ public class UserInfo extends User {
 
 		if (wr.setTimeout(20 * 1000).go() == 200) {
 			Skus s = gson.fromJson(wr.getResponse(), Skus.class);
-			s.setOwner(owner);
+			if (s != null) {
+				s.setOwner(owner);
+				s.setSignal(signal);
+				
+				//TODO: api should do this but lets filter them since api isn't for now...
+				if (onSale != null || categoryId != null) {
+					int i = 0;
+					List<Sku> skus = s.get();
+					
+					while(i < skus.size()) {
+						if (
+							(onSale != null && onSale != skus.get(i).isOnSale()) ||
+							(categoryId != null && skus.get(i).category.id != categoryId)
+						) {
+							skus.remove(i);
+						}
+						else i++;
+					}
+				}
+			}
+
 			return s;
 		}
 		else reportError("Could not get skus");
@@ -291,13 +378,22 @@ public class UserInfo extends User {
 		return null;
 	}
 	
-	public Scenario getScenario(int id, boolean refresh) {
+	public Scenario getScenario(int id, boolean onSale, boolean refresh) {
 		String url = context.getString(R.string.url_scenario_get, context.getString(R.string.url_cobrain_api), id);
 		if (refresh) url += "?refresh=true";
 		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
 		
-		if (wr.go() == 200) {
+		if (wr.setTimeout(60 * 1000).go() == 200) {
 			Scenario s = gson.fromJson(wr.getResponse(), Scenario.class);
+			if (s != null && onSale) {
+				int i = 0;
+				while(i < s.getSkus().size()) {
+					if (!s.getSkus().get(i).isOnSale()) {
+						s.getSkus().remove(i);
+					}
+					else i++;
+				}
+			}
 			return s;
 		}
 		else reportError("Could not get scenario");
@@ -390,8 +486,9 @@ public class UserInfo extends User {
 	public boolean raveProduct(User owner, Sku product) {
 		if (apiKey != null) {
 			String url = context.getString(R.string.url_raves_post, context.getString(R.string.url_cobrain_api));
-			String json = String.format("{\"_id\":\"%s\",\"sku\":{\"id\":%s}}",
-					owner.getId(), product.getId());
+			String json = String.format(
+					"{\"for\":\"%s\",\"sku\":{\"id\":%s},\"user\":{\"_id\":\"%s\",\"name\":\"%s\"},\"_id\":null,\"created_at\":null}",
+					owner.getId(), product.getId(), _id, name);
 
 			WebRequest wr = new WebRequest().post(url).setContentType("application/json").setHeaders(apiKeyHeader());
 			if (wr.setBody(json).go() == 200) {
@@ -521,9 +618,9 @@ public class UserInfo extends User {
 		WebRequest wr = new WebRequest().setHeaders(apiKeyHeader()).delete(url);
 		if (wr.go() == 200) {
 
-			Editor e = new Cobrain(context).getEditableSharedPrefs();
-			e.clear();
-			e.commit();
+			new Cobrain(context).getSharedPrefs().edit()
+				.clear()
+				.commit();
 
 			return true;
 		}
@@ -756,17 +853,23 @@ public class UserInfo extends User {
 		return false;
 	}
 
+	boolean validationSent;
 	public void validateInvitation() {
 		HelperUtils.SMS.sendSMS(context.getString(R.string.sms_invite_validation_number), _id);
-		Cobrain c = new Cobrain(context);
-		Editor prefs = c.getEditableSharedPrefs();
-		prefs.putBoolean("invitesVerified", true);
-		prefs.commit();
+		validationSent = true;
+		//Cobrain c = new Cobrain(context);
+		//Editor prefs = c.getEditableSharedPrefs();
+		//prefs.putBoolean("invitesVerified", true);
+		//prefs.commit();
 	}
 
 	public boolean areInvitesVerified() {
-		Cobrain c = new Cobrain(context);
-		return c.getSharedPrefs().getBoolean("invitesVerified", false);
+		return (validationSent || hashedPhone != null);
+		//if (hashedPhone != null) return true;
+		
+		//Cobrain c = new Cobrain(context);
+		//boolean verified = c.getSharedPrefs().getBoolean("invitesVerified", false);
+		//return verified;
 	}
 
 	public HashMap<String, String> getApiKeyHeader() {

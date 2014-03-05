@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<array name="profile_gender_names">
+	    <item></item>
+	    <item>Men</item>
+	    <item>Women</item>
+	    <item>Both</item>
+	</array>
+	<array name="profile_gender_values">
+	    <item></item>
+	    <item>MALE</item>
+	    <item>FEMALE</item>
+	    <item>BOTH</item>
+	</array>
+	
 	<array name="navigation_menu_items">
 
-	    <item type="string">Home</item>
+	    <item type="string">Home Rack</item>
 	    <item>@drawable/ic_navigation_menu_home</item>
    	    <item type="integer">0</item>
 	    
-	    <item type="string">On Sale</item>
-   	    <item>@drawable/ic_category_menu_onsale</item>
+	    <item type="string">Sale Rack</item>
+   	    <item>@drawable/ic_navigation_menu_sale_rack</item>
    	    <item type="integer">7</item>
 
 	    <item type="string">My Private Rack</item>
-	    <item>@drawable/ic_navigation_menu_saved_craves</item>
+	    <item>@drawable/ic_navigation_menu_private_rack</item>
    	    <item type="integer">2</item>
 	    
    	    <item type="string">My Shared Rack</item>
-   	    <item>@drawable/ic_navigation_menu_share_and_rave</item>
+   	    <item>@drawable/ic_navigation_menu_shared_rack</item>
    	    <item type="integer">3</item>
    	    
 	</array>
@@ -27,15 +40,15 @@
    	    <item type="integer">1</item>
 	    
    	    <item type="string">Settings</item>
-	    <item>@drawable/ic_navigation_menu_nerve_center</item>
+	    <item>@drawable/ic_navigation_menu_settings</item>
    	    <item type="integer">4</item>
 	    
-	    <item type="string">Feedback</item>
+	    <!-- item type="string">Feedback</item>
    	    <item>@drawable/ic_navigation_menu_feedback</item>
-   	    <item type="integer">5</item>
+   	    <item type="integer">5</item -->
 
-	    <item type="string">About Us</item>
-	    <item>@drawable/ic_about_us</item>
+	    <item type="string">About</item>
+	    <item>@drawable/ic_navigation_menu_about</item>
    	    <item type="integer">6</item>
 	    
 	</array>

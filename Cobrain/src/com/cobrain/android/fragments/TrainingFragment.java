@@ -6,7 +6,10 @@ import com.cobrain.android.loaders.TrainingLoader;
 import com.cobrain.android.loaders.TrainingLoader.OnSelectedListener;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.utils.HelperUtils;
+
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,7 +26,8 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	Button save;
 	Button skip;
 	boolean saveChoicesThenGoHome;
-	
+	AlertDialog dialog;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 		skip = (Button) v.findViewById(R.id.training_skip_button);
 		skip.setOnClickListener(this);
 		question.setText("Loading...");
+		question.setGravity(Gravity.CENTER);
 		
 		//LoaderUtils.hide(question, false, false);
 		//LoaderUtils.hide(cravesFound, false, false);
@@ -74,6 +79,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	
 	@Override
 	public void onDestroyView() {
+		dialog = null;
 		trainingLoader.dispose();
 		setSubTitle(null);
 		skip.setOnClickListener(null);
@@ -111,11 +117,13 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			public void onLoadCompleted(Boolean r) {
 				//if (r != null && r == true) {
 					//we ASSUME we saved our choices load new ones now!
-					loaderUtils.dismissLoading();
 					if (saveChoicesThenGoHome) {
-						controller.showHome();
+						controller.showHome(HomeFragment.TAB_HOME_RACK, true);
 					}
-					else update(true);
+					else {
+						//loaderUtils.dismissLoading();
+						update(true);
+					}
 				//}
 			}
 			
@@ -153,14 +161,17 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 		String response;
 		if (trainingLoader.getCravesRemaining() == 0) {
 			response = "Your Cobrain has Craves just for you! Keep teaching or View your Craves";
-			setSubTitle(null);
 		}
 		else {
 			response = "Like " + trainingLoader.getCravesRemaining() + " more apparel " + HelperUtils.Strings.plural(trainingLoader.getCravesRemaining(), "item") + " to make your Cobrain smarter!";
-			setSubTitle("You've liked " + trainingLoader.getCravesLiked() + " " + HelperUtils.Strings.plural(trainingLoader.getCravesLiked(), "item"));
 		}
+		setSubTitle("You've liked " + trainingLoader.getCravesLiked() + " " + HelperUtils.Strings.plural(trainingLoader.getCravesLiked(), "item"));
+		question.setGravity(Gravity.LEFT);
 		question.setText(response);
 		
+		if (trainingLoader.getCravesRemaining() == 0) {
+			showTeachingCompleteDialog();
+		}
 		//String craves = getResources().getString(R.string.craves_found, score);
 		//cravesFound.setText(Html.fromHtml(craves));
 		//loaderUtils.show(question);
@@ -169,6 +180,36 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	@Override
 	public void onSelected(View v, int selected) {
 		updateUI();
+	}
+
+
+	void showTeachingCompleteDialog() {
+		boolean completed = controller.getCobrain().getSharedPrefs().getBoolean("trainingCompletedShown", false);
+		
+		if (!completed) {
+			OnClickListener click = new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					switch(v.getId()) {
+					case R.id.keep_teaching:
+						dialog.dismiss();
+						break;
+					case R.id.done:
+						dialog.dismiss();
+						TrainingFragment.this.onClick(skip);
+					}
+				}
+			};
+			
+			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			View v = View.inflate(getActivity().getApplicationContext(), R.layout.dlg_teaching_complete, null);
+			v.findViewById(R.id.keep_teaching).setOnClickListener(click);
+			v.findViewById(R.id.done).setOnClickListener(click);
+			b.setView(v);
+			dialog = b.show();
+			controller.getCobrain().getSharedPrefs().edit().putBoolean("trainingCompletedShown", true).commit();
+		}
 	}
 
 }

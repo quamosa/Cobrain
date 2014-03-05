@@ -2,32 +2,60 @@ package com.cobrain.android.loaders;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.cobrain.android.utils.HelperUtils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 
 public class ImageLoader {
-    private static LruCache<String, Bitmap>     mMemoryCache    = null;
-    private static int                          CACHE_SIZE       = 1024 * 1024 * 10;
+    private static final boolean DISK_CACHE_ENABLED = false;
+	private LruCache<String, Bitmap> mMemoryCache = null;
+    private int CACHE_SIZE = 1024 * 1024 * 10;
+    private String CACHE_NAME = "cache";
+    private DiskCacheLoader diskCacheLoader;
+	private static final boolean DEBUG = true;
+	public static final int CACHE_NONE = 0;
+	public static final int CACHE_MEMORY = 1;
+	public static final int CACHE_DISK = 2;
 
+    public static ImageLoader get = new ImageLoader();
+    
+	public ImageLoader newInstance() {
+    	return new ImageLoader();
+    }
+    public ImageLoader newInstance(int cacheSize) {
+    	return new ImageLoader(CACHE_NAME, cacheSize);
+    }
+    public ImageLoader() {
+	}
+    public ImageLoader(String cacheName, int cacheSize) {
+    	CACHE_SIZE = cacheSize;
+    	CACHE_NAME = cacheName;
+	}
+    
     public interface OnImageLoadListener {
     	public Bitmap onBeforeLoad(String url, ImageView view, Bitmap b);
-    	public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache);
+    	public void onLoad(String url, ImageView view, Bitmap b, int fromCache);
     }
 
-    private static class AsyncLoader extends AsyncTask<String, Void, Bitmap> {
+    private class AsyncLoader extends AsyncTask<String, Void, Bitmap> {
         private ImageView mTarget;
         private int mWidth = -1;
         private int mHeight = -1;
         private OnImageLoadListener mOnLoadListener;
         private String mUrl;
+		public InputStream stream;
+		public int fromCache = CACHE_NONE;
         
         public AsyncLoader(ImageView target) {
             mTarget = target;
@@ -58,18 +86,23 @@ public class ImageLoader {
             mUrl = url;
             if (url != null) {
             	
+            	//start diskcache
+            	//then check if the image is there
+            	initDiskCache(mTarget.getContext());
+
             	//lets check one last time before we download the image from the internet
             	//maybe the image has just finished loading by a previous request
             	result = mMemoryCache.get(url);
 
             	if (result == null || !isCorrectSize(result, mWidth, mHeight)) {
-	                result = load(url, mWidth, mHeight);
+	                result = load(this, url, mWidth, mHeight);
                 	if (mOnLoadListener != null) result = mOnLoadListener.onBeforeLoad(mUrl, mTarget, result);
 	
 	                if (result != null) {
 	                    mMemoryCache.put(url, result);
 	                }
             	}
+            	else fromCache = CACHE_MEMORY;
             }
 
             return result;
@@ -82,31 +115,51 @@ public class ImageLoader {
                 if (result != null) {
                 	mTarget.setImageBitmap(result);
                 }
-            	if (mOnLoadListener != null) mOnLoadListener.onLoad(mUrl, mTarget, result, false);
-            } else if (mTarget.getTag() != null) {
-            	ImageLoader.cancel(mTarget);
+            	if (mOnLoadListener != null) mOnLoadListener.onLoad(mUrl, mTarget, result, fromCache);
+            } else if (mTarget.getTag() != null && mTarget.getTag() instanceof ImageLoader) {
+            	ImageLoader loader = (ImageLoader) mTarget.getTag(); 
+            	loader.cancel(mTarget);
             }
             mTarget = null;
             mOnLoadListener = null;
         }
     }
 
-    public static Bitmap load(String urlString, int width, int height) {
+    public void initDiskCache(Context c) {
+    	if (DISK_CACHE_ENABLED)
+	    	if (diskCacheLoader == null)
+	    		diskCacheLoader = new DiskCacheLoader(c, "images", CACHE_SIZE);
+    }
+
+    private Bitmap overlayColor(Bitmap bitmap, int color) {
+		Bitmap b = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
+		Canvas c = new Canvas(b);
+		Paint p = new Paint();
+		p.setColor(color);
+		c.drawBitmap(bitmap, 0, 0, p);
+		c.drawRect(0, 0, b.getWidth(), b.getHeight(), p);
+		bitmap.recycle();
+		return b;
+    }
+    
+    public Bitmap load(AsyncLoader asyncLoader, String urlString, int width, int height) {
         if (urlString == null || urlString.length() == 0) return null;
 
         Bitmap bitmap = null;
-        URL url = null;
-
-        try {
-            url = new URL(urlString);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        
+        if (diskCacheLoader != null)
+        	bitmap = diskCacheLoader.getBitmapFromDiskCache(urlString, width, height);
+        
+        if (bitmap != null) {
+        	asyncLoader.fromCache = CACHE_DISK;
+        	return bitmap;
         }
 
-        if (url == null) return null;
-        
         try {
-            InputStream is = url.openStream();
+            URL url = new URL(urlString);
+            InputStream is = url.openStream(); 
+            
+            asyncLoader.stream = is;
             BitmapFactory.Options opts = new BitmapFactory.Options();
 
             if (width != -1 && height != -1) {
@@ -124,14 +177,15 @@ public class ImageLoader {
 
 	            is = url.openStream();
 	            Bitmap temp = BitmapFactory.decodeStream(is, null, opts);
-	            //bitmap = Bitmap.createScaledBitmap(temp, width, height, true);
-	            bitmap = HelperUtils.Bitmaps.scaleToFill(temp, width, height, true);
-	            if (temp != bitmap) temp.recycle();
+	            if (temp != null) {
+		            //bitmap = Bitmap.createScaledBitmap(temp, width, height, true);
+		            bitmap = HelperUtils.Bitmaps.scaleToFill(temp, width, height, true);
+		            if (temp != bitmap) temp.recycle();
+	            }
             }
             else {
             	bitmap = BitmapFactory.decodeStream(is);
             }
-        	
             is.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -139,14 +193,21 @@ public class ImageLoader {
         	e.printStackTrace();
         }
 
+        asyncLoader.stream = null;
+
+        if (bitmap != null) {
+        	if (diskCacheLoader != null)
+        		diskCacheLoader.putBitmapIntoDiskCache(urlString, width, height, bitmap);
+        }
+        
         return bitmap;
     }
 
-    public static void load(String url, ImageView view, OnImageLoadListener listener) {
+    public void load(String url, ImageView view, OnImageLoadListener listener) {
     	load(url, view, -1, -1, listener);
     }
 
-	public static void load(String url, ImageView view, int width, int height, OnImageLoadListener listener) {
+	public void load(String url, ImageView view, int width, int height, OnImageLoadListener listener) {
         if (url == null || url.length() == 0) return;
         if (mMemoryCache == null) {
             mMemoryCache = new LruCache<String, Bitmap>(CACHE_SIZE) {
@@ -160,15 +221,34 @@ public class ImageLoader {
         if (view.getTag() != null) {
         	cancel(view);
         }
-
+        
+        /*
+        if (width == -2 || height == -2) {
+        	boolean dow = false, doh = false;
+        	if (width == -2) {
+        		dow = true;
+        		width = view.getMeasuredWidth();
+        	}
+        	if (height == -2) {
+        		doh = true;
+        		height = view.getMeasuredWidth();
+        	}
+        	if (dow && width == 0 || doh && height == 0) {
+        		view.measure(0, 0);
+        		if (dow) width = view.getMeasuredWidth();
+        		if (doh) height = view.getMeasuredHeight();
+        	}
+        }*/
+        
         Bitmap bitmap = mMemoryCache.get(url);
+        
         if (bitmap == null || !isCorrectSize(bitmap, width, height)) {
             final AsyncLoader task = (AsyncLoader) new AsyncLoader(view, width, height, listener);
             view.setTag(task);
             task.execute(url);
         } else {
             view.setImageBitmap(bitmap);
-            if (listener != null) listener.onLoad(url, view, bitmap, true);
+            if (listener != null) listener.onLoad(url, view, bitmap, CACHE_MEMORY);
         }
 	}
 
@@ -177,11 +257,25 @@ public class ImageLoader {
 		return true;
     }
     
-	public static void cancel(ImageView view) {
+	public void cancel(ImageView view) {
     	AsyncLoader loader = (AsyncLoader) view.getTag();
     	if (loader != null) {
             view.setTag(null);
             loader.mOnLoadListener = null;
+            Animation a = view.getAnimation();
+            if (a != null) {
+            	a.setAnimationListener(null);
+            	a.cancel();
+            }
+            /*
+             * if (loader.stream != null) {
+            	try {
+					loader.stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+            }
+            */
     		loader.cancel(true);
     	}
 	}

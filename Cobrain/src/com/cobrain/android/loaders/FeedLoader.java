@@ -15,11 +15,14 @@ public class FeedLoader {
 	private AsyncTask<Void, Void, Feeds> currentRequest;
 	private OnLoadListener<Feeds> onLoadListener;
 	private Feeds feeds;
+	public int itemHeight;
+	private boolean pause;
 
 	public void initialize(CobrainController controller,
 			FeedListAdapter adapter) {
 		this.controller = controller;
 		this.adapter = adapter;
+		itemHeight = adapter.getItemHeight();
 	}
 
 	public void dispose() {
@@ -29,6 +32,7 @@ public class FeedLoader {
 	}
 
 	public void loadFeedList() {
+		if (pause) return;
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 
 		currentRequest = new AsyncTask<Void, Void, Feeds>() {
@@ -49,7 +53,7 @@ public class FeedLoader {
 
 			@Override
 			protected void onPostExecute(Feeds result) {
-				if (!isCancelled()) {
+				if (!isCancelled() && !pause) {
 					if (result != null) {
 						adapter.clear();
 						adapter.addAll(result.getFeeds());
@@ -71,5 +75,10 @@ public class FeedLoader {
 	
 	public void setOnLoadListener(OnLoadListener<Feeds> listener) {
 		onLoadListener = listener;
+	}
+
+	public void pauseLoad(boolean pause) {
+		this.pause = pause;
+		if (pause) cancel();
 	}
 }

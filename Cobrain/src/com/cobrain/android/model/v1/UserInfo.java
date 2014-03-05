@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
-import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.cobrain.android.R;
@@ -351,9 +350,9 @@ public class UserInfo {
 		WebRequest wr = new WebRequest().setHeaders(apiKeyHeader()).delete(url);
 		if (wr.go() == 200) {
 
-			Editor e = new Cobrain(context).getEditableSharedPrefs();
-			e.clear();
-			e.commit();
+			new Cobrain(context).getSharedPrefs().edit()
+				.clear()
+				.commit();
 
 			return true;
 		}
@@ -588,11 +587,12 @@ public class UserInfo {
 	public void validateInvitation() {
 		HelperUtils.SMS.sendSMS(context.getString(R.string.sms_invite_validation_number), userId);
 		Cobrain c = new Cobrain(context);
-		Editor prefs = c.getEditableSharedPrefs();
-		prefs.putBoolean("invitesVerified", true);
-		prefs.commit();
+		c.getSharedPrefs()
+			.edit()
+			.putBoolean("invitesVerified", true)
+			.commit();
 	}
-
+	
 	public boolean areInvitesVerified() {
 		Cobrain c = new Cobrain(context);
 		return c.getSharedPrefs().getBoolean("invitesVerified", false);

@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.NavigationMenuAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
+import com.cobrain.android.controllers.Cobrain.CobrainMenuView;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
+import com.cobrain.android.model.Badge;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.model.UserInfo.OnUserInfoChanged;
 import com.cobrain.android.utils.LoaderUtils;
 
 import android.content.res.Resources;
@@ -15,6 +18,8 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Debug;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +28,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class NavigationMenuFragment extends BaseCobrainFragment implements OnItemClickListener {
+public class NavigationMenuFragment extends BaseCobrainFragment implements CobrainMenuView, OnItemClickListener, OnUserInfoChanged {
 
 	public static final String TAG = "NavigationMenuFragment";
 	private Button signoutButton;
@@ -37,7 +43,9 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 	private TextView username;
 	private ImageView useravatar;
 	ColorDrawable color = new ColorDrawable();
-
+	private ImageView userbadge;
+	ImageLoader avatarLoader;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -47,6 +55,7 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 		menuBottom = (ListView) v.findViewById(R.id.navigation_menu_listview_bottom);
 		username = (TextView) v.findViewById(R.id.user_name);
 		useravatar = (ImageView) v.findViewById(R.id.user_avatar);
+		userbadge = (ImageView) v.findViewById(R.id.user_badge);
 		setupNavigationMenu(menu);
 		setupBottomNavigationMenu(menuBottom);
 		
@@ -54,7 +63,10 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 		signoutButton.setOnClickListener(this);
 		
 		color.setColor(getResources().getColor(R.color.FeedsColor));
-
+		
+		int sz = (int) getActivity().getResources().getDimension(R.dimen.avatar_size);
+		avatarLoader = new ImageLoader("avatar", 4*sz*sz);
+		
 		return v;
 	}
 	
@@ -95,16 +107,69 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		update();
 		super.onActivityCreated(savedInstanceState);
 	}
 
+	Runnable updateRunnable = new Runnable() {
+		public void run() {
+			update();
+		}
+	};
+	
+	//this keep checking every 2 seconds
+	void tryUpdateAgainLater() {
+		Debug.waitForDebugger();
+		View v = getView();
+		if (v != null) 
+			if (userbadge != null)
+				v.postDelayed(updateRunnable, 2 * 1000);
+	}
 
 	public void update() {
+		/*
+		if (controller == null) {
+			tryUpdateAgainLater();
+			return;
+		}
+		*/
+		
+		if (controller == null) return; 
 		UserInfo ui = controller.getCobrain().getUserInfo();
-		username.setText(ui.getName());
-		useravatar.setImageDrawable(color);
-		ImageLoader.load(ui.getAvatarUrl(), useravatar, listener) ;
+		CharSequence cs;
+
+		/*
+		if (ui == null) {
+			tryUpdateAgainLater();
+			return;
+		}
+		*/
+		
+		if (ui != null) {
+			ui.registerUserInfoChangedListener(this);
+			if (ui.hasBadge(Badge.TASTEMAKER)) {
+				cs = Html.fromHtml(String.format("%s<br><i><font color=\"#%x\">Tastemaker</font></i>", 
+						ui.getName(),
+						getActivity().getResources().getColor(R.color.Tastemaker) & 0xffffff));
+				userbadge.setImageResource(R.drawable.ic_badge_tastemaker);
+				userbadge.setVisibility(View.VISIBLE);
+				username.setText(cs);
+			}
+			else
+				if (ui.hasBadge(Badge.TRENDSETTER)) {
+					cs = Html.fromHtml(String.format("%s<br><i><font color=\"#%x\">Trendsetter</font></i>", 
+							ui.getName(),
+							getActivity().getResources().getColor(R.color.Trendsetter) & 0xffffff));
+					userbadge.setImageResource(R.drawable.ic_badge_trendsetter);
+					userbadge.setVisibility(View.VISIBLE);
+					username.setText(cs);
+				}
+				else {
+					username.setText(ui.getName());
+					userbadge.setVisibility(View.GONE);
+				}
+			
+			avatarLoader.load(ui.getAvatarUrl(), useravatar, listener) ;
+		}
 	}
 
 	OnImageLoadListener listener = new OnImageLoadListener() {
@@ -116,8 +181,8 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 
 		@Override
 		public void onLoad(String url, ImageView view, Bitmap b,
-				boolean fromCache) {
-			LoaderUtils.show(view, !fromCache);
+				int fromCache) {
+			LoaderUtils.show(view, fromCache == ImageLoader.CACHE_NONE);
 		}
 		
 	};
@@ -138,6 +203,11 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 
 	@Override
 	public void onDestroyView() {
+		if (controller != null) {
+			UserInfo ui = controller.getCobrain().getUserInfo();
+			if (ui != null) ui.unregisterUserInfoChangedListener(this);
+		}
+		userbadge = null;
 		username = null;
 		useravatar = null;
 		menu.setOnItemClickListener(null);
@@ -158,18 +228,23 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 	public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
 		switch((int)id) {
 		case 0: //home
-			controller.showHome();
+			controller.showHome(HomeFragment.TAB_HOME_RACK, false);
 			break;
 		case 1: //teach
 			controller.showTeachMyCobrain(false);
 			break;
 		case 2: //saved
-			controller.showSavedAndShare();
+			controller.showHome(HomeFragment.TAB_PRIVATE_RACK, false);
+			//controller.showSavedAndShare();
 			break;
 		case 3: //my shared craves
+			controller.showHome(HomeFragment.TAB_SHARED_RACK, false);
 			//TODO: do I need to refresh the cache first?
-			controller.showWishList(controller.getCobrain().getUserInfo(), false, null, false);
-			controller.closeMenu(true);
+			//controller.showWishList(controller.getCobrain().getUserInfo(), false, null, false);
+			//controller.closeMenu(true);
+			break;
+		case 7: //on sale
+			controller.showHome(HomeFragment.TAB_SALE_RACK, false);
 			break;
 		case 4: //nerve center
 			controller.showNerveCenter();
@@ -182,6 +257,40 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements OnIte
 		controller.setMenuItemSelected((ListView)arg0, position, true);
 	
 	}
+
+	@Override
+	public void onUserInfoChanged(UserInfo ui) {
+		getActivity().runOnUiThread(updateRunnable);
+	}
+
+	@Override
+	public int getMenuTypeCount() {
+		return 1;
+	}
 	
+	@Override
+	public ListAdapter getAdapter(int type) {
+		return menuAdapter;
+	}
+
+	@Override
+	public ListView getMenu(int type) {
+		return menu;
+	}
+
+	@Override
+	public int getMenuItemPosition(int type, String id) {
+		long lid = Long.valueOf(id);
+		
+		if (menuAdapter != null) {
+			for (int i = 0; i < menuAdapter.getCount(); i++) {
+				if (menuAdapter.getItemId(i) == lid) {
+					return i;
+				}
+			}
+		}
+		
+		return -1;
+	}
 
 }

@@ -13,9 +13,8 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.ImageView;
 
-public class RoundedImageView extends ImageView {
+public class RoundedImageView extends HttpImageView {
 
   public static final String TAG = "RoundedImageView";
   public static final int DEFAULT_RADIUS = 0;

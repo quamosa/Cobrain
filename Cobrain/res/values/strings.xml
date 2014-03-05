@@ -16,7 +16,13 @@
     <string name="item_out_of_num_item">out of 1 apparel item</string>
     <string name="craves_found"><![CDATA[<b><font color="#00BE9B">%1$d</font> Craves Found</b>]]></string>
     <string name="invite_sms_subject">Join me at Cobrain!</string>
-    <string name="invite_sms_body">%1$s wants your opinion on their apparel Craves, download the free Cobrain app %2$s to help them out!</string>
+    <string name="invite_sms_body">Hey, I need your opinion of my Cobrain rack. See it here: %1$s</string>
+    <string name="splash_caption"><![CDATA[Already a member? <font color="#f05923">Login</font>]]></string>
+	<string name="profile_name_label">Name*</string>
+   	<string name="profile_zipcode_label"><![CDATA[Zipcode* <font color="#ffaaaaaa"><small>(To help find location specific clothing for you)</small></font>]]></string>
+   	<string name="profile_gender_label">Do you prefer clothing designed for Men or for Women?</string>
+    <string name="friend_accept_caption">%1$s wants your opinion on the Craves in his Shared Rack.</string>
+    <string name="friend_dismiss_link"><u>Dismiss Request</u></string>
     
     <!-- feed strings -->
     <string name="friend_likes_own"><![CDATA[<font color=\"#%2$x\">%1$s</font> liked a new item]]></string>
@@ -25,7 +31,7 @@
     <!-- urls for qa and prd -->
     <string name="url_cobrain_api_dev">https://beaker.cobrain.com</string>
     <string name="url_cobrain_api_qa">https://qa.api.cobrain.com</string>
-    <string name="url_cobrain_api_prd">https://api.cobrain.com</string>
+    <string name="url_cobrain_api_prd">https://beaker.cobrain.com</string>
     <string name="url_cobrain_app_dev">https://bunsen.cobrain.com</string>
     <string name="url_cobrain_app_qa">https://qa.cobrain.com</string>
     <string name="url_cobrain_app_prd">https://cobrain.com</string>
@@ -87,5 +93,7 @@
     
     <string name="url_tastemaker_beta_program_rules">%1$s/campaign/tastemaker</string>
     <string name="tastemaker_beta_program_rules_link"><![CDATA[<a href=\"%1$s\">Tastemaker Beta Program Rules</a>]]></string>
-    
+    <string name="tastemaker_beta_link"><![CDATA[Hurry, start adding friends now!<br><a href=\"%1$s\">The Tastemaker Beta</a> is filling up fast.]]></string>
+    <string name="tastemaker_dont_show_again_link"><![CDATA[<u>Don\'t Show This Again</u>]]></string>
+    <string name="tastemaker_status"><![CDATA[Invite %1$d more friends and you\'ll get the <font color=\"#5097d4\">Trendsetter Badge</font> AND earn $12]]></string>
 </resources>

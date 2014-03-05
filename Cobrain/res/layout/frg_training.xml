@@ -32,11 +32,11 @@
         	        android:padding="8dp"
         	        android:gravity="center_vertical"
         	        android:layout_toLeftOf="@+id/training_skip_button"
-        	        android:background="#ddd"
+        	        android:background="@color/CraveBorderColor"
         	        android:maxLines="2"
         	        android:text="@string/blah"
         	        android:textColor="#000"
-        	        android:textSize="13.5sp" />
+        	        android:textSize="12sp" />
        
        </RelativeLayout>
     

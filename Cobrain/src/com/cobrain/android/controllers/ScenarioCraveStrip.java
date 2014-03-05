@@ -1,5 +1,6 @@
 package com.cobrain.android.controllers;
 
+
 import com.cobrain.android.adapters.CraveStripListAdapter;
 import com.cobrain.android.loaders.CraveStripLoader;
 import com.cobrain.android.loaders.OnLoadListener;
@@ -14,6 +15,14 @@ public class ScenarioCraveStrip extends CraveStrip<Scenario> {
 	public int scenarioId;
 
 	@Override
+	void onLoadHasStarted() {
+		if (loader.refresh) {
+			setCaption("Refreshing...");
+		}
+		else setCaption("Loading...");
+	}
+	
+	@Override
 	void onLoadWasCompleted(Scenario r) {
 		String whyText = null;
 
@@ -25,17 +34,15 @@ public class ScenarioCraveStrip extends CraveStrip<Scenario> {
 			type = STRIP_TYPE_CRAVES;
 		}
 		else {
-			type = STRIP_TYPE_CRAVES_NOT_AVAILABLE;
+			//type = STRIP_TYPE_CRAVES_NOT_AVAILABLE;
+			type = STRIP_TYPE_CRAVES;
 			if (r == null) {
 				whyText = "Was not able to find new Craves for you... please try refreshing your list.";
 			}
 			//whyText = "While your Cobrain finds new Craves for you, check out these popular items";
 		}
 		
-		if (whyText != null && !whyText.equals(caption)) {
-			caption = whyText;
-			allStripsAdapter.notifyDataSetChanged();
-		}
+		setCaption(whyText);
 
 		adapter.setCraveStrip(ScenarioCraveStrip.this);
 

@@ -21,16 +21,21 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:src="@drawable/ic_slide_left" />
+    <View
+        android:id="@+id/divider"
+        android:layout_width="1dp"
+        android:layout_toRightOf="@+id/item_image"
+        android:layout_height="match_parent"
+        android:background="#e5e5e5"
+        />
     
    <RelativeLayout
         android:id="@+id/crave_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_margin="10dp"
         android:layout_toLeftOf="@+id/slide_left_icon"
-        android:layout_toRightOf="@+id/item_image" >
+        android:layout_toRightOf="@+id/divider" >
 
         <TextView
             android:id="@+id/item_retailer"
@@ -58,7 +63,7 @@
             android:layout_alignParentBottom="true"
             android:text="$30.00"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
         
 

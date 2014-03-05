@@ -42,7 +42,8 @@ import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -52,7 +53,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class FriendsListFragment extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<Friendships> {
+public class FriendsListFragment extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<Friendships>, OnScrollListener {
 	public static final String TAG = FriendsListFragment.class.toString();
 	private SwipeListView friends;
 	private ListView feeds;
@@ -80,6 +81,9 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		verify.setOnClickListener(this);
 		adapter = new FriendsListAdapter(container.getContext(), R.id.friend_name, loader.getItems(), this);
 		friends.setAdapter(adapter);
+		
+		feeds.setOnScrollListener(this);
+		friends.setOnScrollListener(this);
 		
 		TextView tv = (TextView) v.findViewById(R.id.friends_list_empty);
 		tv.setText("Invite friends to see their Shared Craves and Rave about the ones you think are best for them. The more you interact with your friends, the smarter your Cobrain becomes!");
@@ -158,14 +162,15 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		update();
 		super.onActivityCreated(savedInstanceState);
 	}
 
 	public void update() {
-		verify.setVisibility((!controller.getCobrain().getUserInfo().areInvitesVerified()) ? View.VISIBLE : View.GONE);
-		loader.loadFriendList();
-		feedLoader.loadFeedList();
+		if (controller != null && controller.getCobrain().getUserInfo() != null) {
+			verify.setVisibility((!controller.getCobrain().getUserInfo().areInvitesVerified()) ? View.VISIBLE : View.GONE);
+			loader.loadFriendList();
+			feedLoader.loadFeedList();
+		}
 	}
 	
 	void setupMyFeedsList(final ListView menu) {
@@ -178,19 +183,23 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			public void onLoadStarted() {
 			}
 
+			int getFeedHeight(float items) {
+				final int itemHeight = feedLoader.itemHeight;
+				float height = (itemHeight * items) + (feeds.getDividerHeight() * (items - 1));
+				return (int) height;
+			}
+			
 			@Override
 			public void onLoadCompleted(Feeds r) {
-				int height = LayoutParams.WRAP_CONTENT; //getResources().getDimensionPixelSize(R.dimen.min_feed_list_height);
-		        if (r != null) {
-		        	if (r.getFeeds().size() > 2) {
-		        		View item = feedsAdapter.getView(0, null, menu);
-		        		if (item.getLayoutParams() == null) {
-		        			item.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		        		}
-		        		item.measure(0, 0);
-		        		height = (int) (2.25 * item.getMeasuredHeight());
-		        	}
-		        }
+				final float MIN_ITEMS = 3f;
+				final float ITEM_OVERFLOW = 0.25f;
+
+				float items = (r == null) ? 0 : r.getFeeds().size();
+				
+				if (items <= MIN_ITEMS) items = MIN_ITEMS;
+				else items = MIN_ITEMS + ITEM_OVERFLOW;
+
+				int height = getFeedHeight(items);
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) menu.getLayoutParams();
 				params.height = height;
 	            menu.setLayoutParams(params);
@@ -287,7 +296,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		int send = 0;
 		
 		if (contact.number != null) send = SEND_SMS;
-		else if (contact.email != null) send = SEND_EMAIL;
+		//else if (contact.email != null) send = SEND_EMAIL;
 
 		switch(send) {
 		case SEND_SMS:
@@ -323,42 +332,42 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			invite.setEnabled(false);
 
 			new WebRequest().get(bitly)
-					.setTimeout(3000)
-					.setOnResponseListener(new OnResponseListener() {
+				.setTimeout(3000)
+				.setOnResponseListener(new OnResponseListener() {
 
-						String cobrainUrl;
+					String cobrainUrl;
+					
+					@Override
+					public void onResponseInBackground(int responseCode, String response,
+							HashMap<String, String> headers) {
 						
-						@Override
-						public void onResponseInBackground(int responseCode, String response,
-								HashMap<String, String> headers) {
-							
-							if (responseCode == 200) {
-								String shortUrl = response;
-								//cobrainUrl = shortUrl.replace("http", "cobrain");
-								cobrainUrl = shortUrl.replace("http", "https");
-								cobrainUrl = cobrainUrl.replaceAll("[\\s\\n]", "");
-							}
-							else {
-								//controller.getCobrain().getUserInfo().reportError("We had a problem creating your text message. Please try again.");
-								cobrainUrl = link;
-							}
+						if (responseCode == 200) {
+							String shortUrl = response;
+							//cobrainUrl = shortUrl.replace("http", "cobrain");
+							cobrainUrl = shortUrl.replace("http", "https");
+							cobrainUrl = cobrainUrl.replaceAll("[\\s\\n]", "");
 						}
-						
-						@Override
-						public void onResponse(int responseCode, String response,
-								HashMap<String, String> headers) {
+						else {
+							//controller.getCobrain().getUserInfo().reportError("We had a problem creating your text message. Please try again.");
+							cobrainUrl = link;
+						}
+						cobrainUrl = link;
+					}
+					
+					@Override
+					public void onResponse(int responseCode, String response,
+							HashMap<String, String> headers) {
 
-							//loaderUtils.dismiss();
-							invite.setPressed(false);
-							invite.setEnabled(true);
-							
-							if (cobrainUrl != null) {
-								String subject = getString(R.string.invite_sms_subject);
-								String message = getString(R.string.invite_sms_body, controller.getCobrain().getUserInfo().getName(), cobrainUrl);
-								startSMSIntent(contact.number, subject, message);
-							}
+						//loaderUtils.dismiss();
+						invite.setPressed(false);
+						invite.setEnabled(true);
+						
+						if (cobrainUrl != null) {
+							sendSMSInvite(contact, cobrainUrl);
 						}
-					}).go(true);
+					}
+				}).go(true);
+
 			break;
 
 		case SEND_EMAIL:
@@ -377,11 +386,17 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			break;
 			
 		default:
-			reportErrorNonSilently("The contact you selected from your contact list doesn't appear to have a mobile phone number or email.\n" +
-				"Please update your contact's information with either then try inviting them again.");
+			reportErrorNonSilently("The contact you selected from your contact list doesn't appear to have a mobile phone number.\n" +
+				"Please update your contact's information then try inviting them again.");
 		}
 	}
 
+	void sendSMSInvite(ContactInfo contact, String url) {
+		String subject = getString(R.string.invite_sms_subject);
+		String message = getString(R.string.invite_sms_body, url);
+		startSMSIntent(contact.number, subject, message);
+	}
+	
 	public byte[] getHash(String password) {
 		MessageDigest digest = null;
 		try {
@@ -472,6 +487,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 
+		final boolean debug = false;
+		
 		if (((ListView)parent) == friends) {
 			Friendship friend = adapter.getItem(position);
 	
@@ -480,7 +497,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 				return;
 			}
 			
-			if (friend.isAccepted()) {
+			if (!debug && friend.isAccepted()) {
 				showWishList(friend.getUser(), null, false);
 				controller.setMenuItemSelected((ListView)parent, position, true);
 			}
@@ -504,7 +521,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	}
 	
 	private void showFriendAccept(final Friendship friend) {
-		FriendAcceptDialog dialog = new FriendAcceptDialog(friend.getUser().getName(), new OnClickListener() {
+		FriendAcceptDialog dialog = new FriendAcceptDialog(friend.getUser(), new OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -589,10 +606,20 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	
 	Runnable updater = new Runnable() {
 		public void run() {
-			setSilentMode( timer.getRunCount(this) > 1 );
+			//setSilentMode( timer.getRunCount(this) > 1 );
 			update();
 		}
 	};
+
+	@Override
+	public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView arg0, int arg1) {
+		feedLoader.pauseLoad(arg1 != SCROLL_STATE_IDLE);
+		loader.pauseLoad(arg1 != SCROLL_STATE_IDLE);
+	}
 	
 	
 }

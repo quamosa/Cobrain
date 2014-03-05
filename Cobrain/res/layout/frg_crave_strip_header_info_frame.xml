@@ -19,6 +19,7 @@
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:paddingLeft="5dp"
                   android:src="@drawable/ic_home_rack_cobrain_logo"
                   />
 
@@ -29,6 +30,8 @@
                 android:gravity="center"
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
+			    android:textSize="13sp"
+			    android:textColor="#000"
               	android:text="While your Cobrain finds new Craves for you, check out these popular items."
                   />
 

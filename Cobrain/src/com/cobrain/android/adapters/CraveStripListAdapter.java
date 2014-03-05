@@ -1,10 +1,10 @@
 package com.cobrain.android.adapters;
 
-import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.cobrain.android.R;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.fragments.CraveStripsFragment;
-import com.cobrain.android.loaders.FontLoader;
 import com.cobrain.android.utils.LoaderUtils;
 
 public class CraveStripListAdapter<T> extends ArrayAdapter<CraveStrip<T>> implements DialogInterface.OnClickListener {
@@ -36,7 +35,7 @@ public class CraveStripListAdapter<T> extends ArrayAdapter<CraveStrip<T>> implem
 	}
 
 	private class ViewHolder implements OnClickListener {
-		int position;
+		int position = -1;
 		RelativeLayout layout;
 		TextView caption;
 		
@@ -45,22 +44,32 @@ public class CraveStripListAdapter<T> extends ArrayAdapter<CraveStrip<T>> implem
 		}
 	}
 
+	@Override
+	public void clear() {
+		views.clear();
+		super.clear();
+	}
+
 	LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+	SparseArray<View> views = new SparseArray<View>();
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
 		ViewHolder vh;
 
+		v = views.get(position);
+		
 		if (v == null) {
 			v = View.inflate(parent.getContext(), R.layout.list_item_crave_strip, null);
 
 			vh = new ViewHolder();
 			vh.caption = (TextView) v.findViewById(R.id.caption);
 			vh.layout = (RelativeLayout) v.findViewById(R.id.layout);
-			vh.caption.setTypeface(FontLoader.load(getContext(), "Doppio One.ttf"));
 
 			v.setTag(vh);
+			
+			views.put(position, v);
 		}
 		else vh = (ViewHolder) v.getTag();
 		
@@ -72,9 +81,12 @@ public class CraveStripListAdapter<T> extends ArrayAdapter<CraveStrip<T>> implem
 		}
 		else vh.caption.setVisibility(View.GONE);
 		
-		removeAllViews(vh.layout);
-		addView(vh.layout, strip.container, lp);
-
+		if (vh.position != position) {
+			removeAllViews(vh.layout);
+			addView(vh.layout, strip.container, lp);
+			vh.position = position;
+		}
+		
 		return v;
 	}
 

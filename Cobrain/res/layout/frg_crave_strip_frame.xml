@@ -4,23 +4,23 @@
     android:layout_height="match_parent" 
     android:padding="3dp"
      >
-
     <View
         android:id="@+id/progress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignBottom="@+id/border_for_image"
+        android:layout_alignBottom="@+id/item_image"
         android:layout_centerHorizontal="true"
         android:background="@color/CraveBorderColor" />
 
+    	
   	    <ImageView
   	        android:id="@+id/item_image"
   	        android:layout_width="match_parent"
   	        android:layout_height="match_parent"
   	        android:layout_above="@+id/item_info"
   	        android:layout_alignParentLeft="true"
-  	        android:background="@color/White"
-  	        android:src="@drawable/ic_ab_cobrain_logo" />
+  	        android:background="#fff"
+  	        android:src="@drawable/ic_noimage" />
   	    
   	    <RelativeLayout
   	        android:id="@+id/item_info"
@@ -28,16 +28,18 @@
   	        android:layout_height="wrap_content"
   	        android:layout_alignParentBottom="true"
   	        android:padding="5dp"
-  	        android:background="@color/White" >
+  	         >
 
 	  	    <TextView 
 	  	        android:id="@+id/item_merchant"
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:lines="1"
-		        android:layout_marginBottom="2dp"
+		        android:layout_marginBottom="3dp"
 		        android:ellipsize="end"
 		        android:textColor="#000"
+		        android:textStyle="bold"
+		        android:textSize="11sp"
 		        android:text="@string/blah"
 	  	        />
 	  	    <TextView 
@@ -45,10 +47,11 @@
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:layout_below="@+id/item_merchant"
-		        android:layout_marginBottom="2dp"
-		        android:lines="1"
+		        android:layout_marginBottom="3dp"
+		        android:lines="2"
 		        android:ellipsize="end"
 		        android:textColor="#000"
+		        android:textSize="10sp"
 		        android:text="@string/blah"
 	  	        />
 	  	    <TextView 
@@ -81,8 +84,8 @@
           android:layout_height="wrap_content"
           android:layout_alignParentRight="true"
           android:layout_alignParentBottom="true"
-          android:paddingRight="5dp"
-          android:background="#6ea9db"
+          android:padding="5dp"
+          android:background="@color/Raved"
           android:visibility="visible" >
 
           <TextView
@@ -91,6 +94,7 @@
               android:layout_height="wrap_content"
               android:layout_centerVertical="true"
               android:drawableLeft="@drawable/ic_shared_craves_friend_rave"
+              android:drawablePadding="5dp"
               android:gravity="center_vertical"
               android:lines="1"
               android:textStyle="bold"
@@ -107,6 +111,23 @@
        android:background="@drawable/crave_border"
 	/>
 
+
+        <TextView
+        android:id="@+id/item_sale_pct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:minWidth="40dp"
+        android:padding="3dp"
+        android:gravity="center"
+        android:text="30%\nOFF"
+        android:textSize="13sp"
+        android:visibility="visible"
+        android:background="#eda43f"
+        android:textColor="@color/White"
+        android:textStyle="bold" />
+  	 	 
+  	 
   	     <Button
   	         android:id="@+id/item_button"
         android:layout_width="match_parent"

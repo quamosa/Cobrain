@@ -136,7 +136,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 	public void onError(final String message) {
 		//show dialog
 		loggingIn = false;
-		controller.showErrorDialog(message);
+		if (controller != null) controller.showErrorDialog(message);
 	}
 	
 	boolean validate(String email, String password) {

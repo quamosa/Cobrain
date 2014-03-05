@@ -6,7 +6,11 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.text.Html;
+import android.view.View;
+import android.widget.TextView;
 
+import com.cobrain.android.R;
 import com.cobrain.android.fragments.CraveFragment;
 import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.model.Sku;
@@ -102,7 +106,9 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		CraveFragment f = new CraveFragment(parentFragment);
 
 		f.setWishListItem(results, listItems, listItems.get(position), position + 1, listItems.size());
-		
+
+		if (parentFragment.cravePager.getCurrentItem() == position) updateTitle(position);
+
 		return f;
 	}
 
@@ -123,4 +129,24 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		return cnt;
 	}
 
+	public void updateTitle(int position) {
+		if (listItems != null) {
+			int totalCraves = listItems.size();
+			
+			String s;
+			
+			if (listItems.size() > position && count > position && listItems.get(position) != null) 
+				s = parentFragment.getString(R.string.rank_for_you,
+						position + 1, 
+						totalCraves
+						);
+			else
+				s = parentFragment.getString(R.string.rank_for_you_empty);
+
+			parentFragment.setSubTitle(Html.fromHtml(s));
+			//final TextView txt = parentFragment.getCobrainController().getSubTitleView();
+			//txt.setVisibility(View.VISIBLE);
+			//txt.setText(Html.fromHtml(s));
+		}
+	}
 }

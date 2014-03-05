@@ -19,6 +19,7 @@ public class FriendsListLoader {
 	private AsyncTask<Void, Void, Friendships> currentRequest;
 	private OnLoadListener<Friendships> onLoadListener;
 	private Friendships friends;
+	private boolean pause;
 
 	public void initialize(CobrainController controller,
 			FriendsListAdapter adapter) {
@@ -38,6 +39,7 @@ public class FriendsListLoader {
 	}
 
 	public void loadFriendList() {
+		if (pause) return;
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 
 		currentRequest = new AsyncTask<Void, Void, Friendships>() {
@@ -58,7 +60,7 @@ public class FriendsListLoader {
 
 			@Override
 			protected void onPostExecute(Friendships result) {
-				if (!isCancelled()) {
+				if (!isCancelled() && !pause) {
 					if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 					if (result != null) {
 						adapter.clear();
@@ -80,5 +82,10 @@ public class FriendsListLoader {
 	
 	public void setOnLoadListener(OnLoadListener<Friendships> listener) {
 		onLoadListener = listener;
+	}
+
+	public void pauseLoad(boolean pause) {
+		this.pause = pause;
+		if (pause) cancel();
 	}
 }

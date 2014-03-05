@@ -6,9 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,6 +19,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.telephony.SmsManager;
@@ -44,6 +42,41 @@ public class HelperUtils {
 			SmsManager sms = SmsManager.getDefault();
 			sms.sendTextMessage(toPhoneNumber, null, message, null, null);
 		}		
+	}
+	
+	public static class Streams {
+		public static String ToString(InputStream is) {
+		    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		    StringBuilder sb = new StringBuilder();
+
+		    String line = null;
+		    try {
+		        while ((line = reader.readLine()) != null) {
+		            sb.append(line + "\n");
+		        }
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    } finally {
+		        try {
+		            is.close();
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }
+		    }
+		    return sb.toString();
+		}		
+	}
+	
+	public static class Tasks {
+		public static boolean asyncTaskCancel(AsyncTask<?, ?, ?> task, boolean cancelTask) {
+			if (cancelTask) {
+				if (!task.isCancelled()) {
+					task.cancel(true);
+				}
+				return true;
+			}
+			return false;
+		}
 	}
 	
 	public static class Graphics {

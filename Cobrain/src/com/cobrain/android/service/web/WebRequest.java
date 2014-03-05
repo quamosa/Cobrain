@@ -333,7 +333,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 			}
 		}
 
-        h.add(new BasicHeader("x-cobrain-client", "android " + Build.VERSION.RELEASE + " (phone)"));
+        h.add(new BasicHeader("x-cobrain-client", "android, " + Build.VERSION.RELEASE + ", phone"));
 
 		return h.toArray(new Header[h.size()]);
 	}

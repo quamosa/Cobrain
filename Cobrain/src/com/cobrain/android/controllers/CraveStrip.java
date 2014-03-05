@@ -4,6 +4,7 @@ import java.util.List;
 
 import it.sephiroth.android.library.widget.HListView;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.widget.Adapter;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
@@ -30,21 +31,29 @@ public class CraveStrip<T> {
 	public Adapter listAdapter;
 	public int type;
 
+	public interface OnRefreshCompletedListener {
+		public void onRefreshCompleted();
+	}
+	
+	OnRefreshCompletedListener refreshListener;
 	OnLoadListener<T> listener;
 	OnLoadListener<T> _listener = new OnLoadListener<T>() {
 
 		@Override
 		public void onLoadStarted() {
+			onLoadHasStarted();
 			listener.onLoadStarted();
 		}
 		
 		@Override
 		public void onLoadCompleted(T r) {
+			if (refreshListener != null) refreshListener.onRefreshCompleted();
 			listener.onLoadCompleted(r);
 			onLoadWasCompleted(r);
 		}
 	};
 
+	void onLoadHasStarted() {}
 	void onLoadWasCompleted(T r) {}
 	
 	public CraveStrip(CraveStripListAdapter<T> allStripsAdapter, OnLoadListener<T> listener) {
@@ -53,6 +62,8 @@ public class CraveStrip<T> {
 	}
 	
 	public void dispose() {
+		refreshListener = null;
+		
 		list.setTag(null);
 		list.setAdapter(null);
 		
@@ -90,6 +101,10 @@ public class CraveStrip<T> {
 	}
 
 	public void refresh() {
+		refresh(null);
+	}
+	public void refresh(OnRefreshCompletedListener listener) {
+		refreshListener = listener;
 		loader.clearPages();
 		loader.refresh = true;
 		loader.loadPage(1);
@@ -97,6 +112,12 @@ public class CraveStrip<T> {
 
 	public List<Sku> getSkus() {
 		return adapter.getRecommendations();
+	}
+	public void setCaption(String text) {
+		if (!TextUtils.equals(caption, text)) {
+			caption = text;
+			allStripsAdapter.notifyDataSetChanged();
+		}
 	}
 
 }

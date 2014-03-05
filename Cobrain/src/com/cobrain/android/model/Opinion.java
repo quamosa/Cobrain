@@ -12,11 +12,19 @@ public class Opinion {
 		return _id;
 	}
 
+	public String updatedAt() {
+		return updated_at;
+	}
+	
 	public boolean is(String signal) {
 		return this.signal != null && this.signal.equals(signal);
 	}
 
 	public void setSignal(String signal) {
 		this.signal = signal;
+	}
+
+	public String getSignal() {
+		return signal;
 	}
 }

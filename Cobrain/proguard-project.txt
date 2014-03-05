@@ -12,6 +12,17 @@
 
 # Add any project specific keep options here:
 
+-renamesourcefileattribute SourceFile    
+-keepattributes SourceFile,LineNumberTable
+-keep class com.actionbarsherlock.** { *; }
+-keep interface com.actionbarsherlock.** { *; }
+-keep class com.cobrain.android.** { *; }
+-keep class * { *; }
+-keep class **.R$* { *; }
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:

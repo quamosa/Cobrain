@@ -4,15 +4,19 @@ import com.cobrain.android.R;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.controllers.Cobrain.CobrainView;
 
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 public class AccountSaveFragment extends BaseCobrainFragment implements OnClickListener, CobrainView {
 
@@ -21,7 +25,7 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 	private Button verifyInviteButton;
 	private EditText name;
 	private EditText zipcode;
-	private RadioGroup gender;
+	private Spinner gender;
 	private boolean loggingIn;
 	private boolean doInviteValidation;
 
@@ -40,7 +44,10 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 		verifyInviteButton = (Button) v.findViewById(R.id.verify_invite_button);
 		name = (EditText) v.findViewById(R.id.name);
 		zipcode = (EditText) v.findViewById(R.id.zipcode);
-		gender = (RadioGroup) v.findViewById(R.id.gender);
+		gender = (Spinner) v.findViewById(R.id.gender);
+		
+		TextView tv = (TextView) v.findViewById(R.id.zipcode_label);
+		tv.setText(Html.fromHtml(getString(R.string.profile_zipcode_label)));
 		
 		saveButton.setOnClickListener(this);
 		verifyInviteButton.setOnClickListener(this);
@@ -55,6 +62,8 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 
 	@Override
 	public void onDestroyView() {
+		controller.hideSoftKeyBoard();
+
 		saveButton.setOnClickListener(null);
 		saveButton = null;
 		gender = null;
@@ -64,6 +73,16 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 		//restoreActionBar();
 
 		super.onDestroyView();
+	}
+
+	String getGenderFromSpinner(Spinner spinner) {
+		Resources res = getResources();
+		final TypedArray selectedValues = res
+		        .obtainTypedArray(R.array.profile_gender_values);
+		int i = spinner.getSelectedItemPosition();
+		if (i >= 0)
+			return selectedValues.getString(i);
+		return null;
 	}
 
 	@Override
@@ -78,16 +97,9 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 			if (!loggingIn) {
 				loggingIn = true;
 
-				final String gender;
+				final String gender = getGenderFromSpinner(this.gender);
 				final String name = this.name.getText().toString();
 				final String zipcode = this.zipcode.getText().toString();
-				int genderId = this.gender.getCheckedRadioButtonId();
-
-				switch (genderId) {
-				case R.id.male: gender = "MALE"; break;
-				case R.id.female: gender = "FEMALE"; break;
-				default: gender = "BOTH";
-				}
 
 				if (validate(name, zipcode, gender)) {
 					controller.showProgressDialog("Please wait ...", "Saving your profile ...");

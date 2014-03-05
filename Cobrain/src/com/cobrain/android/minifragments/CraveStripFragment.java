@@ -41,6 +41,7 @@ import android.widget.TextView;
 
 public class CraveStripFragment<T> extends MiniFragment implements OnClickListener, OnTouchListener {
 
+	protected static final boolean debug = false;
 	private Sku recommendation;
 	TextView itemRetailer;
 	TextView itemDescription;
@@ -84,6 +85,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 	private TextView raveCount;
 	private View ravesLayout;
 	private View selector;
+	public boolean flinging = true;
 
 	public CraveStripFragment() {
 	}
@@ -123,15 +125,10 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 
 		itemPrice.setPaintFlags(itemPrice.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
 		itemSalePrice.setPaintFlags(itemSalePrice.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
+		itemSalePercent = (TextView) v.findViewById(R.id.item_sale_pct);
 
 		selector = v.findViewById(R.id.item_button);
 		selector.setOnClickListener(this);
-		
-		applyWebFont(itemRetailer);
-		applyWebFont(itemDescription);
-		applyWebFont(itemPrice);
-		applyWebFont(itemSalePrice);
-		applyWebFont(raveCount);
 		
 		//i want my stripe crave to be a fourth of the screen size;
 		DisplayMetrics metrics = inflater.getContext().getResources().getDisplayMetrics();
@@ -225,6 +222,8 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 			if (raves > 0) {
 				raveCount.setText(String.valueOf(raves));
 				ravesLayout.setVisibility(View.VISIBLE);
+				int colorId = recommendation.wasRavedBy(parent.controller.getCobrain().getUserInfo()) ? R.color.Raved : R.color.Unraved;
+				ravesLayout.setBackgroundColor( getActivity().getResources().getColor(colorId) );
 			}
 			else ravesLayout.setVisibility(View.GONE);
 
@@ -233,20 +232,38 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 				itemSalePrice.setVisibility(View.VISIBLE);
 				itemSalePrice.setTextColor(0xfff4a427);
 				itemSalePrice.setText(recommendation.getSalePriceFormatted());
+				float pct = 1-((float)recommendation.getSalePrice() / recommendation.getPrice());
+				itemSalePercent.setText((int)(pct * 100) + "%\nOFF");
+				itemSalePercent.setVisibility(View.VISIBLE);
 			}
 			else {
 				itemPrice.setPaintFlags(itemPrice.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
 				itemSalePrice.setVisibility(View.INVISIBLE);
+				itemSalePercent.setVisibility(View.GONE);
 			}
+						
 			//updateSaveAndShareState(false);
 
 			showProgress(true, false);
 			
 			if (recommendation.getImageURL() != null) {
-				ImageLoader.load(recommendation.getImageURL(), itemImage, width, height, new OnImageLoadListener() {
+				ImageLoader.get.load(recommendation.getImageURL(), itemImage, width, height, new OnImageLoadListener() {
 					@Override
-					public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
-						showProgress(false, !fromCache);
+					public void onLoad(String url, ImageView view, Bitmap b, int fromCache) {
+						showProgress(false, fromCache == ImageLoader.CACHE_NONE && !flinging);
+						if (debug) {
+							switch(fromCache) {
+							case ImageLoader.CACHE_NONE:
+								selector.setBackgroundColor(0x77ff0000);
+								break;
+							case ImageLoader.CACHE_MEMORY:
+								selector.setBackgroundColor(0x7700ff00);
+								break;
+							case ImageLoader.CACHE_DISK:
+								selector.setBackgroundColor(0x770000ff);
+								break;
+							}
+						}
 					}
 		
 					@Override
@@ -341,7 +358,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 		itemSalePrice = null;
 		raveCount = null;
 		
-		ImageLoader.cancel(itemImage);
+		ImageLoader.get.cancel(itemImage);
 		itemRetailer = null;
 		itemDescription = null;
 		itemPrice = null;

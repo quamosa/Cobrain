@@ -8,6 +8,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,7 +18,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class ProfileFragment extends BaseCobrainFragment implements OnClickListener, CobrainView {
@@ -25,7 +27,7 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 	private Button saveButton;
 	private EditText name;
 	private EditText zipcode;
-	private RadioGroup gender;
+	private Spinner gender;
 	private boolean loggingIn;
 	private boolean doInviteValidation;
 
@@ -37,7 +39,7 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 		saveButton = (Button) v.findViewById(R.id.save_account_button);
 		name = (EditText) v.findViewById(R.id.name);
 		zipcode = (EditText) v.findViewById(R.id.zipcode);
-		gender = (RadioGroup) v.findViewById(R.id.gender);
+		gender = (Spinner) v.findViewById(R.id.gender);
 
 		saveButton.setOnClickListener(this);
 
@@ -46,7 +48,6 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		update();
 		//controller.showOptionsMenu(false);
 		//actionBar.setCustomView(R.layout.actionbar_login_save_account_frame);
 
@@ -60,14 +61,10 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 		name.setText(ui.getName());
 		zipcode.setText(ui.getZipcode());
 		String gen = ui.getGenderPreference();
+
+		int i = getIndexOfGender(gen);
+		if (i != -1) gender.setSelection(i);
 		
-		if (gen.equals("MALE")) {
-			gender.check(R.id.male);
-		}
-		else if (gen.equals("FEMALE")) {
-			gender.check(R.id.female);
-		}
-		else gender.clearCheck();
 	}
 	
 	@Override
@@ -102,16 +99,9 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 			builder.setPositiveButton("Save", new Dialog.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					final String gender;
 					final String name = ProfileFragment.this.name.getText().toString();
 					final String zipcode = ProfileFragment.this.zipcode.getText().toString();
-					int genderId = ProfileFragment.this.gender.getCheckedRadioButtonId();
-
-					switch (genderId) {
-					case R.id.male: gender = "MALE"; break;
-					case R.id.female: gender = "FEMALE"; break;
-					default: gender = "BOTH";
-					}
+					final String gender = getGenderFromSpinner(ProfileFragment.this.gender);
 
 					if (validate(name, zipcode, gender)) {
 						controller.showProgressDialog("Please wait ...", "Saving your profile ...");
@@ -135,6 +125,8 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 							protected void onPostExecute(Boolean result) {
 								controller.dismissDialog();
 								if (result) {
+									NavigationMenuFragment f = (NavigationMenuFragment) getActivity().getSupportFragmentManager().findFragmentByTag(NavigationMenuFragment.TAG);
+									if (f != null) f.update();
 									controller.showDialog("Your profile was saved.");
 								}
 								else onError("We had a problem updating your profile. Please try again later.");
@@ -188,6 +180,26 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 		return true;
 	}
 
+	String getGenderFromSpinner(Spinner spinner) {
+		Resources res = getResources();
+		final TypedArray selectedValues = res
+		        .obtainTypedArray(R.array.profile_gender_values);
+		int i = spinner.getSelectedItemPosition();
+		if (i >= 0)
+			return selectedValues.getString(i);
+		return null;
+	}
+	int getIndexOfGender(String gender) {
+		Resources res = getResources();
+		final TypedArray selectedValues = res
+		        .obtainTypedArray(R.array.profile_gender_values);
+		for (int i = 0; i < selectedValues.length(); i++) {
+			if (selectedValues.getString(i).equals(gender))
+				return i;
+		}
+		return -1;
+	}
+	
 	public void setSubTitle(CharSequence title) {
 	}
 

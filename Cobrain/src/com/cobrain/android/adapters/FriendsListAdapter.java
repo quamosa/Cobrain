@@ -2,9 +2,11 @@ package com.cobrain.android.adapters;
 
 import java.util.List;
 import com.cobrain.android.R;
+import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
+import com.cobrain.android.model.Badge;
 import com.cobrain.android.model.Friendship;
 import com.cobrain.android.utils.LoaderUtils;
 import com.cobrain.anroid.dialogs.FriendDeleteDialog;
@@ -27,10 +29,14 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 	FriendsListFragment parent;
 	List<Friendship> items;
 	FriendDeleteDialog dialog;
+
+	//4 bytes per pixel * 60 pixels * 60 pixels tall
+	public ImageLoader avatarLoader;
 	
 	boolean editMode;
 
 	ColorDrawable color = new ColorDrawable();
+	private int avatarSize;
 
 	/*public FriendsListAdapter(Context context, int resource, TuneMenuFragment parent) {
 		super(context, resource);
@@ -43,12 +49,14 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 		this.items = items;
 		setParent(parent);
 		color.setColor(context.getResources().getColor(R.color.FeedsColor));
+		avatarSize = (int) context.getResources().getDimension(R.dimen.avatar_friends_size);
+		avatarLoader = new ImageLoader("friend", (4*avatarSize*avatarSize) * 50);
 	}
 
 	public boolean inEditMode() {
 		return editMode;
 	}
-	
+
 	/**
 	for now it only works if the row is visible
 	 */
@@ -87,6 +95,9 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 		TextView updates;
 		public View updatesLayout;
 		public ImageView avatar;
+		public ImageView badge;
+		int paddingTop;
+		int paddingBottom;
 
 		@Override
 		public void onClick(View v) {
@@ -104,12 +115,15 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 
 			vh = new ViewHolder();
 			vh.avatar = (ImageView) v.findViewById(R.id.friend_avatar);
+			vh.badge = (ImageView) v.findViewById(R.id.friend_badge);
 			vh.friend = (TextView) v.findViewById(R.id.friend_name);
 			vh.delete = (ImageView) v.findViewById(R.id.friend_delete);
 			vh.delete.setOnClickListener(vh);
 			vh.updates = (TextView) v.findViewById(R.id.friend_updates);
 			vh.updatesLayout = (View) vh.updates.getParent();
-
+			vh.paddingTop = v.getPaddingTop();
+			vh.paddingBottom = v.getPaddingBottom();
+			
 			v.setTag(vh);
 		}
 		else vh = (ViewHolder) v.getTag();
@@ -118,8 +132,24 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 		int updates = 0 ;//list.getUpdates();
 
 		vh.avatar.setImageDrawable(color);
-		ImageLoader.load(friend.getUser().getAvatarUrl(), vh.avatar, listener);
+		avatarLoader.load(friend.getUser().getAvatarUrl(), vh.avatar, avatarSize, avatarSize, listener);
 
+		if (friend.getUser().hasBadge(Badge.TASTEMAKER)) {
+			v.setPadding(0, 0, 0, 2);
+			vh.badge.setImageResource(R.drawable.ic_badge_tastemaker);
+			vh.badge.setVisibility(View.VISIBLE);
+		}
+		else
+			if (friend.getUser().hasBadge(Badge.TRENDSETTER)) {
+				v.setPadding(0, 0, 0, 2);
+				vh.badge.setImageResource(R.drawable.ic_badge_trendsetter);
+				vh.badge.setVisibility(View.VISIBLE);
+			}
+			else {
+				v.setPadding(0, vh.paddingTop, 0, vh.paddingBottom);
+				vh.badge.setVisibility(View.GONE);
+			}
+		
 		vh.friend.setTypeface(null, (!friend.isAccepted()) ? Typeface.ITALIC : Typeface.NORMAL);
 		vh.friend.setText(friend.getUser().getName());
 		vh.position = position;
@@ -139,8 +169,8 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 
 		@Override
 		public void onLoad(String url, ImageView view, Bitmap b,
-				boolean fromCache) {
-			LoaderUtils.show(view, !fromCache);
+				int fromCache) {
+			LoaderUtils.show(view, fromCache == ImageLoader.CACHE_NONE);
 		}
 		
 	};

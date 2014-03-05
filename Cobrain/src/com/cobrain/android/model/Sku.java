@@ -39,5 +39,12 @@ public class Sku extends Product {
 	public List<Rave> getRaves() {
 		return raves;
 	}
+	public boolean wasRavedBy(User user) {
+		if (raves != null)
+			for (Rave r : raves)
+				if (r.getUser().getId().equals(user.getId()))
+					return true;
+		return false;
+	}
 	
 }

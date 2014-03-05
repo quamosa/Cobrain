@@ -7,6 +7,7 @@ import com.cobrain.android.views.StateFullView;
 import com.cobrain.android.views.StateFullView.OnStateChangedListener;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -67,13 +68,13 @@ public class NavigationMenuAdapter extends ArrayAdapter<NavigationMenuItem> {
 		
 		@Override
 		public void onStateChanged(View v, int state, boolean enabled) {
-			/*if (state == StateFullView.STATE_PRESSED) {
+			if (state == StateFullView.STATE_PRESSED || state == StateFullView.STATE_CHECKED) {
 				ImageView iv = (ImageView) v.findViewById(R.id.navigation_menu_icon);
 	            if (enabled) 
-	            	iv.setColorFilter(0xff000000, PorterDuff.Mode.MULTIPLY); //your color here
+	            	iv.setColorFilter(0xffffffff, PorterDuff.Mode.SRC_IN); //your color here
 	            else
 		            iv.setColorFilter(null);
-			}*/
+			}
 		}
 	};
 
@@ -86,7 +87,7 @@ public class NavigationMenuAdapter extends ArrayAdapter<NavigationMenuItem> {
 		if (v == null) {
 			v = (StateFullView) View.inflate(getContext(), layoutId, null);
 			v.setOnTouchListener(listener);
-			//v.setOnStateChangeListener(statelistener);
+			v.setOnStateChangeListener(statelistener);
 			//v.setBackground(getContext().getResources().getDrawable(R.drawable.navigation_menu_selector));
 		}
 		

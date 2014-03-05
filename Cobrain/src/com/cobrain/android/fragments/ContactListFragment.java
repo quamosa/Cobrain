@@ -4,11 +4,9 @@ import com.cobrain.android.loaders.ContactLoader.ContactInfo;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 
 public class ContactListFragment extends BaseCobrainFragment {
 	public static final String TAG = "ContactListFragment";

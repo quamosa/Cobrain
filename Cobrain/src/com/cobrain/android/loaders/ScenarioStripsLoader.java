@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import it.sephiroth.android.library.widget.AbsHListView;
 import it.sephiroth.android.library.widget.HListView;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
@@ -23,6 +22,7 @@ import com.cobrain.android.adapters.ScenarioStripPagerListAdapter;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.controllers.ScenarioCraveStrip;
 import com.cobrain.android.fragments.CraveStripsFragment;
+import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.ScenarioItem;
 import com.cobrain.android.model.Scenarios;
 import com.cobrain.android.model.UserInfo;
@@ -32,11 +32,11 @@ public class ScenarioStripsLoader {
 	CraveStripsFragment parent;
 	ListView craveStripList;
 	CraveStripListAdapter craveStripListAdapter;
-	public ArrayList<CraveStrip> craveStrips = new ArrayList<CraveStrip>();
+	public ArrayList<CraveStrip<Scenario>> craveStrips = new ArrayList<CraveStrip<Scenario>>();
 	private AsyncTask<Void, Void, List<ScenarioItem>> currentRequest;
 	private boolean onSale;
 	
-	public void initialize(CraveStripsFragment parent, ListView list, boolean onSale) {
+	public void initialize(CraveStripsFragment<?> parent, ListView list, boolean onSale) {
 		this.parent = parent;
 		craveStripList = list;
 		this.onSale = onSale;
@@ -49,7 +49,7 @@ public class ScenarioStripsLoader {
 			currentRequest = null;
 		}
 		
-		for (CraveStrip strip : craveStrips) {
+		for (CraveStrip<Scenario> strip : craveStrips) {
 			strip.dispose();
 		}
 		craveStrips.clear();
@@ -76,6 +76,10 @@ public class ScenarioStripsLoader {
 	}
 
 	void loadScenarios() {
+		craveStripList.setAdapter(null);
+
+		parent.loaderUtils.showLoading("Loading...");
+		
 		currentRequest = new AsyncTask<Void, Void, List<ScenarioItem>>() {
 
 			@Override
@@ -109,6 +113,7 @@ public class ScenarioStripsLoader {
 			@Override
 			protected void onPostExecute(List<ScenarioItem> result) {
 				loadStrips();
+				parent.loaderUtils.dismissLoading();
 			}
 			
 		}.execute();
@@ -119,21 +124,25 @@ public class ScenarioStripsLoader {
 	}
 
 	void loadStrips() {
-		for (CraveStrip strip : craveStrips) {
+		for (CraveStrip<Scenario> strip : craveStrips) {
 			strip.load();
 		}
 		craveStripList.setAdapter(craveStripListAdapter);
 	}
 
-	public void addHeaderStrip() {
-		ScenarioCraveStrip strip = new ScenarioCraveStrip(craveStripListAdapter, parent);
-		strip.type = ScenarioCraveStrip.STRIP_TYPE_HEADER;
+	public void clear() {
+		craveStrips.clear();
+	}
+	
+	public void addHeaderStrip() {	
+		CraveStrip<Scenario> strip = new ScenarioCraveStrip(craveStripListAdapter, parent);
+		strip.type = CraveStrip.STRIP_TYPE_HEADER;
 		strip.list = new HListView(parent.getActivity().getApplicationContext());
 		strip.list.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		strip.list.setDivider(null);
 		strip.list.setTag(strip);
 		strip.list.setSelector(R.drawable.sel_transparent);
-		strip.listAdapter = new ArrayAdapter(parent.getActivity().getApplicationContext(), 0) {
+		strip.listAdapter = new ArrayAdapter<Object>(parent.getActivity().getApplicationContext(), 0) {
 
 			@Override
 			public int getCount() {

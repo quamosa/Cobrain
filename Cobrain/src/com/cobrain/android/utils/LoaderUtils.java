@@ -23,8 +23,8 @@ public class LoaderUtils {
 
 	public void initialize(ViewGroup v) {
 		LayoutInflater inflater = (LayoutInflater) v.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View lv = inflater.inflate(R.layout.loading_frame, null);
-		View ev = inflater.inflate(R.layout.empty_frame, null); 
+		View lv = inflater.inflate(R.layout.pop_loading, null);
+		View ev = inflater.inflate(R.layout.pop_empty, null); 
 
 		lv.setVisibility(View.GONE);
 		ev.setVisibility(View.GONE);
@@ -57,6 +57,13 @@ public class LoaderUtils {
 		});
 	}
 
+/*	public void showEmpty(CharSequence message, View bindToView) {
+		int[] pos = new int[2];
+		bindToView.getLocationInWindow(pos);
+		emptyFrame.layout(pos[0], pos[1], pos[0] + bindToView.getWidth(), pos[1] + bindToView.getHeight());
+		showEmpty(message);
+	}*/
+	
 	public void showEmpty(CharSequence message) {
 		empty++;
 		dismissLoading();

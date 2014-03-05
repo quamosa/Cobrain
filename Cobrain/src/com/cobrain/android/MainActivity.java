@@ -1,5 +1,6 @@
 package com.cobrain.android;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -10,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Gravity;
@@ -27,6 +29,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.controllers.Cobrain.CobrainMenuView;
 import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.controllers.Cobrain.OnLoggedInListener;
 import com.cobrain.android.fragments.AccountSaveFragment;
@@ -38,6 +41,7 @@ import com.cobrain.android.fragments.CravesFragment;
 import com.cobrain.android.fragments.FriendCraveStripsFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.fragments.HomeFragment;
+import com.cobrain.android.fragments.LoadingFragment;
 import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
 import com.cobrain.android.fragments.NavigationMenuFragment;
@@ -49,6 +53,7 @@ import com.cobrain.android.fragments.SignupFragment;
 import com.cobrain.android.fragments.TrainingFragment;
 import com.cobrain.android.fragments.WishListFragment;
 import com.cobrain.android.loaders.IntentLoader;
+import com.cobrain.android.loaders.PlayServicesLoader;
 import com.cobrain.android.loaders.TasteMakerLoader;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
@@ -66,6 +71,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController, OnOpenedListener, OnClosedListener, View.OnClickListener {
 
     static final String TAG = MainActivity.class.toString();
+	public static final String ACTION_SIGNUP = "com.cobrain.android.signup";
 	Cobrain cobrain;
 	CobrainView cobrainView, cobrainMainView, cobrainMenuView;
 	Runnable showView;
@@ -82,11 +88,86 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	private TextView actionBarSubTitle;
 	private View actionBarView;
 	private View actionBarMenuOpenerView;
+	PlayServicesLoader playServicesLoader = new PlayServicesLoader();
 
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Analytics.start(this);
+        
+        cobrain = new Cobrain(getApplicationContext());
+		cobrain.setOnLoggedInListener(this);
+
+		intentLoader.initialize(this);
+		
+		showDefaultActionBar();
+		
+		/*ActionBar ab = controller.getSupportActionBar();
+		ab.setCustomView(R.layout.actionbar_training_frame);
+		ImageButton ib = (ImageButton) controller.getSupportActionBar().getCustomView().findViewById(R.id.navigation_button);
+		ib.setOnClickListener(this);
+		skip = (Button) controller.getSupportActionBar().getCustomView().findViewById(R.id.training_skip_button);
+		skip.setOnClickListener(this);
+
+		ActionBar ab = controller.getSupportActionBar();
+		ab.setCustomView(R.layout.actionbar_crave_frame);
+		ImageButton ib = (ImageButton) controller.getSupportActionBar().getCustomView().findViewById(R.id.navigation_button);
+		ib.setOnClickListener(this);
+		ib = (ImageButton) ab.getCustomView().findViewById(R.id.filter_button);
+		ib.setOnClickListener(this);
+		*/
+		
+		getSlidingMenu().setMode(SlidingMenu.LEFT_RIGHT);
+		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+
+		// set the Behind View
+		setContentView(R.layout.content_frame);
+		setBehindContentView(R.layout.menu_frame);
+		getSlidingMenu().setSecondaryMenu(R.layout.menu_frame_two);
+		getSlidingMenu().setSecondaryShadowDrawable(R.drawable.shadowright);
+
+		// customize the SlidingMenu
+		SlidingMenu sm = getSlidingMenu();
+		sm.setShadowWidthRes(R.dimen.menu_shadow_width);
+		sm.setShadowDrawable(R.drawable.shadow);
+		sm.setBehindOffsetRes(R.dimen.navigation_menu_hide_width);
+		sm.setAboveOffsetRes(R.dimen.friends_menu_hide_width);
+		sm.setFadeEnabled(true);
+		sm.setFadeDegree(.75f);
+		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+
+		//TODO: we need to do this because status bar height is not being accounted for
+		//by slidingmenu .. shame on you..
+		int pad = HelperUtils.getStatusBarHeight(this);
+		getSlidingMenu().getMenu().setPadding(0, pad, 0, 0);
+		getSlidingMenu().getSecondaryMenu().setPadding(0, pad, 0, 0);
+		// ***************
+
+        getSlidingMenu().setOnOpenedListener(this);
+        getSlidingMenu().setOnClosedListener(this);
+
+        //for performance!
+        getWindow().setBackgroundDrawable(null);
+        
+		if (!processIntents()) {
+			if (!cobrain.restoreLogin(new Runnable() {
+				public void run() {
+					if (!cobrain.isLoggedIn())
+			        	showLogin(null);
+					else showMain(CobrainController.VIEW_HOME);
+				}
+			}))
+				showLogin(null);
+		}
+
+		//register so we can receive push notifications
+		playServicesLoader.checkGoogleCloudMessaging(this, false);
+    }
+	
 	@Override
 	public void showLogin(String loginUrl) {
 		//getSupportActionBar().hide();
-
 		
 		FragmentTransaction t = getSupportFragmentManager().beginTransaction();
 		/*
@@ -97,10 +178,16 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 					t.remove(f);
 		*/
 		
-		if (cobrainMainView != null) {
-			t.remove((Fragment) cobrainMainView);
-		}
-		
+		//if I remove it now, then click home on the login screen, then android tries to save the state of it
+		//and crashes because its no longer attached.
+		//me be related to me replacing the entire content view with login
+		//instead of creating a login activity and starting that instead
+		//so whatever is currently in the content frame replace it with a 
+		//lightweight loading frame..loading seems a bit of a hack but oh well its clean one
+		t.replace(R.id.content_frame, new LoadingFragment(), LoadingFragment.TAG);
+		t.commitAllowingStateLoss();
+		getSupportFragmentManager().executePendingTransactions();
+		t = getSupportFragmentManager().beginTransaction();
 		
 		Bundle args = new Bundle();
 		args.putString("loginUrl", loginUrl);
@@ -110,10 +197,12 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         
         //int id = (homeFragment == null) ? android.R.id.content : R.id.content_frame;
         int id = android.R.id.content;
+        
         setCurrentCobrainView(login);
 
         t.replace(id, login, LoginFragment.TAG)
         	.commitAllowingStateLoss();
+        
 	}
 
 	@Override
@@ -149,10 +238,26 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	    if(imm.isAcceptingText() && getCurrentFocus() != null)// verify if the soft keyboard is open                         
 	    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
+
+	void updateFragment(final String tag) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+		        BaseCobrainFragment f = (BaseCobrainFragment) getSupportFragmentManager().findFragmentByTag(tag);
+		        if (f != null) {
+		        	f.update();
+		        }
+			}
+		});
+	}
 	
 	@Override
 	public void showMain(int defaultView) {
-        
+
+		//just in case android has restored the state of the fragments i need to update some manually
+		//because the user object was not logged in at the time android restored it.. way tooooo early!
+		updateFragment(NavigationMenuFragment.TAG);
+		//updateFragment(FriendsListFragment.TAG);
+		
         //we only ever show main on log in and sign up
         if (defaultView != VIEW_FRIENDS_MENU && cobrain.getUserInfo().getSignInCount() <= 1)
         	defaultView = VIEW_TEACH;
@@ -177,12 +282,9 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         Bundle args = new Bundle();
         args.putInt("defaultView", defaultView);
         main.setArguments(args);
-		setCurrentCobrainView(main);
         homeFragment = main;
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(android.R.id.content, main, MainFragment.TAG)
-        	.commitAllowingStateLoss();
+        
+        showFragment(main, android.R.id.content, MainFragment.TAG, true, false, true);
 	}
 	
 	@Override
@@ -233,77 +335,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		actionBarSubTitle.setVisibility((title == null) ? View.GONE : View.VISIBLE);
 		actionBarSubTitle.setText(title);
 	}
-
-	@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Analytics.start(this);
-        
-        cobrain = new Cobrain(getApplicationContext());
-		cobrain.setOnLoggedInListener(this);
-		
-		intentLoader.initialize(this);
-		
-		showDefaultActionBar();
-		
-		/*ActionBar ab = controller.getSupportActionBar();
-		ab.setCustomView(R.layout.actionbar_training_frame);
-		ImageButton ib = (ImageButton) controller.getSupportActionBar().getCustomView().findViewById(R.id.navigation_button);
-		ib.setOnClickListener(this);
-		skip = (Button) controller.getSupportActionBar().getCustomView().findViewById(R.id.training_skip_button);
-		skip.setOnClickListener(this);
-
-		ActionBar ab = controller.getSupportActionBar();
-		ab.setCustomView(R.layout.actionbar_crave_frame);
-		ImageButton ib = (ImageButton) controller.getSupportActionBar().getCustomView().findViewById(R.id.navigation_button);
-		ib.setOnClickListener(this);
-		ib = (ImageButton) ab.getCustomView().findViewById(R.id.filter_button);
-		ib.setOnClickListener(this);
-		*/
-		
-		getSlidingMenu().setMode(SlidingMenu.LEFT_RIGHT);
-		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-
-		// set the Behind View
-		setContentView(R.layout.content_frame);
-		setBehindContentView(R.layout.menu_frame);
-		getSlidingMenu().setSecondaryMenu(R.layout.menu_frame_two);
-		getSlidingMenu().setSecondaryShadowDrawable(R.drawable.shadowright);
-
-		// customize the SlidingMenu
-		SlidingMenu sm = getSlidingMenu();
-		sm.setShadowWidthRes(R.dimen.menu_shadow_width);
-		sm.setShadowDrawable(R.drawable.shadow);
-		sm.setBehindOffsetRes(R.dimen.navigation_menu_hide_width);
-		sm.setAboveOffsetRes(R.dimen.friends_menu_hide_width);
-		sm.setFadeEnabled(true);
-		sm.setFadeDegree(.75f);
-		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-
-		//TODO: we need to do this because status bar height is not being accounted for
-		//by slidingmenu .. shame on you..
-		int pad = HelperUtils.getStatusBarHeight(this);
-		getSlidingMenu().getMenu().setPadding(0, pad, 0, 0);
-		getSlidingMenu().getSecondaryMenu().setPadding(0, pad, 0, 0);
-		// ***************
-
-        getSlidingMenu().setOnOpenedListener(this);
-        getSlidingMenu().setOnClosedListener(this);
-
-		if (!processIntents()) {
-			if (!cobrain.restoreLogin(new Runnable() {
-				public void run() {
-					if (!cobrain.isLoggedIn())
-			        	showLogin(null);
-					else showMain(CobrainController.VIEW_HOME);
-				}
-			}))
-				showLogin(null);
-		}
-
-    }
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (showOptionsMenu) {
@@ -340,7 +372,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void onLoggedIn(UserInfo ui) {
 		Analytics.sendEvent("Login-Logout", "Login", null, null);
-		
+
 		dismissDialog(); //dismiss an indeterminate progress dialog if we have one open
 		showMain(VIEW_HOME);
 	}
@@ -515,6 +547,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	
 	@Override
 	protected void onResume() {
+		playServicesLoader.checkGoogleCloudMessaging(this, true);
 		super.onResume();
 	}
 	
@@ -572,6 +605,23 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
+	public void showHome(int initialTab, boolean showPersonalizationAnimation) {
+		FragmentManager fm = getSupportFragmentManager();
+		HomeFragment h = (HomeFragment) fm.findFragmentByTag(HomeFragment.TAG);
+		
+		if (h == null) {
+			HomeFragment home = HomeFragment.newInstance(initialTab, showPersonalizationAnimation);
+			showFragment(home, HomeFragment.TAG, true, false, true);
+		}
+		else {
+			clearBackStack(fm);
+			h.setTab(initialTab);
+			if (showPersonalizationAnimation) h.showPersonalizationAnimation();
+			closeMenu(true);
+		}
+	}
+
+	@Override
 	public void showSavedAndShare() {
 		SavedAndShareFragment f = new SavedAndShareFragment();
         setCurrentCobrainView(f);
@@ -585,34 +635,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public void showTeachMyCobrain(boolean addToBackStack) {
-		//this displays within MainFragment in the main content area
-		//showView = new Runnable() {
-		//	public void run() {
-				if (getSupportFragmentManager().findFragmentByTag(TrainingFragment.TAG) == null) {
-					
-			        TrainingFragment training = new TrainingFragment();
-					setCurrentCobrainView(training);
-			        FragmentTransaction t = getSupportFragmentManager()
-			        	.beginTransaction();
-
-			        if (addToBackStack) t.addToBackStack(null);
-			        
-			        t.replace(R.id.content_frame, training, TrainingFragment.TAG)
-			        	.commitAllowingStateLoss();
-			        
-			        //getSupportFragmentManager().executePendingTransactions();
-		        
-				}
-		//	}
-		//};
-		
-		//if (isMenuOpen()) {
-			closeMenu(true);
-		//}
-		//else {
-		//	showView.run();
-		//	showView = null;
-		//}
+		showFragment(new TrainingFragment(), TrainingFragment.TAG, !addToBackStack, addToBackStack, true);
 	}
 	
 	public boolean isMenuOpen() {
@@ -622,15 +645,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	
 	@Override
 	public void showNerveCenter() {
-
-		SettingsFragment training = new SettingsFragment();
-		setCurrentCobrainView(training);
-        getSupportFragmentManager()
-        	.beginTransaction()
-        	.replace(R.id.content_frame, training, SettingsFragment.TAG)
-        	.commitAllowingStateLoss();
-
-        closeMenu(true);
+		showFragment(new SettingsFragment(), SettingsFragment.TAG, true, false, true);
 	}
 
 	@Override
@@ -673,27 +688,97 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void showFriendsSharedRack(User owner, List<Integer> skus) {
 		FriendCraveStripsFragment f = FriendCraveStripsFragment.newInstance(owner, skus);
-		showFragment(f, FriendCraveStripsFragment.TAG, false);
+		String uniqueTag = FriendCraveStripsFragment.TAG + owner.getId();
+		showFragment(f, uniqueTag, true, false, true);
 	}
 	
-	void showFragment(BaseCobrainFragment f, String tag, boolean addToBackStack) {
-		setCurrentCobrainView(f);
-        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-        if (addToBackStack) tr.addToBackStack(tag);
-        tr.replace(R.id.content_frame, f, tag)
-        	.commitAllowingStateLoss();
+	void showFragment(BaseCobrainFragment f, String tag, boolean clearBackStackFirst, boolean addToBackStack, boolean closeMenu) {
+		showFragment(f, R.id.content_frame, tag, clearBackStackFirst, addToBackStack, closeMenu);
+	}
+	
+	class ShowFragmentRequest {
+		Fragment f;
+		int containerId;
+		String tag;
+		boolean addToBackStack;
+		public boolean clearBackStack;
+	}
+	ShowFragmentRequest showFragmentRequest;
+	Object showFragmentRequestLock = new Object();
+	
+	void clearBackStack(FragmentManager fm) {
+		for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
+			//if (fm.popBackStackImmediate()) pops++;
+			fm.popBackStack();
+		}
+	}
+	
+	void showFragment(BaseCobrainFragment f, int containerId, String tag, boolean clearBackStack, boolean addToBackStack, boolean closeMenu) {
+		
+		//need this for top level fragments like home, settings, friends raves, etc
+		FragmentManager fm = getSupportFragmentManager();
+		if (clearBackStack) {
+			clearBackStack(fm);
+		}
+		
+		if (getSupportFragmentManager().findFragmentByTag(tag) == null) {
+
+			//FIXME: HMMM.. if we are not adding to the backstack then we are clearing it!
+			//do we even need the clearBackStack parameter then here... we shall see...
+
+			if (closeMenu && isMenuOpen()) {
+				//cache our fragment so we can show it when the menu has closed for 
+				//increased performance
+				synchronized (showFragmentRequestLock) {
+					showFragmentRequest = new ShowFragmentRequest();
+					showFragmentRequest.f = f;
+					showFragmentRequest.containerId = containerId;
+					showFragmentRequest.tag = tag;
+					showFragmentRequest.addToBackStack = addToBackStack;
+					showFragmentRequest.clearBackStack = clearBackStack;
+				}
+				
+				//show lightweight loading fragment until 
+				//the menu is closed for increased performance on the menu closing
+		        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+				tr.replace(containerId, new LoadingFragment(), LoadingFragment.TAG).commitAllowingStateLoss();
+				
+				//now close menu
+				closeMenu(true);
+				return;
+			}
+			
+			setCurrentCobrainView(f);
+			
+	        FragmentTransaction tr = fm.beginTransaction();
+	        if (addToBackStack) {
+	        	tr.addToBackStack(tag);
+	        }
+	        tr.replace(containerId, f, tag)
+	        	.commitAllowingStateLoss();
+	        
+		}
+		
+        if (closeMenu) closeMenu(true);
 	}
 
 	@Override
 	public void showWishList(Skus list, boolean showMyPrivateItems, boolean addToStack) {
 		WishListFragment training = new WishListFragment();
-		training.initialize(list, showMyPrivateItems);
+		training.initialize(list, null, showMyPrivateItems);
 		setCurrentCobrainView(training);
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         if (addToStack) tr.addToBackStack(WishListFragment.TAG);
         tr.replace(R.id.content_frame, training, WishListFragment.TAG)
         	.commitAllowingStateLoss();
+	}
+
+
+	@Override
+	public void showWishList(Skus skus, Sku sku, boolean showPrivateItems, int containerId, boolean addToBackStack) {
+		WishListFragment f = WishListFragment.newInstance(skus, sku, showPrivateItems);
+		showFragment(f, containerId, WishListFragment.TAG, !addToBackStack, addToBackStack, true);
 	}
 
 	@Override
@@ -716,14 +801,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		args.putString("merchant", merchant);
 		args.putString("url", url);
 		browser.setArguments(args);
-		setCurrentCobrainView(browser);
-
-        FragmentTransaction t = getSupportFragmentManager()
-        	.beginTransaction();
-        
-        t.replace(containerId, browser, BrowserFragment.TAG);
-        if (addToBackStack) t.addToBackStack(null);
-        t.commitAllowingStateLoss();
+		
+		showFragment(browser, containerId, BrowserFragment.TAG, !addToBackStack, addToBackStack, true);
 	}
 
 	@Override
@@ -792,6 +871,28 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
+	public void setMenuItemSelected(String id) {
+		FragmentManager fm = getSupportFragmentManager();
+		ArrayList<Fragment> fs = new ArrayList<Fragment>();
+
+		fs.add( fm.findFragmentByTag(NavigationMenuFragment.TAG) );
+		//fs.add( fm.findFragmentByTag(FriendsListFragment.TAG) );
+		
+		for (Fragment fr : fs) {
+			if (fr != null && fr instanceof CobrainMenuView) {
+				CobrainMenuView f = (CobrainMenuView) fr;
+				for (int t = 0; t < f.getMenuTypeCount(); t++) {
+					int i = f.getMenuItemPosition(t, id);
+					if (i != -1) {
+						setMenuItemSelected( f.getMenu(t) , i, true );
+					}
+				}
+			}
+		}
+	}
+	
+	
+	@Override
 	public void setMenuItemSelected(View menu, int position,
 			boolean selected) {
 		
@@ -832,6 +933,20 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 			showView = null;
 		}
 		if (cobrainMenuView != null) cobrainMenuView.onSlidingMenuClosed();
+		
+		synchronized (showFragmentRequestLock) {
+			if (showFragmentRequest != null) {
+				showFragment(
+						(BaseCobrainFragment) showFragmentRequest.f, 
+						showFragmentRequest.containerId, 
+						showFragmentRequest.tag, 
+						showFragmentRequest.clearBackStack, 
+						showFragmentRequest.addToBackStack, 
+						false);
+				
+				showFragmentRequest = null;
+			}
+		}
 	}
 
 	@Override

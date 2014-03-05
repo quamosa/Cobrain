@@ -24,14 +24,18 @@ public class SkuStripsLoader {
 	ListView craveStripList;
 	CraveStripListAdapter<Skus> craveStripListAdapter;
 	public ArrayList<CraveStrip<Skus>> craveStrips = new ArrayList<CraveStrip<Skus>>();
+	private OnLoadListener<Skus> listener;
 	
-	public void initialize(FriendCraveStripsFragment parent, ListView list) {
+	public void initialize(FriendCraveStripsFragment parent, ListView list, OnLoadListener<Skus> listener) {
+		this.listener = listener;
 		this.parent = parent;
 		craveStripList = list;
 		setup();
 	}
 	
 	public void dispose() {
+		listener = null;
+		
 		for (CraveStrip<Skus> strip : craveStrips) {
 			strip.dispose();
 		}
@@ -54,11 +58,14 @@ public class SkuStripsLoader {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void load(final User owner, final String caption[], final String signal[] ) {
-		new AsyncTask<Void, Void, Skus>() {
+		if (listener != null) listener.onLoadStarted();
+		
+		parent.addAsyncTask("skuStripsLoader", new AsyncTask<Object, Void, Skus>() {
 
 			@Override
-			protected Skus doInBackground(Void... params) {
+			protected Skus doInBackground(Object... params) {
 				UserInfo u = parent.controller.getCobrain().getUserInfo();
 				Skus s;
 				
@@ -73,9 +80,10 @@ public class SkuStripsLoader {
 			@Override
 			protected void onPostExecute(Skus result) {
 				loadStrips();
+				if (listener != null) listener.onLoadCompleted(result);
 			}
 			
-		}.execute();
+		}).execute();
 	}
 	
 	void setup() {

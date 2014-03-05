@@ -17,7 +17,6 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_marginBottom="10dp"
-             android:layout_marginTop="20dp"
              android:textColor="#000"
              android:text="Current Password" />
 
@@ -67,7 +66,7 @@
          
          <Button
              android:id="@+id/save_account_button"
-             style="@style/login_button"
+	        style="@style/purple_button"
              android:layout_below="@+id/confirm_password"
              android:text="UPDATE PASSWORD" />
      </RelativeLayout>

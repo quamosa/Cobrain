@@ -3,7 +3,6 @@ package com.cobrain.android.fragments;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
@@ -20,16 +19,13 @@ import com.cobrain.android.adapters.SkuPagerAdapter;
 import com.cobrain.android.adapters.CravesCategoryAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
 import com.cobrain.android.controllers.CraveStrip;
-import com.cobrain.android.controllers.ScenarioCraveStrip;
-import com.cobrain.android.controllers.SkuCraveStrip;
 import com.cobrain.android.loaders.CraveFilterLoader;
 import com.cobrain.android.loaders.ScenarioStripsLoader;
 import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.model.Scenario;
 import com.cobrain.android.model.Sku;
-import com.cobrain.android.model.Skus;
 
-public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnLoadListener<T>, OnItemClickListener {
+public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<T> {
 	public static final String TAG = "CraveStripsFragment";
 
 	SkuPagerAdapter craveAdapter;
@@ -94,7 +90,7 @@ public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnLoa
 		if (f instanceof CravesFragment) {
 			HomeFragment home = (HomeFragment) getSherlockActivity().getSupportFragmentManager().findFragmentByTag(HomeFragment.TAG);
 			if (home != null) {
-				home.homePager.setVisibility(View.GONE);
+				if (home.homePager != null) home.homePager.setVisibility(View.GONE);
 			}
 			else getView().setVisibility(View.GONE);
 		}
@@ -103,6 +99,10 @@ public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnLoa
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState) {
+		
+		if (savedInstanceState != null) {
+			onSale = savedInstanceState.getBoolean("onSale", false);
+		}
 		
 		setHasOptionsMenu(true);
 		
@@ -140,21 +140,35 @@ public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnLoa
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt("categoryId", savedState.categoryId);
 		outState.putInt("position", savedState.position);
+		outState.putBoolean("onSale", onSale);
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		//FIXME: update();
 		loaderUtils.initialize((ViewGroup) getView());
-
 		super.onActivityCreated(savedInstanceState);
 	}
 
+/*	@Override
+	public boolean onUpdate() {
+		if (controller != null) {
+			controller.getCobrain().checkLogin();
+			loaderUtils.dismiss();
+			if (!onSale) {
+				loader.addHeaderStrip();
+			}
+			loader.load();
+			return true;
+		}
+		return false;
+	}*/
+	
 	public void update() {
 		if (controller != null) {
 			controller.getCobrain().checkLogin();
 			loaderUtils.dismiss();
+			loader.clear();
 			if (!onSale) {
 				loader.addHeaderStrip();
 			}
@@ -203,18 +217,19 @@ public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnLoa
 
 	@Override
 	public void onLoadStarted() {
-		//loaderUtils.showLoading("Loading your craves...");
 	}
 
 	@Override
 	public void onLoadCompleted(T r) {
 		if (r == null) {
-			loaderUtils.showEmpty("We had a problem loading your craves. Click here to try loading them again.");
+			//this happens for each strip..! not the overall load
+			
+			/*loaderUtils.showEmpty("We had a problem loading your craves. Click here to try loading them again.");
 			loaderUtils.setOnClickListener(new OnClickListener () {
 				public void onClick(View v) {
 					update();
 				}
-			});
+			});*/
 		}
 		else if ((r instanceof Scenario) && ((Scenario)r).getSkus().size() == 0) {
 			//loaderUtils.showEmpty("Sorry we couldn't find any craves for you yet. Try training your Cobrain to get some craves.");

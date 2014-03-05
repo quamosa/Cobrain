@@ -24,7 +24,6 @@ public class InviteFragment extends BaseCobrainFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		update();
 	}
 	
 	@Override

@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.cobrain.android.R;
@@ -26,12 +25,13 @@ public class TrainingLoader {
 
 	private static final int CRAVES_NEEDED = 5;
 	private CobrainController controller;
-	private AsyncTask currentRequest;
+	private AsyncTask<?, ?, ?> currentRequest;
 	public ArrayList<TrainingItem> trainingItems = new ArrayList<TrainingItem>();
 	public boolean multiSelect = true;
 	OnSelectedListener selectedListener;
 	int cravesCompleted;
 	int currentSelects;
+	public boolean inLoading;
 	
 	public interface OnSelectedListener {
 		void onSelected(View v, int selected);
@@ -41,7 +41,7 @@ public class TrainingLoader {
 		ImageView image;
 		ImageView checkboxLiked;
 		ImageView checkboxDisliked;
-		ProgressBar progress;
+		View progress;
 		int selected;
 		int id;
 		View parent;
@@ -59,7 +59,7 @@ public class TrainingLoader {
 			checkboxLiked.setOnClickListener(this);
 			checkboxDisliked.setOnClickListener(this);
 
-			progress = (ProgressBar) v.findViewById(R.id.training_progress);
+			progress = v.findViewById(R.id.training_progress);
 
 			setText(R.id.training_description, null);
 			setText(R.id.training_dollars, null);
@@ -71,7 +71,7 @@ public class TrainingLoader {
 		void showProgress(boolean show) {
 			if (show) {
 				image.setVisibility(View.GONE);
-				progress.setVisibility(View.VISIBLE);
+				progress.setVisibility(View.GONE);
 			}
 			else {
 				LoaderUtils.show(image);
@@ -90,7 +90,7 @@ public class TrainingLoader {
 
 		public void setImageUrl(String url) {
 			showProgress(true);
-			ImageLoader.load(url, image, this);
+			ImageLoader.get.load(url, image, this);
 		}
 		
 		public void setSelected(int selected) {
@@ -114,7 +114,7 @@ public class TrainingLoader {
 					checkboxDisliked.setImageResource(R.drawable.ic_training_checkbox_disliked_selected);
 					break;
 				}
-				onSelected(image, selected);
+				if (!inLoading) onSelected(image, selected);
 			}
 		}
 
@@ -123,6 +123,7 @@ public class TrainingLoader {
 		}*/
 		
 		public void dispose() {
+			ImageLoader.get.cancel(image);
 			opinion = null;
 			viewCache.clear();
 			image = null;
@@ -156,8 +157,8 @@ public class TrainingLoader {
 		}
 
 		@Override
-		public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
-			showProgress(false);
+		public void onLoad(String url, ImageView view, Bitmap b, int fromCache) {
+			if (image != null) showProgress(false);
 		}
 
 	}
@@ -263,9 +264,15 @@ public class TrainingLoader {
 				Skus tr = null;
 				
 				if (u != null) {
+					boolean silent = controller.getShown().getSilentMode();
+					controller.getShown().setSilentMode(true);
 					tr = u.getSkus(u, "training", null, null, 4, 1 /*(!refresh) ? 1 : 2*/);
 					Skus liked = u.getSkus(u, "liked", null, null);
-					if (liked != null) cravesCompleted = liked.get().size();
+					if (liked != null) {
+						cravesCompleted = liked.get().size();
+						currentSelects = 0;
+					}
+					controller.getShown().setSilentMode(silent);
 				}
 				
 				return tr;
@@ -276,6 +283,7 @@ public class TrainingLoader {
 				if (listener != null) listener.onLoadCompleted(result);
 				if (result != null) {
 					int i = 0;
+					inLoading = true;
 					for (Sku p : result.get()) {
 						if (isCancelled()) return;
 						String url = p.getImageURL();
@@ -293,6 +301,7 @@ public class TrainingLoader {
 						ti.setText(R.id.training_dollars, price[0] + ".");
 						ti.setText(R.id.training_cents, price[1]);
 					}
+					inLoading = false;
 				}
 				currentRequest = null;
 			}
