@@ -19,7 +19,16 @@ public class SlidingSherlockFragmentActivity extends SherlockFragmentActivity im
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mHelper = new SlidingActivityHelper(this);
+		mHelper = new SlidingActivityHelper(this) {
+			@Override
+			public boolean onBackPressed() {
+				if (mHelper.getSlidingMenu().isMenuShowing()) {
+					SlidingSherlockFragmentActivity.this.onBackPressed();
+					return true;
+				}
+				return false;
+			}
+		};
 		mHelper.onCreate(savedInstanceState);
 	}
 

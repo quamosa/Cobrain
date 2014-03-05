@@ -27,6 +27,7 @@ public class SavedAndShareLoader {
 	public String signal;
 	public boolean mostRaved;
 	public boolean mostNew;
+	public int totalUnfilteredCount;
 
 	public void initialize(CobrainController controller, SavedAndShareAdapter adapter, String signal) {
 		this.controller = controller;
@@ -69,6 +70,7 @@ public class SavedAndShareLoader {
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 
 		currentRequest = new AsyncTask<Void, Void, List<Sku>>() {
+
 			@Override
 			protected List<Sku> doInBackground(Void... params) {
 				if (HelperUtils.Tasks.asyncTaskCancel(this, controller == null)) return null;
@@ -79,6 +81,7 @@ public class SavedAndShareLoader {
 				if (u != null) {
 					Skus s = u.getSkus(null, signal, (categoryId > 0) ? categoryId : null, (onSale) ? onSale : null);
 					if (s != null) {
+						totalUnfilteredCount = s.getTotalReturned();
 						if (mostNew) doMostNewFilter(s.get());
 						if (mostRaved) doMostRavedFilter(s.get());
 						return s.get();

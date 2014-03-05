@@ -23,6 +23,7 @@ public class PlayServicesLoader {
 	private final static String SENDER_ID = "521768102800";
 	//for reference:
 	private final static String SERVER_API_KEY = "AIzaSyDopi6KJ86323elpFSlhtqF4JHWQ1D0mPE";
+	private static final boolean CLOUD_MESSAGING_ENABLED = false;
 	
 	
     String regid;
@@ -36,6 +37,8 @@ public class PlayServicesLoader {
 	 */
 	
 	public boolean checkGoogleCloudMessaging(Activity activity, boolean onResume) {
+		if (!CLOUD_MESSAGING_ENABLED) return true;
+		
         Context context = activity.getApplicationContext();
 
         // Check device for Play Services APK. If check succeeds, proceed with

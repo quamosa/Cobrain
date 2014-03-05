@@ -69,7 +69,9 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 				@Override
 				public void onTabChanged(String tabId) {
 					int i = Integer.parseInt(tabId);
-					homePager.setCurrentItem(i, false);
+					if (homePager.getCurrentItem() != i) {
+						homePager.setCurrentItem(i, false);
+					}
 				}
 			});
 			
@@ -316,7 +318,7 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 	@Override
 	public void onPageSelected(int position) {
 		setSubTitle(null);
-		//tabHost.setCurrentTab(position);
+		tabHost.setCurrentTab(position);
 		if (loading) homePager.post(updateRunnable);
 		else updateRunnable.run();
 	}

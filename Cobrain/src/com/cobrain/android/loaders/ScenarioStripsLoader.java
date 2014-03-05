@@ -131,6 +131,7 @@ public class ScenarioStripsLoader {
 	}
 
 	public void clear() {
+		craveStripListAdapter.clear();
 		craveStrips.clear();
 	}
 	
@@ -162,8 +163,8 @@ public class ScenarioStripsLoader {
 			}
 			
 		};
-		strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
-		strip.container.addView(strip.list);
+		//strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
+		//strip.container.addView(strip.list);
 		
 		craveStrips.add(strip);
 	}
@@ -197,14 +198,13 @@ public class ScenarioStripsLoader {
 				//strip.pager.setPageMargin(-80); to do like netflix android app
 				//strip.adapter = new CraveStripGroupedPagerAdapter
 				
-				
-				strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
+				//strip.container = new RelativeLayout(parent.getActivity().getApplicationContext());
 				/*
 				strip.pager.setId(strip.categoryId);
 				strip.container.setId(strip.categoryId + 0x1000);
 				strip.container.addView(strip.pager);
 				*/
-				strip.container.addView(strip.list);
+				//strip.container.addView(strip.list);
 	
 				craveStrips.add(strip);
 			}

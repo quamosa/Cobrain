@@ -265,7 +265,7 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements Cobra
 
 	@Override
 	public int getMenuTypeCount() {
-		return 1;
+		return 2;
 	}
 	
 	@Override
@@ -275,21 +275,37 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements Cobra
 
 	@Override
 	public ListView getMenu(int type) {
-		return menu;
+		switch(type) {
+		case 1: return menuBottom;
+		default: return menu;
+		}
 	}
 
 	@Override
 	public int getMenuItemPosition(int type, String id) {
 		long lid = Long.valueOf(id);
 		
-		if (menuAdapter != null) {
-			for (int i = 0; i < menuAdapter.getCount(); i++) {
-				if (menuAdapter.getItemId(i) == lid) {
+		ArrayAdapter<NavigationMenuItem> a = null;
+		
+		switch (type) {
+		case 0:
+			a = menuAdapter;
+			break;
+		case 1:
+			if (menuBottom != null) {
+				a = (NavigationMenuAdapter) menuBottom.getAdapter();
+			}
+			break;
+		}
+
+		if (a != null) {
+			for (int i = 0; i < a.getCount(); i++) {
+				if (a.getItemId(i) == lid) {
 					return i;
 				}
 			}
 		}
-		
+
 		return -1;
 	}
 

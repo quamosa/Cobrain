@@ -69,14 +69,18 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
+		outState.putString("signal", signal);
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+
+		if (savedInstanceState != null) {
+			signal = savedInstanceState.getString("signal", signal);
+		}
+
 		View v = inflater.inflate(R.layout.frg_saved_and_shared_craves, null);
 		saves = (SwipeListView) v.findViewById(R.id.saves_list);
 		adapter = new SavedAndShareAdapter(container.getContext(), R.id.item_info, this);
@@ -410,12 +414,11 @@ public class SavedAndShareFragment extends BaseCobrainFragment implements OnLoad
 	}
 	
 	void showEmpty() {
-
-		if (loader.isFiltered()) {
+		if (loader.totalUnfilteredCount == 0) 
+			loaderUtils.showEmpty("Your 1st " + (signal.equals("saved") ? "Private" : "Shared") + " Crave will appear here. Save the Craves you love so you can find them later!");
+		else {
 			loaderUtils.dismiss();
-			return;
 		}
-		loaderUtils.showEmpty("Your 1st " + (signal.equals("saved") ? "Private" : "Shared") + " Crave will appear here. Save the Craves you love so you can find them later!");
 	}
 
 	@Override
