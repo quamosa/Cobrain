@@ -209,10 +209,22 @@ public class SlidingActivityHelper {
 	 * @return true, if successful
 	 */
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			boolean b = onBackPressed();
+			if (b) return true;
+		}
+		
 		if (keyCode == KeyEvent.KEYCODE_BACK && mSlidingMenu.isMenuShowing()) {
 			showContent();
 			return true;
 		}
+		return false;
+	}
+
+	/**
+	 * Override this to override default back press on menu show and hide
+	 */
+	public boolean onBackPressed() {
 		return false;
 	}
 
