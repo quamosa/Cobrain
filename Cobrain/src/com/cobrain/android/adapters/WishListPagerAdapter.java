@@ -6,22 +6,26 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.text.Html;
+import android.view.View;
+import android.widget.TextView;
 
+import com.cobrain.android.R;
 import com.cobrain.android.fragments.CraveFragment;
 import com.cobrain.android.fragments.WishListFragment;
-import com.cobrain.android.model.WishList;
-import com.cobrain.android.model.WishListItem;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
 
 public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 	private int page = 1;
 	private int perPage;
 	private int countOnThisPage;
 	private int count;
-	private List<WishListItem> listItems;
+	private ArrayList<Sku> listItems;
 	private WishListFragment parentFragment;
 	private boolean destroyAll;
 	//private RecommendationsResults results;
-	private WishList results;
+	private Skus results;
 
 	public WishListPagerAdapter(FragmentManager fm, WishListFragment cravesFragment) {
 		super(fm);
@@ -37,16 +41,20 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		}
 	}
 
-	public void add(WishListItem item, boolean notify) {
-		if (listItems == null) listItems = new ArrayList<WishListItem>();
+	public void add(Sku item, boolean notify) {
+		if (listItems == null) listItems = new ArrayList<Sku>();
 		listItems.add(item);
 		if (notify) notifyDataSetChanged();
 	}
+	public Sku get(int index) {
+		if (listItems == null) return null;
+		return listItems.get(index);
+	}
 
-	public void load(WishList r, ArrayList<WishListItem> items, boolean append) {
+	public void load(Skus r, List<Sku> items, boolean append) {
 		load(r, items, append, true);
 	}
-	public void load(WishList r, ArrayList<WishListItem> items, boolean append, boolean notify) {
+	public void load(Skus r, List<Sku> items, boolean append, boolean notify) {
 		//page = r.getPage();
 		//perPage = r.getPerPage();
 		//countOnThisPage = r.getCount();
@@ -59,7 +67,7 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		if (append && listItems != null) {
 			listItems.addAll(items);
 		}
-		else listItems = items;
+		else listItems = new ArrayList<Sku>(items);
 		
 		results = r;
 
@@ -71,9 +79,9 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		}
 	}
 
-	public void load(WishList r, boolean append) {
+	public void load(Skus r, boolean append) {
 		if (r != null) {
-			load(r, r.getItems(), append, false);
+			load(r, r.get(), append, false);
 		}
 		else {
 			page = 1;
@@ -97,8 +105,10 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 	public Fragment getItem(int position) {
 		CraveFragment f = new CraveFragment(parentFragment);
 
-		f.setWishListItem(results, listItems.get(position), position + 1, listItems.size());
-		
+		f.setWishListItem(results, listItems, listItems.get(position), position + 1, listItems.size());
+
+		if (parentFragment.cravePager.getCurrentItem() == position) updateTitle(position);
+
 		return f;
 	}
 
@@ -119,4 +129,24 @@ public class WishListPagerAdapter extends FragmentStatePagerAdapter {
 		return cnt;
 	}
 
+	public void updateTitle(int position) {
+		if (listItems != null) {
+			int totalCraves = listItems.size();
+			
+			String s;
+			
+			if (listItems.size() > position && count > position && listItems.get(position) != null) 
+				s = parentFragment.getString(R.string.rank_for_you,
+						position + 1, 
+						totalCraves
+						);
+			else
+				s = parentFragment.getString(R.string.rank_for_you_empty);
+
+			parentFragment.setSubTitle(Html.fromHtml(s));
+			//final TextView txt = parentFragment.getCobrainController().getSubTitleView();
+			//txt.setVisibility(View.VISIBLE);
+			//txt.setText(Html.fromHtml(s));
+		}
+	}
 }

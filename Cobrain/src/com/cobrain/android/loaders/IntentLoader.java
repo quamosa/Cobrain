@@ -1,6 +1,7 @@
 package com.cobrain.android.loaders;
 
-import com.cobrain.android.service.Cobrain.CobrainController;
+import com.cobrain.android.MainActivity;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.service.web.WebRequest;
 
 import android.app.Activity;
@@ -10,7 +11,6 @@ import android.os.AsyncTask;
 
 public class IntentLoader {
 
-	private boolean processedMobileDownload;
 	private CobrainController controller;
 
 	public IntentLoader() {
@@ -24,18 +24,37 @@ public class IntentLoader {
 		controller = null;
 	}
 	
-	public void processAnyIntents(Activity activity) {
+	public boolean processAnyIntents(Activity activity) {
 		Intent i = activity.getIntent();
+
 		if (i != null) {
+			String action = i.getAction();
+			
+			if (MainActivity.ACTION_SIGNUP.equals(action)) {
+				controller.showSignup(null);
+				return true;
+			}
+			
 			Uri uri = i.getData();
-			if (uri != null && uri.getHost().contains("cobrain.com") && uri.getPath().equals("/mobile/download")) {
-				//String phone = uri.getQueryParameter("phone");
-				processMobileDownloadIntent(uri.toString());
+			if (uri != null && uri.getHost().contains("cobrain.com")) {
+				if (uri.getPath().equals("/mobile/download")) {
+					//String phone = uri.getQueryParameter("phone");
+					return processMobileDownloadIntent(uri.toString());
+				}
+				else if (uri.getPath().contains("/favorites/exchange/")) {
+					return processEmailIntent(uri.toString());
+				}
 			}
 		}
+		return false;
 	}
 
-	void processMobileDownloadIntent(String url) {
+	boolean processEmailIntent(String url) {
+		controller.showLogin(url);
+		return true;
+	}
+
+	boolean processMobileDownloadIntent(String url) {
 		//if (!processedMobileDownload) {
 			new AsyncTask<String, Void, Boolean>() {
 	
@@ -47,16 +66,28 @@ public class IntentLoader {
 					}
 					return false;
 				}
-	
+
+				boolean result;
+				Runnable runWhenLoggedIn = new Runnable() {
+					public void run() {
+						if (result) {
+							//processedMobileDownload = true;
+							controller.showMain(CobrainController.VIEW_FRIENDS_MENU);
+						}
+						else controller.showMain(CobrainController.VIEW_HOME);					
+					}
+				};
+				
 				@Override
 				protected void onPostExecute(Boolean result) {
-					if (result) {
-						//processedMobileDownload = true;
-						controller.showFriendsMenu();
+					if (!controller.getCobrain().isLoggedIn()) {
+						this.result = result;
+						controller.getCobrain().restoreLogin(runWhenLoggedIn);
 					}
 				}
 				
 			}.execute(url);
 		//}
+		return true;
 	}
 }

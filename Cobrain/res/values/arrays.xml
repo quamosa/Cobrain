@@ -1,47 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<array name="profile_gender_names">
+	    <item></item>
+	    <item>Men</item>
+	    <item>Women</item>
+	    <item>Both</item>
+	</array>
+	<array name="profile_gender_values">
+	    <item></item>
+	    <item>MALE</item>
+	    <item>FEMALE</item>
+	    <item>BOTH</item>
+	</array>
+	
 	<array name="navigation_menu_items">
 
-	    <item type="string">Home</item>
+	    <item type="string">Home Rack</item>
 	    <item>@drawable/ic_navigation_menu_home</item>
    	    <item type="integer">0</item>
 	    
-	    <item type="string">Teach My Cobrain</item>
-   	    <item>@drawable/ic_navigation_menu_teach</item>
-   	    <item type="integer">1</item>
+	    <item type="string">Sale Rack</item>
+   	    <item>@drawable/ic_navigation_menu_sale_rack</item>
+   	    <item type="integer">7</item>
 
-	    <item type="string">My Saved Craves</item>
-	    <item>@drawable/ic_navigation_menu_saved_craves</item>
+	    <item type="string">My Private Rack</item>
+	    <item>@drawable/ic_navigation_menu_private_rack</item>
    	    <item type="integer">2</item>
 	    
-   	    <item type="string">My Shared Craves</item>
-   	    <item>@drawable/ic_navigation_menu_share_and_rave</item>
+   	    <item type="string">My Shared Rack</item>
+   	    <item>@drawable/ic_navigation_menu_shared_rack</item>
    	    <item type="integer">3</item>
    	    
 	</array>
 
 	<array name="navigation_bottom_menu_items">
 
-	    <item type="string">Nerve Center</item>
-	    <item>@drawable/ic_navigation_menu_nerve_center</item>
+	    <item type="string">Teach My Cobrain</item>
+   	    <item>@drawable/ic_navigation_menu_teach</item>
+   	    <item type="integer">1</item>
+	    
+   	    <item type="string">Settings</item>
+	    <item>@drawable/ic_navigation_menu_settings</item>
    	    <item type="integer">4</item>
 	    
-	    <item type="string">Feedback</item>
+	    <!-- item type="string">Feedback</item>
    	    <item>@drawable/ic_navigation_menu_feedback</item>
-   	    <item type="integer">-5</item>
+   	    <item type="integer">5</item -->
 
-	    <item type="string">Help</item>
-	    <item>@drawable/ic_navigation_menu_help</item>
-   	    <item type="integer">-6</item>
+	    <item type="string">About</item>
+	    <item>@drawable/ic_navigation_menu_about</item>
+   	    <item type="integer">6</item>
 	    
 	</array>
 
 	<array name="friends_menu_mycraves_menu_items">
-	    <item type="string">My Saved Craves</item>
+	    <item type="string">My Private Craves</item>
    	    <item>@drawable/ic_menu_saved_craves</item>
    	    <item type="integer">2</item>
    	    <item type="string">My Shared Craves</item>
    	    <item>@drawable/ic_navigation_menu_share_and_rave</item>
+   	    <item type="integer">3</item>
+   	</array>
+
+	<array name="sku_categories">
+	    <!-- 
+        <item type="string">All Categories</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">0</item>
+	     -->
+	    
+	    <item type="string">Tops</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">5</item>
+
+   	    <item type="string">Bottoms</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">1</item>
+
+   	    <item type="string">Accessories</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">4</item>
+   	    
+   	    <item type="string">Footwear</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
+   	    <item type="integer">2</item>
+   	    
+   	    <item type="string">Underwear</item>
+   	    <item>@drawable/ic_category_menu_apparel</item>
    	    <item type="integer">3</item>
    	</array>
 	
@@ -61,12 +106,5 @@
    	    <item type="integer">-1</item>
 	    <item type="string">Coming Soon</item>
 	</array>
-		
-	<array name="craves_filter_menu_items">
-	    <item type="string">Tops</item>
-	    <item type="string">Bottoms</item>
-	    <item type="string">Accessories</item>
-	    <item type="string">Footwear</item>
-	    <item type="string">Underwear</item>
-	</array>
+
 </resources>

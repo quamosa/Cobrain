@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/overlay_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+     >
+
+    <!-- LinearLayout
+        android:id="@+id/bottom_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
+
+        <Button
+            android:id="@+id/just_for_me_button"
+            style="@style/crave_purple_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_launcher"
+            android:text="Just for Me" />
+
+        <Button
+            android:id="@+id/friends_can_see_button"
+            style="@style/crave_purple_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_launcher"
+            android:text="Friends can See" />
+    </LinearLayout -->
+
+   <!-- LinearLayout
+        android:id="@+id/top_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/crave_padding"
+        android:layout_marginLeft="@dimen/crave_padding"
+        android:layout_marginRight="@dimen/crave_padding"
+		>
+
+		<Button
+	        android:id="@+id/price_filter_button"
+	        android:background="@drawable/crave_filter_button_highlight"
+			android:paddingLeft="15dp"
+			android:paddingRight="15dp"
+	        android:layout_width="0dp"
+	        android:layout_height="40dp"
+	        android:layout_weight="1"
+	        android:layout_marginRight="10dp"
+	        android:textColor="@color/crave_filter_button_highlight"
+	        android:drawableRight="@drawable/ic_crave_price_toggle"
+	        android:textSize="15sp"
+	        android:text="All Prices"
+	        />
+		<ToggleButton
+	        android:id="@+id/category_filter_button"
+	        android:background="@drawable/crave_filter_button_highlight"
+	        android:layout_width="0dp"
+	        android:layout_height="40dp"
+	        android:layout_weight="1"
+	        android:textSize="15sp"
+	        android:textColor="@color/crave_filter_button_highlight"
+	        android:textOn="Category"
+	        android:textOff="Category"
+	        />
+	</LinearLayout-->
+		  
+    <RelativeLayout
+        android:id="@+id/main_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         >
+
+        <ListView 
+            android:id="@+id/crave_strip_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            />
+        
+        <!-- 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/crave_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </android.support.v4.view.ViewPager>
+         -->
+    </RelativeLayout>
+    
+
+</RelativeLayout>

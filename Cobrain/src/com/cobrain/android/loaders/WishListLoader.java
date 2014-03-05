@@ -1,37 +1,39 @@
 package com.cobrain.android.loaders;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.os.AsyncTask;
-import android.os.Debug;
 import com.cobrain.android.adapters.WishListPagerAdapter;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.WishList;
-import com.cobrain.android.model.WishListItem;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
+import com.cobrain.android.utils.HelperUtils;
 
 public class WishListLoader {
-	String listId;
+	User owner;
 	int page;
 	int categoryId = 1;
 	int countPerPage = 5; //50 no longer returns results
 	WishListPagerAdapter adapter;
 	CobrainController controller;
-	OnLoadListener<ArrayList<WishListItem>> onLoadListener;
-	private AsyncTask<Void, Void, ArrayList<WishListItem>> currentRequest;
+	OnLoadListener<List<Sku>> onLoadListener;
+	private AsyncTask<Void, Void, List<Sku>> currentRequest;
 	private ArrayList<Integer> pagesLoaded = new ArrayList<Integer>();
 	boolean onSale;
 	boolean showPrivateOrPublic; //private is true
 
-	public String getListId() {
-		return listId;
+	public User getListId() {
+		return owner;
 	}
 
-	public boolean setMyListId(String listId, boolean showPrivateOrPublic) {
-		if (listId != this.listId || showPrivateOrPublic != this.showPrivateOrPublic) {
+	public boolean setMyListId(User owner, boolean showPrivateOrPublic) {
+		if (owner != this.owner || showPrivateOrPublic != this.showPrivateOrPublic) {
 			this.showPrivateOrPublic = showPrivateOrPublic;
-			this.listId = listId;
+			this.owner = owner;
 			page = 0;
 			pagesLoaded.clear();
 			return true;
@@ -39,19 +41,23 @@ public class WishListLoader {
 		return false;
 	}
 	
-	public boolean setListId(String listId) {
-		return setMyListId(listId, false);
+	public boolean setListId(User owner) {
+		return setMyListId(owner, false);
 	}
 
 	public int getCategoryId() {
 		return categoryId;
 	}
 
+	public void clearPagesLoaded() {
+		page = 0;
+		pagesLoaded.clear();
+	}
+	
 	public boolean setCategoryId(int categoryId) {
 		if (categoryId != this.categoryId) {
 			this.categoryId = categoryId;
-			page = 0;
-			pagesLoaded.clear();
+			clearPagesLoaded();
 			return true;
 		}
 		return false;
@@ -59,8 +65,7 @@ public class WishListLoader {
 	public boolean setOnSaleRecommendationsOnly(boolean onSale) {
 		if (this.onSale != onSale) {
 			this.onSale = onSale;
-			page = 0;
-			pagesLoaded.clear();
+			clearPagesLoaded();
 			return true;
 		}
 		return false;
@@ -86,6 +91,7 @@ public class WishListLoader {
 	public void dispose() {
 		cancel();
 		controller = null;
+		owner = null;
 		adapter = null;
 		onLoadListener = null;
 	}
@@ -96,46 +102,51 @@ public class WishListLoader {
 		
 		if (this.page != page) {
 			if (!pagesLoaded.contains(page)) {
-				loadWishList(listId, countPerPage, page);
+				loadWishList(countPerPage, page);
 			}
 		}
 	}
 	
-	void loadWishList(final String listId, final int countPerPage, final int page) {
+	void loadWishList(final int countPerPage, final int page) {
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 		
-		currentRequest = new AsyncTask<Void, Void, ArrayList<WishListItem>>() {
-			WishList r = null;
+		currentRequest = new AsyncTask<Void, Void, List<Sku>>() {
 
+			Skus r = null;
+			
 			@Override
-			protected ArrayList<WishListItem> doInBackground(Void... params) {
+			protected List<Sku> doInBackground(Void... params) {
+				if (HelperUtils.Tasks.asyncTaskCancel(this, controller == null)) return null;
+				
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
-				ArrayList<WishListItem> items = new ArrayList<WishListItem>();
+				List<Sku> items = null;
 				
 				if (u != null) {
-					r = u.getList(listId);
-					if (r != null) {
-						for (WishListItem item : r.getItems()) {
-							if (!item.isPublic() == showPrivateOrPublic) {
-								items.add(item);
-							}
-						}
-					}
+					r = u.getSkus(owner, showPrivateOrPublic ? "saved" : "shared", null, null);
+					if (r != null) items = r.get();
 				}
 				
 				return items;
 			}
 
 			@Override
-			protected void onPostExecute(ArrayList<WishListItem> result) {
-				if (result != null) {
-					int pg = 1; //result.getPage();
-					WishListLoader.this.page = pg;
-					pagesLoaded.add(pg);
+			protected void onCancelled() {
+				r = null;
+				super.onCancelled();
+			}
+
+			@Override
+			protected void onPostExecute(List<Sku> result) {
+				if (adapter != null) {
+					if (result != null) {
+						int pg = 1; //result.getPage();
+						WishListLoader.this.page = pg;
+						pagesLoaded.add(pg);
+					}
+					adapter.load(r, result, (page > 1));
+					if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
 				}
-				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
-				adapter.load(r, result, (page > 1));
 				r = null;
 				currentRequest = null;
 			}
@@ -150,7 +161,7 @@ public class WishListLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<ArrayList<WishListItem>> listener) {
+	public void setOnLoadListener(OnLoadListener<List<Sku>> listener) {
 		onLoadListener = listener;
 	}
 }

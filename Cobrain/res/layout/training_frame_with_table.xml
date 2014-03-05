@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White" 
+    >
+
+    <RelativeLayout
+        android:id="@+id/craves_header"
+        android:layout_margin="10dp"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent" 
+	    >
+
+        <TextView
+            android:id="@+id/craves_found_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="7dp"
+            android:text="23 Craves Found"
+            android:textSize="16sp" />
+        
+ 	    <Button
+ 	        android:id="@+id/training_save_button"
+ 	        style="@style/green_button"
+ 	        android:layout_width="220dp"
+ 	        android:layout_height="wrap_content"
+ 	        android:layout_alignParentBottom="true"
+ 	        android:layout_centerHorizontal="true"
+ 	        android:layout_marginTop="10dp"
+ 	        android:paddingLeft="30dp"
+ 	        android:paddingRight="30dp"
+ 	        android:text="NONE OF THESE" />
+	
+	    <TableLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_above="@+id/training_save_button"
+	        android:layout_below="@+id/craves_found_info"
+	        android:stretchColumns="*" >
+	
+	        <TableRow
+	            android:layout_weight="1"
+	            android:layout_width="match_parent"
+	            android:layout_height="0dp" >
+	
+	            <include
+	                android:id="@+id/training_image_1"
+					layout="@layout/inc_training_image_frame_with_info"
+	                style="@style/training_image_1"
+	                 />
+	
+	            <include
+	                android:id="@+id/training_image_2"
+					layout="@layout/inc_training_image_frame_with_info"
+	                style="@style/training_image_2" />
+	
+	        </TableRow>
+
+	        <RelativeLayout
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:background="#474747"
+	            >
+	        <TextView
+	            android:id="@+id/training_question"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_centerInParent="true"
+	            android:layout_marginTop="3dp"
+	            android:layout_marginBottom="3dp"
+	            android:gravity="center"
+	            android:padding="8dp"
+	            android:maxLines="1"
+	            android:text="Which ones would you wear to work?"
+	            android:textColor="@color/White"
+	            android:textSize="14sp" />
+	        </RelativeLayout>
+	        	    	
+	        <TableRow
+	            android:layout_weight="1"
+	            android:layout_width="match_parent"
+	            android:layout_height="0dp" >
+	
+	            <include
+	                android:id="@+id/training_image_3"
+					layout="@layout/inc_training_image_frame_with_info"
+	                style="@style/training_image_3" />
+	
+	            <include
+	                android:id="@+id/training_image_4"
+					layout="@layout/inc_training_image_frame_with_info"
+	                style="@style/training_image_4" />
+	        </TableRow>
+	    </TableLayout>
+	
+	    <!--
+	    GridView
+	        android:id="@+id/gridView1"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_above="@+id/save_training_button"
+	        android:stretchMode="columnWidth"
+	        android:verticalSpacing="10dp"
+	        android:horizontalSpacing="10dp"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@+id/which_header"
+	        android:layout_marginTop="14dp"
+	        android:numColumns="2" >
+	
+	    </GridView
+	    -->
+    </RelativeLayout>
+
+</RelativeLayout>

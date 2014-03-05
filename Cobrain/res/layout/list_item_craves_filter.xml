@@ -2,18 +2,18 @@
 <com.cobrain.android.views.StateFullView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/filter_menu_item_padding" 
-    android:paddingBottom="@dimen/filter_menu_item_padding" 
-    android:gravity="center_vertical" >
+    android:paddingBottom="7dp" 
+     >
 
-   <TextView
+   <CheckedTextView
        android:id="@+id/caption"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_centerVertical="true"
-       android:paddingLeft="@dimen/filter_menu_item_leftpadding"
-       android:paddingRight="@dimen/filter_menu_item_leftpadding"
-       android:textSize="23sp"
+       android:background="@drawable/black_button_highlight"
+       android:padding="10dp"
+       android:textSize="18sp"
+	   android:gravity="center"
+       android:text="Bottoms"
        android:textColor="#fff"
 		 />
 

@@ -13,15 +13,14 @@
     android:layout_height="@dimen/saved_and_shared_item_height"
     android:background="@color/White" >    
 
-    <ImageView
-        android:id="@+id/slide_left_icon"
-        android:layout_width="wrap_content"
+        <View
+        android:id="@+id/divider"
+        android:layout_width="1dp"
+        android:layout_toRightOf="@+id/item_image"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/ic_slide_left" />
-
+        android:background="#e5e5e5"
+        />
+    
    <RelativeLayout
         android:id="@+id/crave_info"
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_toLeftOf="@+id/slide_left_icon"
-        android:layout_toRightOf="@+id/item_image" >
+        android:layout_toRightOf="@+id/divider" >
 
         <TextView
             android:id="@+id/item_retailer"
@@ -55,52 +54,61 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/item_info"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
             android:text="$30.00"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
-      
+
+                <TextView
+            android:id="@+id/item_sale_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/item_price"
+            android:layout_alignTop="@+id/item_price"
+            android:text="$30.00"
+            android:textColor="#f4a427"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+        
+        <RelativeLayout
+          android:id="@+id/raves_layout"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginRight="10dp"
+          android:layout_marginBottom="10dp"
+          android:layout_alignParentRight="true"
+          android:layout_alignParentBottom="true"
+          android:padding="5dp"
+          android:background="@color/Raved"
+          android:visibility="visible" >
+
+          <TextView
+              android:id="@+id/rave_count"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_centerVertical="true"
+              android:drawableLeft="@drawable/ic_shared_craves_friend_rave"
+              android:drawablePadding="5dp"
+              android:gravity="center_vertical"
+              android:lines="1"
+              android:textStyle="bold"
+              android:text="1"
+              android:textColor="@color/White"
+              android:textSize="12dp" />
+          
+      </RelativeLayout>
+        
+        
     </RelativeLayout>
 
-   
-        <RelativeLayout
-            android:id="@+id/raves_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/crave_info"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@color/SharedCravesFriendRavesBackground"
-            android:visibility="visible" >
-
-            <ImageView
-                android:id="@+id/rave_star_icon"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:padding="0dp"
-	            android:src="@drawable/ic_shared_craves_friend_rave"
-                >
-                
-            </ImageView>
-
-            <TextView
-                android:id="@+id/rave_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/rave_star_icon"
-                android:paddingLeft="5dp"
-                android:text="Jim and 10 friends raved this"
-                android:textSize="12dp" />
-            
-        </RelativeLayout>  
+      
         
     <ImageView
         android:id="@+id/item_image"
         android:layout_width="95dp"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
+        android:scaleType="center"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:src="@drawable/ic_launcher" />

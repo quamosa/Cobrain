@@ -5,19 +5,21 @@ import java.util.ArrayList;
 import android.os.AsyncTask;
 
 import com.cobrain.android.adapters.FriendsListAdapter;
-import com.cobrain.android.model.WishList;
+import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Friendships;
 import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.service.Cobrain;
-import com.cobrain.android.service.Cobrain.CobrainController;
+import com.cobrain.android.model.Friendship;
 
 public class FriendsListLoader {
 
 	FriendsListAdapter adapter;
 	CobrainController controller;
-	ArrayList<WishList> items = new ArrayList<WishList>();
-	private AsyncTask<Void, Void, ArrayList<WishList>> currentRequest;
-	private OnLoadListener<ArrayList<WishList>> onLoadListener;
-	private ArrayList<WishList> lists;
+	ArrayList<Friendship> items = new ArrayList<Friendship>();
+	private AsyncTask<Void, Void, Friendships> currentRequest;
+	private OnLoadListener<Friendships> onLoadListener;
+	private Friendships friends;
+	private boolean pause;
 
 	public void initialize(CobrainController controller,
 			FriendsListAdapter adapter) {
@@ -25,48 +27,46 @@ public class FriendsListLoader {
 		this.adapter = adapter;
 	}
 
-	public ArrayList<WishList> getItems() {
+	public ArrayList<Friendship> getItems() {
 		return items;
 	}
 
 	public void dispose() {
+		cancel();
 		adapter = null;
 		controller = null;
 		items.clear();
 	}
 
 	public void loadFriendList() {
+		if (pause) return;
 		if (onLoadListener != null) onLoadListener.onLoadStarted();
 
-		currentRequest = new AsyncTask<Void, Void, ArrayList<WishList>>() {
+		currentRequest = new AsyncTask<Void, Void, Friendships>() {
 
 			@Override
-			protected ArrayList<WishList> doInBackground(Void... params) {
+			protected Friendships doInBackground(Void... params) {
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
 
 				if (u != null) {
 					//if (lists == null)
-						lists = u.getLists();
-
-					ArrayList<WishList> items = new ArrayList<WishList>();
-
-					if (lists != null)
-						for (WishList lr : lists)
-							if (!lr.getOwner().getId().equals(u.getUserId()))
-								items.add(lr);
-					
-					return items;
+					friends = u.getFriendships();
+					return friends;
 				}
 
 				return null;
 			}
 
 			@Override
-			protected void onPostExecute(ArrayList<WishList> result) {
-				if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
-				adapter.clear();
-				adapter.addAll(result);
+			protected void onPostExecute(Friendships result) {
+				if (!isCancelled() && !pause) {
+					if (onLoadListener != null) onLoadListener.onLoadCompleted(result);
+					if (result != null) {
+						adapter.clear();
+						adapter.addAll(result.getFriendships());
+					}
+				}
 				currentRequest = null;
 			}
 
@@ -80,7 +80,12 @@ public class FriendsListLoader {
 		}
 	}
 	
-	public void setOnLoadListener(OnLoadListener<ArrayList<WishList>> listener) {
+	public void setOnLoadListener(OnLoadListener<Friendships> listener) {
 		onLoadListener = listener;
+	}
+
+	public void pauseLoad(boolean pause) {
+		this.pause = pause;
+		if (pause) cancel();
 	}
 }

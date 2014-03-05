@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="TabTabs_home">
+      <item name="android:gravity">center_horizontal</item>
+      <item name="android:paddingLeft">16dip</item>
+      <item name="android:paddingRight">16dip</item>
+      <item name="android:background">@drawable/tabs_home_tab_indicator_holo</item>
+      <item name="android:layout_width">wrap_content</item>
+      <!-- item name="android:minWidth">80dip</item-->
+  </style>
+
+  <style name="TabTextTabs_home">
+	  <item name="android:textColor">#ffffff</item>
+      <item name="android:textSize">15sp</item>
+      <item name="android:textStyle">normal</item>
+      <!-- v14 <item name="android:textAllCaps">true</item> -->
+      <item name="android:ellipsize">marquee</item>
+      <item name="android:maxLines">2</item>
+      <!-- item name="android:maxWidth">180dip</item -->
+  </style>
+
+</resources>

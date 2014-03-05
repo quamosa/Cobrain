@@ -1,9 +1,11 @@
 package com.cobrain.android.fragments;
 
 import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +13,7 @@ import android.view.ViewGroup;
 public class MainFragment extends BaseCobrainFragment {
 
 	public static final String TAG = "MainFragment";
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -27,7 +29,7 @@ public class MainFragment extends BaseCobrainFragment {
 			getFragmentManager()
 			.beginTransaction()
 			.replace(R.id.menu_frame, new NavigationMenuFragment(), NavigationMenuFragment.TAG)
-			.commit();
+			.commitAllowingStateLoss();
 
 			/*getFragmentManager()
 			.beginTransaction()
@@ -37,16 +39,30 @@ public class MainFragment extends BaseCobrainFragment {
 			getFragmentManager()
 			.beginTransaction()
 			.replace(R.id.menu_frame_two, new FriendsListFragment(), FriendsListFragment.TAG)
-			.commit();
+			.commitAllowingStateLoss();
 
 		}
 		
-		actionBar.show();
+		controller.showDefaultActionBar();
+
+		int defaultView = getArguments().getInt("defaultView");
 		
 		//show default cobrain view
-		controller.showHome();
-
-		controller.processIntents();
+		switch(defaultView) {
+		case CobrainController.VIEW_TEACH:
+			controller.showTeachMyCobrain(false);
+			break;
+		case CobrainController.VIEW_FRIENDS_MENU:
+			controller.showHome();
+			new Handler().post(new Runnable() {
+				public void run() {
+					controller.showFriendsMenu();
+				}
+			});
+			break;
+		default:
+			controller.showHome();
+		}
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -73,12 +89,15 @@ public class MainFragment extends BaseCobrainFragment {
 		super.onDestroyView();
 	}
 
-	public void showNavigationMenu() {
+	public NavigationMenuFragment showNavigationMenu() {
 		SlidingMenu sm = controller.getSlidingMenu();
 		if (sm.isMenuShowing()) {
 			sm.showContent();
 		}
 		else sm.showMenu(true);
+
+		NavigationMenuFragment f = (NavigationMenuFragment) getFragmentManager().findFragmentByTag(NavigationMenuFragment.TAG);
+		return f;
 	}
 
 	public FriendsListFragment showFriendsMenu() {
@@ -91,7 +110,7 @@ public class MainFragment extends BaseCobrainFragment {
 		}
 
 		FriendsListFragment f = (FriendsListFragment) getFragmentManager().findFragmentByTag(FriendsListFragment.TAG);
-		if (f != null) f.update();
+		//if (f != null) f.update();
 		
 		return f;
 	}

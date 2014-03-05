@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff" 
+    android:orientation="vertical">
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" 
+	    android:gravity="center_horizontal"
+	    android:paddingTop="10dp"
+	    android:paddingBottom="10dp"
+	    android:background="#78afde"
+	    android:orientation="horizontal">
+
+		<TextView
+		    android:id="@+id/textView1"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="You&apos;re so close!"
+		    android:textAppearance="?android:attr/textAppearanceSmall"
+		    android:textColor="#fff" />
+	    	    
+	</LinearLayout>
+
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingTop="20dp"
+        android:orientation="vertical"
+	   >
+
+	   	    <TextView
+	   	        android:id="@+id/badge_count_message"
+	   	        android:layout_width="wrap_content"
+	   	        android:layout_height="wrap_content"
+	   	        android:layout_marginBottom="7dp"
+	   	        android:text="Only 2 more friends to become a"
+	   	        android:textAppearance="?android:attr/textAppearanceLarge"
+	   	        android:textColor="#000"
+	   	        android:textSize="15sp" />
+
+	   	    <TextView
+	   	        android:id="@+id/badge_name"
+	   	        android:layout_width="wrap_content"
+	   	        android:layout_height="wrap_content"
+	   	        android:text="Tastemaker"
+	   	        android:textAppearance="?android:attr/textAppearanceLarge"
+	   	        android:textColor="#5097d4"
+	   	        android:textSize="28sp"
+	   	        android:textStyle="bold" />
+
+	   	    	   	    <TextView
+	   	        android:id="@+id/badge_earnings"
+	   	        android:layout_width="wrap_content"
+	   	        android:layout_height="wrap_content"
+	   	        android:layout_margin="7dp"
+	   	        android:text="and earn $5"
+	   	        android:textAppearance="?android:attr/textAppearanceLarge"
+	   	        android:textColor="#000"
+	   	        android:textSize="15sp" />
+
+	     <TextView
+	         android:id="@+id/invite_button"
+	         style="@style/invite_button"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:layout_marginTop="10dp"
+	         android:drawableLeft="@drawable/ic_friend_invite"
+	         android:drawablePadding="10dp"
+	         android:padding="10dp"
+	         android:text="INVITE MY FRIENDS"
+	         android:textStyle="bold"
+	         />
+		
+	</LinearLayout>
+
+	<Button
+	    android:id="@+id/tastemaker_close"
+	    android:layout_width="wrap_content"
+	    android:layout_height="34dp"
+	    android:layout_gravity="center_horizontal"
+	    android:layout_marginBottom="10dp"
+	    android:layout_marginTop="20dp"
+	    android:background="@drawable/sel_tastemaker_button_back"
+	    android:paddingLeft="50dp"
+	    android:paddingRight="50dp"
+	    android:text="CLOSE"
+	    android:textColor="@drawable/sel_tastemaker_button_text" />
+	
+	<TextView
+	    android:id="@+id/tastemaker_dont_show_again"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:text="@string/tastemaker_dont_show_again_link"
+	    android:textSize="10sp"
+	    android:textColor="#000"
+	    android:textAppearance="?android:attr/textAppearanceSmall" />
+		
+</LinearLayout>

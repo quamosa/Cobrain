@@ -63,12 +63,23 @@
 	    <item name="android:shadowRadius" >2</item-->
 	</style>
 
+    <style name="skip_verify_button" parent="login_button">
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:background">@null</item>
+	    <item name="android:textColor" >#000</item>
+	    <item name="android:text"><u>SKIP</u></item>
+	    <item name="android:textSize" >15sp</item>
+	</style>
+    
     <style name="verify_invite_button" parent="login_button">
+        <item name="android:layout_marginTop">5dp</item>
         <item name="android:background">@drawable/invite_button_highlight</item>
     </style>
     
     <style name="signup_button" parent="login_button">
-	</style>
+        <item name="android:background">@drawable/green_button_highlight</item>
+    </style>
 
     <style name="cancel_button" parent="login_button">
         <item name="android:background">@drawable/green_button_highlight</item>
@@ -107,6 +118,10 @@
         <item name="android:src">@drawable/ic_crave_share</item>
     	<item name="android:background">@drawable/crave_share_button</item>
     </style>
+    <style name="crave_dislike_button">
+        <item name="android:src">@drawable/ic_crave_dislike</item>
+    	<item name="android:background">@drawable/crave_dislike_button</item>
+    </style>
     
     <style name="see_why_button" parent="cancel_button">
         <!-- 
@@ -126,7 +141,6 @@
         <item name="android:textColor">#000</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_alignParentBottom">true</item>
         <item name="android:layout_alignParentLeft">true</item>
     </style>
     
@@ -135,13 +149,26 @@
     </style>
     
     <style name="navigation_menu_font">
-        <item name="android:textColor">@drawable/navigation_menu_caption_selector</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@drawable/sel_navigation_menu_caption</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="navigation_menu_header_font" parent="@style/navigation_menu_font">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="navigation_menu_username_header_font" parent="@style/navigation_menu_font">
+        <item name="android:textSize">14sp</item>
     </style>
     
     <style name="edit_text">
         <item name="android:padding">10dp</item>
 		<item name="android:background">@drawable/border</item>
+		<item name="android:singleLine">true</item>
+    </style>
+    <style name="edit_spinner" parent="edit_text">
+        <item name="android:padding">10dp</item>
+		<item name="android:background">@drawable/border_spinner</item>
 		<item name="android:singleLine">true</item>
     </style>
     
@@ -168,4 +195,28 @@
          <item name="android:layout_marginLeft">5dp</item>
          <item name="android:layout_marginTop">5dp</item>
     </style>
+    
+    <style name="avatar_style">
+       <item name="android:layout_width">@dimen/avatar_size</item>
+       <item name="android:layout_height">@dimen/avatar_size</item>
+       <item name="android:background">#bbb</item>
+       <item name="corner_radius">@dimen/avatar_corner_radius</item>
+       <item name="round_background">true</item>
+    </style>
+    
+    <style name="avatar_friends_style" parent="avatar_style">
+       <item name="android:layout_width">@dimen/avatar_friends_size</item>
+       <item name="android:layout_height">@dimen/avatar_friends_size</item>
+    </style>
+
+    <style name="avatar_feeds_style" parent="avatar_style">
+       <item name="android:layout_width">@dimen/avatar_feeds_size</item>
+       <item name="android:layout_height">@dimen/avatar_feeds_size</item>
+    </style>
+
+    <style name="avatar_friend_accept_style" parent="avatar_style">
+       <item name="android:layout_width">@dimen/avatar_friend_accept_size</item>
+       <item name="android:layout_height">@dimen/avatar_friend_accept_size</item>
+    </style>
+    
 </resources>

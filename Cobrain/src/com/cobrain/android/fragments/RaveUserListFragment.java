@@ -3,12 +3,11 @@ package com.cobrain.android.fragments;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.RaveUserListAdapter;
 import com.cobrain.android.loaders.RaveUserListLoader;
+import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.Rave;
-import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.WishList;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,7 @@ import android.widget.ListView;
 public class RaveUserListFragment extends BaseCobrainListFragment {
 
 	public static final String TAG = "RaveUserListFragment";
-	String itemId;
+	int skuId;
 	RaveUserListAdapter adapter;
 	RaveUserListLoader loader = new RaveUserListLoader();
 	
@@ -28,7 +27,7 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		itemId = getArguments().getString("itemId");
+		skuId = getArguments().getInt("skuId");
 		adapter = new RaveUserListAdapter(getActivity().getApplicationContext(), R.id.friend_name, loader.getItems(), this);
 		loader.initialize(controller, adapter);
 		setListAdapter(adapter);
@@ -42,16 +41,15 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 
 		loaderUtils.showLoading("Loading " + rave.getUser().getName() + "'s rave list...");
 		
-		new AsyncTask<Object, Void, WishList>() {
+		new AsyncTask<Object, Void, Skus>() {
 			@Override
-			protected WishList doInBackground(Object... params) {
+			protected Skus doInBackground(Object... params) {
 
-				WishList list = controller.getCobrain().getUserInfo().getListForUser(rave.getUser().getId());
-				return list;
+				return controller.getCobrain().getUserInfo().getSkus(rave.getUser(), "shared", null, null);
 			}
 
 			@Override
-			protected void onPostExecute(WishList result) {
+			protected void onPostExecute(Skus result) {
 				loaderUtils.dismiss();
 				if (result != null) {
 					controller.showWishList(result, false, true);
@@ -77,7 +75,17 @@ public class RaveUserListFragment extends BaseCobrainListFragment {
 	}
 
 	void update() {
-		loader.loadFriendList(itemId);
+		loader.loadFriendList(skuId);
+	}
+
+	public static Fragment newInstance(int productId) {
+		Bundle args = new Bundle();
+		args.putInt("skuId", productId);
+		
+		RaveUserListFragment f = new RaveUserListFragment();
+		f.setArguments(args);
+
+		return f;
 	}
 	
 }

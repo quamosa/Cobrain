@@ -13,7 +13,7 @@
         android:layout_margin="@dimen/crave_padding"
 	>
        
-    <RelativeLayout
+   <RelativeLayout
         android:id="@+id/main_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,15 +33,23 @@
            android:layout_alignParentRight="true"
            android:layout_alignParentTop="true" />
 	
-	    <ImageView
+	    <com.cobrain.android.views.HttpImageView
 	        android:id="@+id/item_image"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
-	        android:layout_alignParentBottom="true"
 	        android:layout_alignParentLeft="true"
-	        android:layout_below="@id/see_why_button"
-	        android:src="@drawable/ic_launcher" />
+	        android:layout_below="@id/crave_info_header"
+	        android:src="@drawable/ic_noimage" />
 
+	    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+	    
 	      <RelativeLayout
 	        android:id="@+id/border_for_image"
 	        android:layout_width="wrap_content"
@@ -57,8 +65,6 @@
 	        android:id="@+id/crave_info_header"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_alignLeft="@+id/item_image"
-	        android:layout_alignTop="@+id/item_image"
 	        android:background="@color/DarkPurple"
 	        android:gravity="center"
 	        android:padding="@dimen/crave_padding" >
@@ -96,24 +102,7 @@
    		    android:visibility="visible"
    		    android:src="@drawable/crave_rave_button" />
    			    	    
-	    <TextView
-	        android:id="@+id/rank_for_you_label"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignBottom="@+id/see_why_button"
-	        android:layout_alignLeft="@+id/item_image"
-	        android:visibility="invisible"
-	        android:text="#1 RANK FOR YOU"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-	    <TextView
-	        android:id="@+id/shared_craves_index_label"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignBaseline="@+id/see_why_button"
-	        android:layout_alignLeft="@+id/item_image"
-	        android:text="1 of 30 Shared Craves"
-	        android:textSize="15sp" />
 	    	
     <LinearLayout
         android:id="@+id/bottom_buttons"
@@ -190,6 +179,7 @@
     	    <RelativeLayout
 	        android:id="@+id/item_info_footer"
 	        style="@style/crave_item_info"
+	        android:layout_alignParentBottom="true"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:padding="@dimen/crave_padding" >
@@ -268,14 +258,6 @@
   	        </RelativeLayout>
 	        
 	    </RelativeLayout>
-    
-    <ProgressBar
-        android:id="@+id/progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
     
    </RelativeLayout>    
     

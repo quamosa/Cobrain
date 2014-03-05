@@ -7,9 +7,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.cobrain.android.R;
-import com.cobrain.android.service.Cobrain.CobrainView;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
 
 public class SignupFragment extends BaseCobrainFragment implements OnClickListener, CobrainView {
 
@@ -19,6 +20,7 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 	private EditText email;
 	private EditText password;
 	private boolean loggingIn;
+	private String signupUrl;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,6 +33,8 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		View v = getView();
+		
+		signupUrl = getArguments().getString("signupUrl");
 		createButton = (Button) v.findViewById(R.id.create_account_button);
 		cancelButton = (Button) v.findViewById(R.id.cancel_button);
 		email = (EditText) v.findViewById(R.id.email);
@@ -39,19 +43,29 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 		createButton.setOnClickListener(this);
 		cancelButton.setOnClickListener(this);
 
-		hideActionBar();
+		if (signupUrl != null) {
+			TextView message = (TextView) v.findViewById(R.id.message_label);
+			message.setVisibility(View.VISIBLE);
+			message.setText("A Cobrain member wants to share favorite craves with you! Please create your Cobrain account below to see them.");
+		}
+
+		controller.showOptionsMenu(false);
+		actionBar.setCustomView(R.layout.actionbar_login_frame);
+
+		//hideActionBar();
 
 		super.onActivityCreated(savedInstanceState);
 	}
 
 	@Override
 	public void onDestroyView() {
+		signupUrl = null;
 		createButton = null;
 		cancelButton = null;
 		email = null;
 		password = null;
 
-		restoreActionBar();
+		//restoreActionBar();
 
 		super.onDestroyView();
 	}
@@ -67,16 +81,14 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 				String password = this.password.getText().toString();
 				if (validate(email, password)) {
 					controller.showProgressDialog("Please wait ...", "Creating your account ...");
-					controller.getCobrain().createAccount(email, password);
+					controller.getCobrain().createAccount(signupUrl, email, password);
 				}
 				else loggingIn = false;
 			}
 			break;
 
 		case R.id.cancel_button:
-			getFragmentManager().beginTransaction()
-				.replace(android.R.id.content, new LoginFragment())
-				.commit();
+			controller.showLogin(signupUrl);
 			break;
 		}
 		

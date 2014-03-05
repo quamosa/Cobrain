@@ -1,39 +1,41 @@
 package com.cobrain.android.adapters;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import com.cobrain.android.R;
 import com.cobrain.android.fragments.SavedAndShareFragment;
 import com.cobrain.android.loaders.ImageLoader;
 import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.loaders.OnLoadListener;
-import com.cobrain.android.model.WishListItem;
-import com.cobrain.android.model.Product;
 import com.cobrain.android.model.Rave;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.v1.WishListItem;
 import com.cobrain.android.utils.LoaderUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.text.Html;
+import android.graphics.Paint;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
+public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 	private static final int VIEWTYPE_SAVED_AND_SHARE = 0;
 	private static final int VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES = 1;
+	private static final boolean debug = false;
 	private final String RAVE_INFO = "<font color='#9ec5e7'>%s</font> RAVED THIS";
 	private final String RAVE_INFO_WITH_FRIENDS = "<font color='#9ec5e7'>%s</font> AND <font color='#9ec5e7'>%s FRIEND%s</font> RAVED THIS";
+	private boolean flinging = true;
 	
-	ArrayList<WishListItem> items = new ArrayList<WishListItem>();
 	LoaderUtils loader = new LoaderUtils();
 	SavedAndShareFragment parent;
+	public boolean isShared;
 
 	public SavedAndShareAdapter(Context context, int resource, SavedAndShareFragment parent) {
 		super(context, resource);
@@ -41,7 +43,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 	}
 
 	public SavedAndShareAdapter(Context context, int resource,
-			List<WishListItem> items, SavedAndShareFragment parent) {
+			List<Sku> items, SavedAndShareFragment parent) {
 		super(context, resource, items);
 		setParent(parent);
 	}
@@ -55,23 +57,25 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		parent = null;
 	}
 	
-	@Override
+	/*@Override
 	public WishListItem getItem(int position) {
 		if (items.size() > position) {
 			return items.get(position);
 		}
 		return super.getItem(position);
-	}
+	}*/
 	
 	@Override
 	public long getItemId(int position) {
-		return getItem(position).getProduct().getId();
+		return getItem(position).getId();
 	}
-
+	
 	@Override
 	public int getItemViewType(int position) {
-		return (items.get(position).getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES :
-			VIEWTYPE_SAVED_AND_SHARE;
+		//Sku item = getItem(position);
+		//int typ = (item.getRaves().size() > 0) ? VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES : VIEWTYPE_SAVED_AND_SHARE;
+		//return typ;
+		return VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES;
 	}
 
 	@Override
@@ -79,12 +83,12 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		return 2;
 	}
 
-	@Override
+	/*@Override
 	public void notifyDataSetChanged() {
 		//do sorting here I suppose
-		doSort();
+		//doSort();
 		super.notifyDataSetChanged();
-	}
+	}*/
 	
 	static Comparator<WishListItem> comparer =
 			new Comparator<WishListItem>() {
@@ -94,7 +98,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				}
 			};
 	
-	void doSort() {
+	/*void doSort() {
 		items.clear();
 
 		for (int i = 0; i < getCount(); i++) {
@@ -102,7 +106,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		}
 
 		Collections.sort(items, comparer);
-	}
+	}*/
 
 	private class ViewHolder implements OnClickListener {
 		int position;
@@ -115,21 +119,22 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		View privateLayout;
 		View removeLayout;
 		View ravesLayout;
+		TextView salePrice;
 
 		@Override
 		public void onClick(View v) {
 			switch(v.getId()) {
 			case R.id.share_layout:
-				parent.shareRecommendation(items.get(position), true, shareListener);
+				parent.shareRecommendation(getItem(position), true, shareListener);
 				break;
 			case R.id.private_layout:
-				parent.shareRecommendation(items.get(position), false, privateListener);
+				parent.shareRecommendation(getItem(position), false, privateListener);
 				break;
 			case R.id.remove_layout:
-				parent.saveRecommendation(items.get(position), false, removeListener);
+				parent.saveRecommendation(getItem(position), false, removeListener);
 				break;
 			case R.id.raves_layout:
-				parent.showRavesUserList(items.get(position).getId());
+				//parent.showRavesUserList(getItem(position).getId());
 			}
 		}
 
@@ -161,9 +166,14 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 			@Override
 			public void onLoadCompleted(Integer r) {
 				parent.getLoaderUtils().dismissLoading();
-				if (r > 0) { 
-					shareLayout.setVisibility(View.GONE);
-					privateLayout.setVisibility(View.VISIBLE);
+				if (r > 0) {
+					if (!isShared && r == 1) {
+						parent.removeCrave(position);
+					}
+					else {
+						shareLayout.setVisibility(View.GONE);
+						privateLayout.setVisibility(View.VISIBLE);
+					}
 				}
 			}
 			
@@ -179,9 +189,14 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 			@Override
 			public void onLoadCompleted(Integer r) {
 				parent.getLoaderUtils().dismissLoading();
-				if (r > 0) { 
-					shareLayout.setVisibility(View.VISIBLE);
-					privateLayout.setVisibility(View.GONE);
+				if (r > 0) {
+					if (isShared) {
+						parent.removeCrave(position);
+					}
+					else {
+						shareLayout.setVisibility(View.VISIBLE);
+						privateLayout.setVisibility(View.GONE);
+					}
 				}
 			}
 			
@@ -207,11 +222,13 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				vh.ravesLayout.setOnClickListener(vh);
 				break;
 			}
+			v.setId(vtyp);
 			vh.image = (ImageView) v.findViewById(R.id.item_image);
 			vh.info = (TextView) v.findViewById(R.id.item_info);
 			vh.merchant = (TextView) v.findViewById(R.id.item_retailer);
 			vh.price = (TextView) v.findViewById(R.id.item_price);
-			vh.rave = (TextView) v.findViewById(R.id.rave_info);
+			vh.salePrice = (TextView) v.findViewById(R.id.item_sale_price);
+			vh.rave = (TextView) v.findViewById(R.id.rave_count);
 			vh.shareLayout = v.findViewById(R.id.share_layout);
 			vh.privateLayout = v.findViewById(R.id.private_layout);
 			vh.removeLayout = v.findViewById(R.id.remove_layout);
@@ -219,13 +236,17 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 			vh.privateLayout.setOnClickListener(vh);
 			vh.removeLayout.setOnClickListener(vh);
 			v.setTag(vh);
+
+			AbsListView.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			v.setLayoutParams(lp);
+			v.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 		}
 		else vh = (ViewHolder) v.getTag();
 
+
 		//showProgress(true);
 		
-		WishListItem item = getItem(position);
-		Product p = item.getProduct();
+		Sku p = getItem(position);
 		vh.position = position;
 		if (p.getMerchant() != null) {
 			vh.merchant.setText(p.getMerchant().getName().toUpperCase());
@@ -240,7 +261,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		else vh.info.setText(null);
 		vh.image.setVisibility(View.INVISIBLE);
 		
-		if (item.isPublic()) {
+		if (p.getOpinion().is("shared")) {
 			vh.shareLayout.setVisibility(View.GONE);
 			vh.privateLayout.setVisibility(View.VISIBLE);
 		}
@@ -250,19 +271,33 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 		}
 
 		if (vtyp == VIEWTYPE_SAVED_AND_SHARE_WITH_RAVES) {
-			CharSequence raveInfo = getRaveInfo(position);
-			vh.rave.setText(raveInfo);
+			if (p.getRaves().size() > 0 || debug) {
+				vh.ravesLayout.setVisibility(View.VISIBLE);
+				CharSequence raveInfo = getRaveInfo(position);
+				vh.rave.setText(raveInfo);
+			}
+			else vh.ravesLayout.setVisibility(View.GONE);
+		}
+
+		if (p.isOnSale()) {
+			vh.price.setPaintFlags(vh.price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			vh.salePrice.setVisibility(View.VISIBLE);
+			vh.salePrice.setText(p.getSalePriceFormatted());
+		}
+		else {
+			vh.price.setPaintFlags(vh.price.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+			vh.salePrice.setVisibility(View.INVISIBLE);
 		}
 		
-		if (p.getImageURL() != null) {
-			ImageLoader.load(p.getImageURL(), vh.image, new OnImageLoadListener() {
+		if (p.getImageURL() != null) { 
+			int w = vh.image.getMeasuredWidth();
+			int h = vh.image.getMeasuredHeight();
+			ImageLoader.get.load(p.getImageURL(), vh.image, w, h, new OnImageLoadListener() {
+
 				@Override
-				public void onLoad(String url, ImageView view, Bitmap b, boolean fromCache) {
+				public void onLoad(String url, ImageView view, Bitmap b, int fromCache) {
 					//showProgress(false);
-					if (fromCache) {
-						view.setVisibility(View.VISIBLE);
-					}
-					else loader.show(view);
+					LoaderUtils.show(view, fromCache == ImageLoader.CACHE_NONE && !flinging);
 				}
 	
 				@Override
@@ -271,29 +306,23 @@ public class SavedAndShareAdapter extends ArrayAdapter<WishListItem> {
 				}
 			});
 		}
-		else vh.image.setVisibility(View.INVISIBLE);
 
 		return v;
 	}
 
 	private CharSequence getRaveInfo(int position) {
 		String raveInfo;
-		ArrayList<Rave> raves = items.get(position).getRaves();
-		String name = raves.get(0).getUser().getName().toUpperCase(Locale.US);
-		int otherRaves = raves.size() - 1;
-		
-		if (otherRaves > 0) {
-			raveInfo = String.format(RAVE_INFO_WITH_FRIENDS, name, otherRaves, (otherRaves > 1) ? "S" : "");
+		List<Rave> raves = getItem(position).getRaves();
+		if (debug) {
+			raveInfo = String.valueOf(Math.random() * 24);
 		}
-		else
-			raveInfo = String.format(RAVE_INFO, name);
-
-		return Html.fromHtml(raveInfo);
+		else raveInfo = String.valueOf(raves.size());
+		return raveInfo;
 	}
 
 	public void remove(int position) {
 		setNotifyOnChange(false);
-		this.remove(items.get(position));
+		this.remove(getItem(position));
 		setNotifyOnChange(true);
 	}
 

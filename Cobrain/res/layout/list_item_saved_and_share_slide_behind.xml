@@ -9,7 +9,7 @@
         android:id="@+id/remove_layout"
         android:layout_width="@dimen/saved_and_shared_item_height"
         android:layout_height="match_parent"
-        android:background="#4b5155"
+        android:background="#de3b75"
         android:gravity="center"
         >
 	    <ImageView
@@ -27,7 +27,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:gravity="center"
-        android:background="#e13774" >
+        android:background="#1abc9c" >
 
 	    <ImageView
 	        android:id="@+id/private_crave"
@@ -44,7 +44,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:gravity="center"
-        android:background="#5097d4" >
+        android:background="#8c4d94" >
 
 	    <ImageView
 	        android:id="@+id/share_crave"

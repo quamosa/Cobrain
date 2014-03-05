@@ -29,8 +29,6 @@
         <item name="android:actionModeBackground">@drawable/cab_background_top_cobrain</item>
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_cobrain</item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Cobrain</item>
-        
-        
     </style>
 
     <style name="ActionBar.Solid.Cobrain" parent="@style/Widget.Sherlock.Light.ActionBar.Solid">

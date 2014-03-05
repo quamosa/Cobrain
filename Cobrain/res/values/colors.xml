@@ -16,19 +16,30 @@
     <color name="SilverButton">#AAAAAA</color>
     <color name="Dimmer">#77000000</color>
     <color name="Brighter">#f0ffffff</color>
-    <color name="NavigationMenuFontDefaultColor">#a5a6a8</color>
+    <color name="NavigationMenuFontDefaultColor">#a8a9aa</color>
     <color name="NavigationMenuFontSelectedColor">#fff</color>
     <color name="NavigationMenuBackgroundDefaultColor">#00000000</color>
-    <color name="NavigationMenuBackgroundSelectedColor">#33000000</color>
+    <color name="NavigationMenuBackgroundSelectedColor">#ff875195</color>
+    <color name="FeedMenuBackgroundDefaultColor">#00000000</color>
+    <color name="FeedMenuBackgroundSelectedColor">#ff875195</color>
+    <item name="FriendsColor" type="color">@color/GreyBackground</item>
+    <color name="FeedsColor">#ff858585</color>
     <color name="CraveShareButton">#AAAAAA</color>
     <color name="CraveSaveButtonNormal">#bb000000</color>
-    <color name="CraveSaveButtonPressed">#bbde3b75</color>
+    <color name="CraveSaveButtonPressed">#bb1abc9c</color>
     <color name="CraveShareButtonNormal">#bb000000</color>
-    <color name="CraveShareButtonPressed">#bb5097d4</color>
+    <color name="CraveShareButtonPressed">#bba2429a</color>
+    <color name="CraveDislikeButtonNormal">#bb000000</color>
+    <color name="CraveDislikeButtonPressed">#bbe03770</color>
     <color name="CraveBorderColor">#cdcdcd</color>
     <color name="SharedCravesFriendRavesBackground">#e2eef8</color>
     <color name="NavigationMenuDivider">#454545</color>
     <color name="FriendsListDivider">#000</color>
 	<color name="FriendsListHeaderText">#c1c1c1</color>
 	<color name="FriendsListItemText">#939495</color>
+	<color name="Raved">#4c96d6</color>
+	<color name="Unraved">#787877</color>
+	<color name="Tastemaker">#aa7eb5</color>
+	<color name="Trendsetter">#ffcb30</color>
+	<color name="CraveFilterMenu">#ddffffff</color>
 </resources>

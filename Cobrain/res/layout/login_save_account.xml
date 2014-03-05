@@ -7,20 +7,13 @@
     >
 <RelativeLayout 
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#949" >
-
-    <include
-        android:id="@+id/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/actionbar_login_save_account_frame" />
 
     <RelativeLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/header"
         android:layout_margin="20dp"
         android:background="@drawable/drop_shadow" >
 
@@ -45,7 +38,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/cobrain_logo"
                 android:layout_marginBottom="10dp"
-                android:text="We need some information before you start using your Cobrain." />
+                android:visibility="gone"
+                android:text="" />
 
             <TextView
                 android:id="@+id/name_label"
@@ -53,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/intro_text"
                 android:layout_marginBottom="10dp"
-                android:text="What is your name?" />
+                android:text="@string/profile_name_label" />
 
             <EditText
                 android:id="@+id/name"
@@ -69,7 +63,7 @@
                 android:layout_below="@+id/name"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="20dp"
-                android:text="What is your zipcode?" />
+                android:text="@string/profile_zipcode_label" />
 
             <EditText
                 android:id="@+id/zipcode"
@@ -85,50 +79,37 @@
                 android:layout_below="@+id/zipcode"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="20dp"
-                android:text="Do you prefer clothing designed for Men or for Women?" />
+                android:text="@string/profile_gender_label" />
 
-            <RadioGroup
-                android:id="@+id/gender"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/gender_label"
-                android:orientation="horizontal" >
+            		<Spinner 
+        android:id="@+id/gender"
+        style="@style/edit_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gender_label"
+        android:entries="@array/profile_gender_names"
+    	/>
 
-                <RadioButton
-                    android:id="@+id/male"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="Male"
-                    android:textColor="#000" />
-
-                <RadioButton
-                    android:id="@+id/female"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Female"
-                    android:textColor="#000" />
-
-                <RadioButton
-                    android:id="@+id/none"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="None"
-                    android:textColor="#000" />
-            </RadioGroup>
-
+       		<TextView 
+       		    android:id="@+id/verify_message"
+       		    android:layout_width="wrap_content"
+       		    android:layout_height="wrap_content"
+       		    android:layout_marginTop="20dp"
+       		    android:gravity="center_horizontal"
+       		    android:layout_below="@+id/gender"
+       		    android:text="We need to verify you so you can receive friend invites"
+       		    />
             <Button
                 android:id="@+id/verify_invite_button"
                 style="@style/verify_invite_button"
-                android:layout_below="@+id/gender"
-                android:text="VERIFY INVITATION" />
+                android:layout_below="@+id/verify_message"
+                android:text="SEND CODE TO VERIFY ME" />
             
             <Button
                 android:id="@+id/save_account_button"
-                style="@style/login_button"
+                style="@style/skip_verify_button"
                 android:layout_below="@+id/verify_invite_button"
-                android:text="SAVE" />
+                 />
         </RelativeLayout>
     </RelativeLayout>
 
