@@ -108,9 +108,28 @@ public class RepeatingTabHost extends HorizontalScrollView {
 	}
 
 	ArrayList<Integer> selectedTabs = new ArrayList<Integer>();
+	PendingSelectTab pendingSelectTab;
+	
+	private class PendingSelectTab {
+		int tab;
+		
+		public PendingSelectTab(int tab) {
+			this.tab = tab;
+		}
+
+		public void selectTab() {
+			RepeatingTabHost.this.selectTab(tab);
+		}
+	}
 	
 	void selectTab(int i) {
 		View v;
+		HorizontalScrollView scroll = (HorizontalScrollView) tabHost.getTabWidget().getParent();
+		
+		if (scroll.getWidth() == 0) {
+			pendingSelectTab = new PendingSelectTab(i);
+			return;
+		}
 		
 		for (Integer tab : selectedTabs) {
 			v = tabHost.getTabWidget().getChildAt(tab);
@@ -138,7 +157,6 @@ public class RepeatingTabHost extends HorizontalScrollView {
 			}
 		}
 
-		HorizontalScrollView scroll = (HorizontalScrollView) tabHost.getTabWidget().getParent();
 		int x = r.centerX() - scroll.getWidth() / 2;
 		scroll.setScrollX(x);
 	}
@@ -211,6 +229,11 @@ public class RepeatingTabHost extends HorizontalScrollView {
 		super.onLayout(changed, l, t, r, b);
 		if (!init) {
 			init = true;
+			if (pendingSelectTab != null) {
+				pendingSelectTab.selectTab();
+				pendingSelectTab = null;
+				return;
+			}
 			if (tabHost.getCurrentTab() == 0) {
 				tabHost.setCurrentTab( tabHost.getTabWidget().getTabCount() / 2 );
 			}
