@@ -4,24 +4,21 @@
     android:layout_height="match_parent" 
     android:padding="3dp"
      >
-    <View
-        android:id="@+id/progress"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignBottom="@+id/item_image"
-        android:layout_centerHorizontal="true"
-        android:background="@color/CraveBorderColor" />
-
-    	
   	    <ImageView
   	        android:id="@+id/item_image"
   	        android:layout_width="match_parent"
   	        android:layout_height="match_parent"
   	        android:layout_above="@+id/item_info"
   	        android:layout_alignParentLeft="true"
-  	        android:background="#fff"
   	        android:src="@drawable/ic_noimage" />
-  	    
+	    <View
+	        android:id="@+id/progress"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_alignBottom="@+id/item_image"
+	        android:layout_centerHorizontal="true"
+	        android:background="@color/CraveBorderColor" />
+
   	    <RelativeLayout
   	        android:id="@+id/item_info"
   	        android:layout_width="match_parent"

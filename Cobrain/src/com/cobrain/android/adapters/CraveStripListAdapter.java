@@ -58,7 +58,7 @@ public class CraveStripListAdapter<T> extends ArrayAdapter<CraveStrip<T>> implem
 		View v = convertView;
 		ViewHolder vh;
 
-		v = views.get(position);
+		//v = views.get(position);
 		
 		if (v == null) {
 			v = View.inflate(parent.getContext(), R.layout.list_item_crave_strip, null);
@@ -82,27 +82,37 @@ public class CraveStripListAdapter<T> extends ArrayAdapter<CraveStrip<T>> implem
 		else vh.caption.setVisibility(View.GONE);
 		
 		if (vh.position != position) {
-			removeAllViews(vh.layout);
-			addView(vh.layout, strip.container, lp);
+			if (!removeAllViews(vh.layout, strip.list)) {
+				addView(vh.layout, strip.list, lp);
+			}
 			vh.position = position;
 		}
 		
 		return v;
 	}
 
-	void removeAllViews(ViewGroup v) {
+	boolean removeAllViews(ViewGroup v, View keep) {
+		boolean found = false;
+		
 		for (int i = 0; i < v.getChildCount(); i++) {
 			View c = v.getChildAt(i);
-			c.setVisibility(View.GONE);
+			if (keep != c) {
+				c.setVisibility(View.GONE);
+			}
+			else {
+				c.setVisibility(View.VISIBLE);
+				found = true;
+			}
 		}
+		return found;
 	}
 	
 	void addView(ViewGroup parent, View v, LayoutParams lp) {
 		ViewGroup vp = (ViewGroup) v.getParent();
-		if (vp != parent) {
+		//if (vp != parent) {
 			if (vp != null) vp.removeView(v);
 			parent.addView(v, lp);
-		}
+		//}
 		v.setVisibility(View.VISIBLE);
 	}
 

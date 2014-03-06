@@ -9,6 +9,14 @@ public class Skus {
 	User owner;	
 	String _id;
 	String signal;
+
+	int totalReturned;
+	public void setTotalReturned(int total) {
+		totalReturned = total;
+	}
+	public int getTotalReturned() {
+		return totalReturned;
+	}
 	
 	public List<Sku> get() {
 		return skus;

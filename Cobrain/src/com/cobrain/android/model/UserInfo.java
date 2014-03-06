@@ -347,15 +347,18 @@ public class UserInfo extends User {
 				if (onSale != null || categoryId != null) {
 					int i = 0;
 					List<Sku> skus = s.get();
+					s.setTotalReturned(skus.size());
 					
-					while(i < skus.size()) {
-						if (
-							(onSale != null && onSale != skus.get(i).isOnSale()) ||
-							(categoryId != null && skus.get(i).category.id != categoryId)
-						) {
-							skus.remove(i);
+					if (skus != null) {
+						while(i < skus.size()) {
+							if (
+								(onSale != null && onSale != skus.get(i).isOnSale()) ||
+								(categoryId != null && (skus.get(i).category == null || skus.get(i).category.id != categoryId))
+							) {
+								skus.remove(i);
+							}
+							else i++;
 						}
-						else i++;
 					}
 				}
 			}

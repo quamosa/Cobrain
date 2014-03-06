@@ -85,7 +85,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 	private TextView raveCount;
 	private View ravesLayout;
 	private View selector;
-	public boolean flinging = true;
+	public boolean flinging = false;
 
 	public CraveStripFragment() {
 	}
@@ -161,8 +161,8 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 			recommendation = r;
 			if (r != null) position = r.getRank();
 			else position = 0;
-			update();
 		}
+		update();
 	}
 
 	public void setWishListItem(WishList results, List<WishListItem> listItems, WishListItem item, int position, int total) {
@@ -246,31 +246,43 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 
 			showProgress(true, false);
 			
-			if (recommendation.getImageURL() != null) {
-				ImageLoader.get.load(recommendation.getImageURL(), itemImage, width, height, new OnImageLoadListener() {
-					@Override
-					public void onLoad(String url, ImageView view, Bitmap b, int fromCache) {
-						showProgress(false, fromCache == ImageLoader.CACHE_NONE && !flinging);
-						if (debug) {
-							switch(fromCache) {
-							case ImageLoader.CACHE_NONE:
-								selector.setBackgroundColor(0x77ff0000);
-								break;
-							case ImageLoader.CACHE_MEMORY:
-								selector.setBackgroundColor(0x7700ff00);
-								break;
-							case ImageLoader.CACHE_DISK:
-								selector.setBackgroundColor(0x770000ff);
-								break;
+			String url = recommendation.getImageURL();
+			
+			if (url != null) {
+				Object tag = itemImage.getTag();
+				
+				if (tag == null || !tag.equals(url)) {
+
+					ImageLoader.get.load(url, itemImage, width, height, new OnImageLoadListener() {
+						@Override
+						public void onLoad(String url, ImageView view, Bitmap b, int fromCache) {
+							showProgress(false, fromCache == ImageLoader.CACHE_NONE && !flinging);
+							itemImage.setTag(url);
+							if (debug) {
+								switch(fromCache) {
+								case ImageLoader.CACHE_NONE:
+									selector.setBackgroundColor(0x77ff0000);
+									break;
+								case ImageLoader.CACHE_MEMORY:
+									selector.setBackgroundColor(0x7700ff00);
+									break;
+								case ImageLoader.CACHE_DISK:
+									selector.setBackgroundColor(0x770000ff);
+									break;
+								}
 							}
 						}
-					}
-		
-					@Override
-					public Bitmap onBeforeLoad(String url, ImageView view, Bitmap b) {
-						return b;
-					}
-				});
+			
+						@Override
+						public Bitmap onBeforeLoad(String url, ImageView view, Bitmap b) {
+							return b;
+						}
+					});
+					
+				}
+				else {
+					showProgress(false, false);
+				}
 			}
 			else
 				itemImage.setVisibility(View.INVISIBLE);
@@ -332,7 +344,7 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 		cravePopupLabel.setText(message);
 	}
 	
-	void showProgress(boolean show, boolean animate) {
+	void showProgressOld(boolean show, boolean animate) {
 		if (show) {
 			progress.setVisibility(View.VISIBLE);
 			itemImage.setVisibility(View.INVISIBLE);
@@ -341,6 +353,17 @@ public class CraveStripFragment<T> extends MiniFragment implements OnClickListen
 			progress.setVisibility(View.VISIBLE);
 			if (animate) LoaderUtils.show(itemImage);
 			else itemImage.setVisibility(View.VISIBLE);
+		}
+	}
+	void showProgress(boolean show, boolean animate) {
+		if (show) {
+			LoaderUtils.show(progress, false);
+			itemImage.setVisibility(View.INVISIBLE);
+		}
+		else {
+			itemImage.setVisibility(View.VISIBLE);
+			if (animate) LoaderUtils.hide(progress);
+			else LoaderUtils.hide(progress, false, true); //progress.setVisibility(View.GONE);
 		}
 	}
 	

@@ -26,7 +26,7 @@ public class CraveStrip<T> {
 	public CraveStripPagerAdapter<T> adapter;
 	public CraveStripLoader<T> loader;
 	public ViewPager pager;
-	public RelativeLayout container;
+	//public RelativeLayout container;
 	public HListView list;
 	public Adapter listAdapter;
 	public int type;
@@ -79,7 +79,7 @@ public class CraveStrip<T> {
 			loader = null;
 		}
 		pager = null;
-		container = null;
+		//container = null;
 		listener = null;
 		_listener = null;
 	}

@@ -208,8 +208,12 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void onBackPressed() {
 		if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-			if (!isMenuOpen()) {
+			if (!getSlidingMenu().isMenuShowing()) {
 				showNavigationMenu();
+				return;
+			}
+			if (getSlidingMenu().isSecondaryMenuShowing()) {
+				showContent();
 				return;
 			}
 			if (!letMeLeave) {
