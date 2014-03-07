@@ -4,7 +4,7 @@ public class Checklist {
 	boolean initial_training;
 	int tastemaker_campaign;
 	
-	public boolean isInitialTraining() {
+	public boolean hasInitialTraining() {
 		return initial_training;
 	}
 	public int getTastemakerCampaign() {

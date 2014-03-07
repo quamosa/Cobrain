@@ -64,9 +64,9 @@ public class SplashActivity extends Activity implements OnClickListener {
 
 	boolean checkStartCobrain() {
         Cobrain cobrain = new Cobrain(getApplicationContext());
-		int firstRun = cobrain.getSharedPrefs().getInt("FirstRun", 0);
+		int firstRun = cobrain.getGlobalSharedPrefs().getInt("FirstRun", 0);
 		if (firstRun == 0) {
-			cobrain.getSharedPrefs().putInt("FirstRun", 1).commit();
+			cobrain.getGlobalSharedPrefs().putInt("FirstRun", 1).commit();
 			return false;
 		}
 		else {

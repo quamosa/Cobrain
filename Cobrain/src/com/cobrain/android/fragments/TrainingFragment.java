@@ -5,9 +5,11 @@ import com.cobrain.android.loaders.OnLoadListener;
 import com.cobrain.android.loaders.TrainingLoader;
 import com.cobrain.android.loaders.TrainingLoader.OnSelectedListener;
 import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.utils.HelperUtils;
 
 import android.app.AlertDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -122,10 +124,32 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			public void onLoadCompleted(Boolean r) {
 				//if (r != null && r == true) {
 					//we ASSUME we saved our choices load new ones now!
-					if (saveChoicesThenGoHome) {
-						controller.showHome(HomeFragment.TAB_HOME_RACK, true);
+
+					if (saveChoicesThenGoHome || trainingLoader.getCravesRemaining() == 0) {
+						new AsyncTask<Void, Void, Void>() {
+			
+							@Override
+							protected Void doInBackground(Void... params) {
+								UserInfo ui = controller.getCobrain().getUserInfo();
+								if (ui != null) {
+									if (!ui.getChecklist().hasInitialTraining()) {
+										ui.updateProfile("{\"checklist\": {\"initial_training\": true}}");
+									}
+								}
+								return null;
+							}
+
+							@Override
+							protected void onPostExecute(Void result) {
+								if (saveChoicesThenGoHome) {
+									controller.showHome(HomeFragment.TAB_HOME_RACK, true);
+								}
+							}
+							
+						}.execute();
 					}
-					else {
+
+					if (!saveChoicesThenGoHome) {
 						//loaderUtils.dismissLoading();
 						update(true);
 					}

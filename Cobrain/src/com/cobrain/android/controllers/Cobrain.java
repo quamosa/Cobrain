@@ -44,7 +44,13 @@ public class Cobrain {
 		context = c;
 		sharedPreferences = new CobrainSharedPreferences(c);
 	}
-	
+
+	public Cobrain(Context c, String apiKey) {
+		context = c;
+		sharedPreferences = new CobrainSharedPreferences(c);
+		this.apiKey = apiKey;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -153,6 +159,7 @@ public class Cobrain {
 
 		public CobrainSharedPreferences(Context context, boolean isGlobal) {
 			prefs = context.getSharedPreferences(SHARED_PREFS_COBRAIN, Context.MODE_PRIVATE);
+			edit();
 			this.isGlobal = isGlobal;
 		}
 		
@@ -177,8 +184,8 @@ public class Cobrain {
 		}
 		
 		String getKey(String key) {
-			if (isGlobal) return key;
-			String prefix = context.getString(R.string.url_cobrain_api);
+			if (isGlobal) return "global:" + key;
+			String prefix = "user:" + context.getString(R.string.url_cobrain_api);
 			return prefix + ((apiKey == null) ? "" : ":" + apiKey) + ":" + key;
 		}
 		
@@ -203,7 +210,16 @@ public class Cobrain {
 			return this;
 		}
 		public CobrainSharedPreferences clear() {
-			editPrefs.clear();
+			//shouldn't we check for global here?
+			if (!isGlobal) {
+				String k = getKey("");
+				for (String key : prefs.getAll().keySet()) {
+					if (key.indexOf(k) >= 0) {
+						editPrefs.remove(key);
+					}
+				}
+			}
+			else editPrefs.clear();
 			return this;
 		}
 		
@@ -609,12 +625,16 @@ public class Cobrain {
 	}
 	
 	void onLogin(boolean success, String message) {
+		onLogin(success, message, false);
+	}
+	//if we return true that means we redirected to create account screen
+	boolean onLogin(boolean success, String message, boolean quick) {
 		if (success) {
 			signIn(apiKey);
 			if (userInfo.apiKey != null) {
 				if (userInfo.getName() == null || userInfo.getGenderPreference() == null || userInfo.getZipcode() == null) {
 					loggedInListener.onAccountCreated(userInfo);
-					return;
+					return true;
 				}
 			}
 			else {
@@ -622,15 +642,18 @@ public class Cobrain {
 			}
 		}
 		
-		if (loggedInListener != null) {
-			if (success) {
-				loggedInListener.onLoggedIn(userInfo);
+		if (!quick)
+			if (loggedInListener != null) {
+				if (success) {
+					loggedInListener.onLoggedIn(userInfo);
+				}
+				else {
+					if (message == null) message = "We had a problem trying to log you in. Please try again.";
+					loggedInListener.onFailure(message);
+				}
 			}
-			else {
-				if (message == null) message = "We had a problem trying to log you in. Please try again.";
-				loggedInListener.onFailure(message);
-			}
-		}
+		
+		return false;
 	}
 	
 	void onAccountCreated(boolean success) {
@@ -772,12 +795,14 @@ public class Cobrain {
 
 	void saveApiKey() {
 		CobrainSharedPreferences prefs = getSharedPrefs();
-		prefs.edit();
-		String _apiKey = apiKey;
-		apiKey = null;
-		prefs.putString("apiKey", _apiKey);
-		prefs.commit();
-		apiKey = _apiKey;
+		if (prefs != null) {
+			prefs.edit();
+			String _apiKey = apiKey;
+			apiKey = null;
+			prefs.putString("apiKey", _apiKey);
+			prefs.commit();
+			apiKey = _apiKey;
+		}
 	}
 	
 	public CobrainSharedPreferences getSharedPrefs() {
@@ -793,11 +818,13 @@ public class Cobrain {
 		
 		if (apiKey != null) {
 			new AsyncTask<Void, Void, Void>() {
-
+				boolean redirectToProfile;
+				
 				@Override
 				protected Void doInBackground(Void... params) {
 					//onLogin(true);
-					signIn(apiKey);
+					redirectToProfile = onLogin(true, null, true);
+					//signIn(apiKey);
 					if (userInfo != null) apiKey = userInfo.apiKey;
 					else apiKey = null;
 					return null;
@@ -805,7 +832,7 @@ public class Cobrain {
 
 				@Override
 				protected void onPostExecute(Void result) {
-					runWhenLoggedIn.run();
+					if (!redirectToProfile) runWhenLoggedIn.run();
 				}
 				
 			}.execute();

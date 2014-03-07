@@ -88,15 +88,22 @@ public class CraveStrip<T> {
 	protected void onLoad(CraveStripLoader<T> loader) {}
 	
 	public void load() {
-		//if (pager.getAdapter() != adapter) {
+		load(false);
+	}
+	
+	public void load(boolean refresh) {
 		if (list.getAdapter() != listAdapter) {
+			
 			if (loader != null) {
 				onLoad(loader);
+				loader.refresh = refresh;
 				loader.loadPage(1);
 			}
 
 			list.setAdapter((ListAdapter) listAdapter);
-			//pager.setAdapter(adapter);
+		}
+		else if (refresh) {
+			refresh();
 		}
 	}
 

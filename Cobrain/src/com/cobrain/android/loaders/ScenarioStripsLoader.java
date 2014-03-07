@@ -124,9 +124,15 @@ public class ScenarioStripsLoader {
 	}
 
 	void loadStrips() {
+		String gender = parent.controller.getCobrain().getSharedPrefs().getString("gender", null);
+		String newGender = parent.controller.getCobrain().getUserInfo().getGenderPreference();
+		boolean refresh = (gender != null && !gender.equals(newGender));
+		
 		for (CraveStrip<Scenario> strip : craveStrips) {
-			strip.load();
+			strip.load(refresh);
 		}
+		
+		parent.controller.getCobrain().getSharedPrefs().edit().putString("gender", newGender).commit();
 		craveStripList.setAdapter(craveStripListAdapter);
 	}
 
