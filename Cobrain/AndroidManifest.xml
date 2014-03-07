@@ -32,14 +32,14 @@
            android:value="@integer/google_play_services_version" />
         
         <receiver
-            android:name=".GcmBroadcastReceiver"
+            android:name="com.cobrain.android.service.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="com.cobrain.android" />
             </intent-filter>
         </receiver>
-        <service android:name=".GcmIntentService" />
+        <service android:name="com.cobrain.android.service.GcmIntentService" />
         
         <activity
             android:name="com.cobrain.android.SplashActivity"

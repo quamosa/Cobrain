@@ -300,21 +300,28 @@ public class UserInfo extends User {
 		return false;
 	}
 
-	public boolean saveProfile(String name, String zipcode, String gender) {
+	public boolean updateProfile(String json) {
 		if (apiKey != null) {
 			String url = context.getString(R.string.url_profile_put, context.getString(R.string.url_cobrain_api));
 			WebRequest wr = new WebRequest().put(url).setHeaders(apiKeyHeader()).setContentType("application/json")
-					.setBody("{\"name\": \"" + name + "\", \"zip\": \"" + zipcode + "\", \"gender\": \"" + gender + "\"}");
+					.setBody(json);
 
 			if (wr.go() == 200) {
-				this.name = name;
-				this.zipcode = zipcode;
-				this.genderPreference = gender;
-				String response = wr.getResponse();
 				return true;
 			}
-			else reportError("Could not save your profile. Please try again later.");
 		}
+		return false;
+	}
+
+	public boolean saveProfile(String name, String zipcode, String gender) {
+		if (updateProfile("{\"name\": \"" + name + "\", \"zip\": \"" + zipcode + "\", \"gender\": \"" + gender + "\"}")) {
+			this.name = name;
+			this.zipcode = zipcode;
+			this.genderPreference = gender;
+			return true;
+		}
+		else reportError("Could not save your profile. Please try again later.");
+
 		return false;
 	}
 
@@ -621,7 +628,7 @@ public class UserInfo extends User {
 		WebRequest wr = new WebRequest().setHeaders(apiKeyHeader()).delete(url);
 		if (wr.go() == 200) {
 
-			new Cobrain(context).getSharedPrefs().edit()
+			new Cobrain(context, apiKey).getSharedPrefs().edit()
 				.clear()
 				.commit();
 

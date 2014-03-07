@@ -193,14 +193,14 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		}
 		
 		public void clear() {
-			FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+			//FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
 			clearing = true;
 			
 			while (getCount() > 0) {
 				Fragment f = getItem(0);
 				destroyItem(null, 0, f);
 
-				ft.remove(f);
+				//ft.remove(f);
 
 				FragmentHolder fh = fragmentHolder.remove(0);
 				fragmentHolderMap.remove(fh.title);
@@ -212,7 +212,7 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 				}
 			}
 			
-			ft.commitAllowingStateLoss();
+			//ft.commitAllowingStateLoss();
 			
 			clearing = false;
 		}

@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -89,7 +90,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	private View actionBarView;
 	private View actionBarMenuOpenerView;
 	PlayServicesLoader playServicesLoader = new PlayServicesLoader();
-
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,7 +187,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		//lightweight loading frame..loading seems a bit of a hack but oh well its clean one
 		t.replace(R.id.content_frame, new LoadingFragment(), LoadingFragment.TAG);
 		t.commitAllowingStateLoss();
-		getSupportFragmentManager().executePendingTransactions();
+		//getSupportFragmentManager().executePendingTransactions();
 		t = getSupportFragmentManager().beginTransaction();
 		
 		Bundle args = new Bundle();
@@ -225,6 +226,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 					public void onClick(DialogInterface dialog, int which) {
 						letMeLeave = true;
 						dialog.dismiss();
+						finish();
 					}
 				});
 				AlertDialog alert = b.create();
@@ -263,7 +265,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		//updateFragment(FriendsListFragment.TAG);
 		
         //we only ever show main on log in and sign up
-        if (defaultView != VIEW_FRIENDS_MENU && cobrain.getUserInfo().getSignInCount() <= 1)
+        if (defaultView != VIEW_FRIENDS_MENU && !cobrain.getUserInfo().getChecklist().hasInitialTraining())
         	defaultView = VIEW_TEACH;
 
         homeFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
@@ -867,6 +869,11 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public boolean processIntents() {
 		return intentLoader.processAnyIntents(this);
+	}
+	
+	@Override
+	public void onNewIntent(Intent intent) {
+		intentLoader.processIntent(intent);
 	}
 
 	@Override
