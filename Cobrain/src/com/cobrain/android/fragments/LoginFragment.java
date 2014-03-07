@@ -133,7 +133,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 	}
 
 	@Override
-	public void onError(final String message) {
+	public void onError(final CharSequence message) {
 		//show dialog
 		loggingIn = false;
 		if (controller != null) controller.showErrorDialog(message);

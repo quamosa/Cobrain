@@ -27,7 +27,7 @@ public class BaseCobrainListFragment extends SherlockListFragment implements OnC
 	}
 
 	@Override
-	public void onError(String message) {
+	public void onError(CharSequence message) {
 		if (loaderUtils != null) loaderUtils.dismiss();
 		if (controller != null) controller.showErrorDialog(message);
 	}

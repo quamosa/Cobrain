@@ -95,7 +95,7 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 	}
 
 	@Override
-	public void onError(final String message) {
+	public void onError(final CharSequence message) {
 		//show dialog
 		loggingIn = false;
 		controller.showErrorDialog(message);
