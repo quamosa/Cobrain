@@ -8,12 +8,15 @@ import com.cobrain.android.utils.LoaderUtils;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -58,6 +61,48 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
 	public void onActivityCreated(Bundle savedInstanceState) {
 		anim.start();
 		super.onActivityCreated(savedInstanceState);
+	}
+	
+	@Override
+	public Animation onCreateAnimation(int transit, final boolean enter, int nextAnim) {
+	    Animation animation = super.onCreateAnimation(transit, enter, nextAnim);
+
+        if (animation == null && nextAnim != 0) {
+            animation = AnimationUtils.loadAnimation(getActivity(), nextAnim);
+        }
+
+        if (animation == null) {
+        	if (enter) {
+        		animation = new AlphaAnimation(0, 1);
+        	}
+        	else {
+        		animation = new AlphaAnimation(1, 0);
+        	}
+        	if (animation != null) {
+        		animation.setDuration(2*1000);
+        	}
+        }
+        
+        if (animation != null) {
+            getView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
+            animation.setAnimationListener(new AnimationListener() {
+                public void onAnimationEnd(Animation animation) {
+                	if (!enter)
+                		getView().setLayerType(View.LAYER_TYPE_NONE, null);
+                }
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+				}
+            });
+        }
+
+	    return animation;
 	}
 
 	@Override

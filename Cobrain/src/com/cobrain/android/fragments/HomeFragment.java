@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.HomePagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -158,13 +157,23 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		}
 	}
 	
+	/*
 	public void showPersonalizationAnimation() {
 		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
 		getFragmentManager().beginTransaction()
 			.add(R.id.overlay_layout, f, PersonalizationAnimationFragment.TAG)
 			.commitAllowingStateLoss();
 	}
+	*/
 	
+	public void showPersonalizationAnimation() {
+		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
+		getFragmentManager().beginTransaction()
+			.replace(R.id.slidingmenumain, f, PersonalizationAnimationFragment.TAG)
+			.addToBackStack(null)
+			.commitAllowingStateLoss();
+	}
+
 	private class FragmentHolder {
 		String title;
 		Fragment fragment;
