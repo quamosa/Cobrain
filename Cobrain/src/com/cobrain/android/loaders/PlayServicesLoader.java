@@ -23,11 +23,7 @@ public class PlayServicesLoader {
 	private final static String SENDER_ID = "521768102800";
 	//for reference:
 	private final static String SERVER_API_KEY = "AIzaSyDopi6KJ86323elpFSlhtqF4JHWQ1D0mPE";
-<<<<<<< HEAD
 	private static final boolean CLOUD_MESSAGING_ENABLED = true;
-=======
-	private static final boolean CLOUD_MESSAGING_ENABLED = false;
->>>>>>> refs/heads/v2.0
 	
 	
     String regid;
