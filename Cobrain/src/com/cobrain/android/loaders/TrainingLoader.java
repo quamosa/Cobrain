@@ -263,7 +263,7 @@ public class TrainingLoader {
 				UserInfo u = c.getUserInfo();
 				Skus tr = null;
 				
-				if (u != null) {
+				if (u != null && controller.getShown() != null) {
 					boolean silent = controller.getShown().getSilentMode();
 					controller.getShown().setSilentMode(true);
 					tr = u.getSkus(u, "training", null, null, 4, 1 /*(!refresh) ? 1 : 2*/);

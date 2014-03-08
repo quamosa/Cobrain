@@ -874,7 +874,7 @@ public class UserInfo extends User {
 	}
 
 	public boolean areInvitesVerified() {
-		return (validationSent || hashedPhone != null);
+		return (validationSent || !TextUtils.isEmpty(hashedPhone));
 		//if (hashedPhone != null) return true;
 		
 		//Cobrain c = new Cobrain(context);
