@@ -35,14 +35,14 @@
     <string name="url_cobrain_app_dev">https://bunsen.cobrain.com</string>
     <string name="url_cobrain_app_qa">https://qa.cobrain.com</string>
     <string name="url_cobrain_app_prd">https://cobrain.com</string>
-    <string name="sms_invite_validation_number_dev">+1(443)5397345</string>
-    <string name="sms_invite_validation_number_qa">+1(443)5397345</string>
-    <string name="sms_invite_validation_number_prd">+1(202)4994992</string>
+    <string name="sms_invite_validation_number_dev">+1(202)4994992</string>
+    <string name="sms_invite_validation_number_qa">+1(202)4994992</string>
+    <string name="sms_invite_validation_number_prd">+1(443)5397345</string>
     <!--  -->
     
-    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_qa</item>
-    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_qa</item>
-    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_qa</item>
+    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_prd</item>
+    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_prd</item>
+    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_prd</item>
 
     <string name="url_about_us">%1$s/about-us</string>
 

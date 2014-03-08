@@ -85,7 +85,9 @@ public class IntentLoader {
 				protected void onPostExecute(Boolean result) {
 					if (!controller.getCobrain().isLoggedIn()) {
 						this.result = result;
-						controller.getCobrain().restoreLogin(runWhenLoggedIn);
+						if (!controller.getCobrain().restoreLogin(runWhenLoggedIn)) {
+							controller.showLogin(null);
+						}
 					}
 				}
 				

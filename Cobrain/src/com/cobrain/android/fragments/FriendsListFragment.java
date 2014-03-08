@@ -332,7 +332,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			invite.setEnabled(false);
 
 			new WebRequest().get(bitly)
-				.setTimeout(3000)
+				.setTimeout(10*1000)
 				.setOnResponseListener(new OnResponseListener() {
 
 					String cobrainUrl;

@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.Html;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -70,7 +71,7 @@ public class Cobrain {
 	public interface OnLoggedInListener {
 		void onLoggedIn(UserInfo ui);
 		void onLoggedOut(UserInfo ui);
-		void onFailure(String message);
+		void onFailure(CharSequence message);
 		void onAccountCreated(UserInfo userInfo);
 	}
 
@@ -103,7 +104,7 @@ public class Cobrain {
 		public void showWishList(User owner, boolean showPrivateItems, List<Integer> skuIds, boolean addToBackStack);
 		public void showWishList(Skus list, boolean showPrivateItems, boolean addToBackStack);
 		public void showWishList(Skus skus, Sku sku, boolean showPrivateItems, int containerId, boolean addToBackStack);
-		public void showErrorDialog(String message);
+		public void showErrorDialog(CharSequence message);
 		public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack);
 		public void showContactList(ContactSelectedListener listener);
 		public boolean processIntents();
@@ -131,7 +132,7 @@ public class Cobrain {
 	}
 	
 	public interface CobrainView {
-		public void onError(String message);
+		public void onError(CharSequence message);
 		//public void onLoggedIn(UserInfo ui);
 		//public void onLoggedOut(UserInfo ui);
 		//public void on
@@ -349,7 +350,7 @@ public class Cobrain {
 	    	 */
 
 			@Override
-			public void onFailure(String message) {
+			public void onFailure(CharSequence message) {
 			}
 			
 			@Override
@@ -600,7 +601,7 @@ public class Cobrain {
 						}
 					}
 	
-				onLogin(success, message);
+				onLogin(success, (message != null) ? Html.fromHtml(message) : null);
 	
 				break;
 			default:
@@ -624,11 +625,11 @@ public class Cobrain {
 		}
 	}
 	
-	void onLogin(boolean success, String message) {
+	void onLogin(boolean success, CharSequence message) {
 		onLogin(success, message, false);
 	}
 	//if we return true that means we redirected to create account screen
-	boolean onLogin(boolean success, String message, boolean quick) {
+	boolean onLogin(boolean success, CharSequence message, boolean quick) {
 		if (success) {
 			signIn(apiKey);
 			if (userInfo.apiKey != null) {

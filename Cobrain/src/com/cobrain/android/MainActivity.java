@@ -401,7 +401,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 
 	@Override
-	public void onFailure(String message) {
+	public void onFailure(CharSequence message) {
 		if (cobrainView != null) cobrainView.onError(message);
 		checkForDestroy();
 		//show a message asking user to login or request new password
@@ -484,7 +484,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 
 	@Override
-	public void showErrorDialog(final String message) {
+	public void showErrorDialog(final CharSequence message) {
 		
 		runOnUiThread(new Runnable () {
 			public void run() {
@@ -495,7 +495,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 				AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
 				View v = View.inflate(getApplicationContext(), R.layout.dlg_error, null);
 				TextView tv = (TextView) v.findViewById(R.id.error_message);
-				String mymessage = "Your Cobrain synapses aren't firing properly. " + message;
+				CharSequence mymessage = "Your Cobrain synapses aren't firing properly. " + message;
 				tv.setText(mymessage);
 				//builder1.setIcon(R.drawable.ic_error);
 				builder1.setView(v);

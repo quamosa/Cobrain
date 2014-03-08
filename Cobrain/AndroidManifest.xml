@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cobrain.android"
-    android:versionCode="37"
-    android:versionName="1.1.10" >
+    android:versionCode="39"
+    android:versionName="1.1.12" >
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -15,12 +15,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
                      android:maxSdkVersion="18" />
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<permission android:name="com.cobrain.android.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
     <uses-permission android:name="com.cobrain.android.permission.C2D_MESSAGE" />
-        
+ 	-->
+         
     <application
 		android:screenOrientation="portrait"
         android:allowBackup="true"
@@ -28,6 +30,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.Cobrain" >
 
+	    <!-- 
         <meta-data android:name="com.google.android.gms.version"
            android:value="@integer/google_play_services_version" />
         
@@ -39,7 +42,12 @@
                 <category android:name="com.cobrain.android" />
             </intent-filter>
         </receiver>
+<<<<<<< HEAD
         <service android:name="com.cobrain.android.service.GcmIntentService" />
+=======
+        <service android:name=".GcmIntentService" />
+        -->
+>>>>>>> refs/heads/v2.0
         
         <activity
             android:name="com.cobrain.android.SplashActivity"

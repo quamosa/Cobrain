@@ -139,7 +139,7 @@ public class AccountSaveFragment extends BaseCobrainFragment implements OnClickL
 	}
 
 	@Override
-	public void onError(final String message) {
+	public void onError(final CharSequence message) {
 		//show dialog
 		loggingIn = false;
 		controller.showErrorDialog(message);
