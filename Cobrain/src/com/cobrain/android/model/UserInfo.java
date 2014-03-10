@@ -422,7 +422,7 @@ public class UserInfo extends User {
 		return null;
 	}
 	
-	public boolean removeFriend(int id) {
+	public boolean removeFriend(String id) {
 		String url = context.getString(R.string.url_friendships_delete, context.getString(R.string.url_cobrain_api), id);
 		WebRequest wr = new WebRequest().delete(url).setHeaders(apiKeyHeader());
 
@@ -433,7 +433,7 @@ public class UserInfo extends User {
 		return false;
 	}
 
-	public boolean acceptFriendship(int id) {
+	public boolean acceptFriendship(String id) {
 		String url = context.getString(R.string.url_friendships_put, context.getString(R.string.url_cobrain_api), id);
 		WebRequest wr = new WebRequest().put(url).setHeaders(apiKeyHeader());
 

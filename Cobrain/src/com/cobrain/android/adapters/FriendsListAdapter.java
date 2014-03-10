@@ -2,6 +2,7 @@ package com.cobrain.android.adapters;
 
 import java.util.List;
 import com.cobrain.android.R;
+import com.cobrain.android.dialogs.FriendDeleteDialog;
 import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.loaders.ImageLoader;
@@ -9,7 +10,6 @@ import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.model.Badge;
 import com.cobrain.android.model.Friendship;
 import com.cobrain.android.utils.LoaderUtils;
-import com.cobrain.anroid.dialogs.FriendDeleteDialog;
 
 import android.content.Context;
 import android.content.DialogInterface;

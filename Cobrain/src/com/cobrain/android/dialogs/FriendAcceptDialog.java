@@ -1,4 +1,4 @@
-package com.cobrain.anroid.dialogs;
+package com.cobrain.android.dialogs;
 
 import com.cobrain.android.R;
 import com.cobrain.android.loaders.ImageLoader;

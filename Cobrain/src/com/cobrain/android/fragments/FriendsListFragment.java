@@ -12,6 +12,7 @@ import java.util.List;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.FeedListAdapter;
 import com.cobrain.android.adapters.FriendsListAdapter;
+import com.cobrain.android.dialogs.FriendAcceptDialog;
 import com.cobrain.android.loaders.ContactLoader;
 import com.cobrain.android.loaders.ContactLoader.ContactInfo;
 import com.cobrain.android.loaders.FeedLoader;
@@ -27,7 +28,6 @@ import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
 import com.cobrain.android.utils.HelperUtils.Storage.TempStore;
 import com.cobrain.android.utils.HelperUtils.Timing;
-import com.cobrain.anroid.dialogs.FriendAcceptDialog;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
 import android.app.Dialog;
@@ -533,7 +533,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 					protected Boolean doInBackground(Boolean... params) {
 						boolean accept = params[0];
 						UserInfo ui = controller.getCobrain().getUserInfo();
-						int friendId = friend.getId();
+						String friendId = friend.getId();
 						
 						if (accept)
 							return ui.acceptFriendship(friendId);

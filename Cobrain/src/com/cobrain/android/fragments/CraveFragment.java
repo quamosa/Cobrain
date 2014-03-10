@@ -70,7 +70,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	private WishListFragment wishListParent;
 	//private TextView craveIndexLabel;
 	private ImageView raveIcon;
-	private View raveNew;
 	private TextView raveInfoLabel;
 	private Boolean _iRavedThis;
 	private boolean isRaved;
@@ -111,7 +110,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			v = inflater.inflate(R.layout.crave_wishlist_frame, null);
 			//craveIndexLabel = (TextView) v.findViewById(R.id.shared_craves_index_label);
 			raveIcon = (ImageView) v.findViewById(R.id.item_rave_icon);
-			raveNew = (View) v.findViewById(R.id.rave_new);
 			raveInfoLabel = (TextView) v.findViewById(R.id.rave_info);
 			raveIcon.setOnClickListener(this);
 			raveIcon.setOnTouchListener(this);
@@ -407,7 +405,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			raveIcon.setOnClickListener(null);
 			raveIcon = null;
 		}
-		raveNew = null;
 		raveInfoLabel = null;
 
 		saleLayout = null;
@@ -676,8 +673,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 
 		if (isShowingWishList()) {
 			
-			//raveNew.setVisibility(wishListItem.isNew() ? View.VISIBLE : View.INVISIBLE);
-			raveNew.setVisibility(View.INVISIBLE);
 			raveIcon.setImageResource(iRavedThis(wishListItem) ? R.drawable.crave_rave_button_pressed : R.drawable.crave_rave_button);
 
 			CharSequence raveInfo = getRaveInfoLabel(wishListItem);

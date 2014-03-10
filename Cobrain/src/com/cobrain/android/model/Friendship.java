@@ -13,12 +13,12 @@ package com.cobrain.android.model;
  */
 
 public class Friendship {
-	int id;
+	String _id;
 	User user;
 	boolean accepted;
 
-	public int getId() {
-		return id;
+	public String getId() {
+		return _id;
 	}
 	public User getUser() {
 		return user;
