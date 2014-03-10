@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -868,6 +869,11 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public boolean processIntents() {
 		return intentLoader.processAnyIntents(this);
+	}
+	
+	@Override
+	public void onNewIntent(Intent intent) {
+		intentLoader.processIntent(intent);
 	}
 
 	@Override

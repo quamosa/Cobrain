@@ -24,9 +24,7 @@ public class IntentLoader {
 		controller = null;
 	}
 	
-	public boolean processAnyIntents(Activity activity) {
-		Intent i = activity.getIntent();
-
+	public boolean processIntent(Intent i) {
 		if (i != null) {
 			String action = i.getAction();
 			
@@ -47,6 +45,11 @@ public class IntentLoader {
 			}
 		}
 		return false;
+	}
+	
+	public boolean processAnyIntents(Activity activity) {
+		Intent i = activity.getIntent();
+		return processIntent(i);
 	}
 
 	boolean processEmailIntent(String url) {
