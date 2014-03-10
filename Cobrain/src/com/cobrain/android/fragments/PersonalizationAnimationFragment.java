@@ -63,6 +63,7 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
 		super.onActivityCreated(savedInstanceState);
 	}
 	
+	/*
 	@Override
 	public Animation onCreateAnimation(int transit, final boolean enter, int nextAnim) {
 	    Animation animation = super.onCreateAnimation(transit, enter, nextAnim);
@@ -103,7 +104,7 @@ public class PersonalizationAnimationFragment extends BaseCobrainFragment implem
         }
 
 	    return animation;
-	}
+	}*/
 
 	@Override
 	public void onDestroyView() {

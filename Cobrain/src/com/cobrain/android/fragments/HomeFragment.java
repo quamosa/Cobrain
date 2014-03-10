@@ -157,22 +157,23 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 		}
 	}
 	
-	/*
+	
 	public void showPersonalizationAnimation() {
 		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
 		getFragmentManager().beginTransaction()
 			.add(R.id.overlay_layout, f, PersonalizationAnimationFragment.TAG)
 			.commitAllowingStateLoss();
 	}
-	*/
 	
+	
+	/*
 	public void showPersonalizationAnimation() {
 		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
 		getFragmentManager().beginTransaction()
 			.replace(R.id.slidingmenumain, f, PersonalizationAnimationFragment.TAG)
 			.addToBackStack(null)
 			.commitAllowingStateLoss();
-	}
+	}*/
 
 	private class FragmentHolder {
 		String title;

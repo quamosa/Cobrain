@@ -460,18 +460,21 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			@Override
 			protected Boolean doInBackground(Object... params) {
 				UserInfo ui = wishListParent.controller.getCobrain().getUserInfo();
+				boolean ok = false;
 				
 				if (rave) {
-					if (ui.raveProduct(wishList.getOwner(), wishListItem)) {
+					ok = ui.raveProduct(wishList.getOwner(), wishListItem);
+					refreshWishList();
+					if (ok) {
 						//isRaved = rave;
-						refreshWishList();
 						return true;
 					}
 				}
 				else {
-					if (ui.unraveProduct(wishList.getOwner(), wishListItem, raveId)) {
+					ok = ui.unraveProduct(wishList.getOwner(), wishListItem, raveId);
+					refreshWishList();
+					if (ok) {
 						//isRaved = rave;
-						refreshWishList();
 						return true;
 					}
 				}
@@ -484,9 +487,9 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				wishListParent.loaderUtils.dismissLoading();
 				if (raveIcon != null) {
 					raveIcon.setEnabled(true);
-					if (result) {
+					//if (result) {
 						updateSaveAndShareState(true);
-					}
+					//}
 				}
 			}
 			

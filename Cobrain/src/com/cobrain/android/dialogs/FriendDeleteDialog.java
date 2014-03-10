@@ -1,4 +1,4 @@
-package com.cobrain.anroid.dialogs;
+package com.cobrain.android.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

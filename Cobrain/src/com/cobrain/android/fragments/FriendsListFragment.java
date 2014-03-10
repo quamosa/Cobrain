@@ -12,6 +12,7 @@ import java.util.List;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.FeedListAdapter;
 import com.cobrain.android.adapters.FriendsListAdapter;
+import com.cobrain.android.dialogs.FriendAcceptDialog;
 import com.cobrain.android.loaders.ContactLoader;
 import com.cobrain.android.loaders.ContactLoader.ContactInfo;
 import com.cobrain.android.loaders.FeedLoader;
