@@ -289,6 +289,7 @@ public class SavedAndShareAdapter extends ArrayAdapter<Sku> {
 			vh.salePrice.setVisibility(View.INVISIBLE);
 		}
 		
+		LoaderUtils.hide(vh.image, false, false);
 		if (p.getImageURL() != null) { 
 			int w = vh.image.getMeasuredWidth();
 			int h = vh.image.getMeasuredHeight();
