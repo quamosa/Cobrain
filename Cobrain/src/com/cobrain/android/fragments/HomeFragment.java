@@ -36,7 +36,6 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 	ViewPager homePager;
 	private HomePagerAdapter adapter;
 	int initialTab = -1;
-	boolean showPersonalizationAnimation;
 	private boolean loading;
 	private RepeatingTabHost tabHost;
 	private static final boolean useCustomTabs = true;
@@ -44,7 +43,6 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 	public static HomeFragment newInstance(int showTab, boolean showPersonalizationAnimation) {
 		HomeFragment f = new HomeFragment();
 		f.initialTab = showTab;
-		f.showPersonalizationAnimation = showPersonalizationAnimation;
 		return f;
 	}
 	
@@ -94,11 +92,6 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 
 		setTitle("Cobrain");
 		
-		if (showPersonalizationAnimation) {
-			showPersonalizationAnimation = false;
-			showPersonalizationAnimation();
-		}
-
 		autoUpdateOnlyFor(Math.max(initialTab, 0));
 
 		if (initialTab >= 0) {
@@ -155,23 +148,6 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 			BaseCobrainFragment f = (BaseCobrainFragment) fh.fragment;
 			if (f != null) f.autoUpdate = (i == position);
 		}
-	}
-	
-	/*
-	public void showPersonalizationAnimation() {
-		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
-		getFragmentManager().beginTransaction()
-			.add(R.id.overlay_layout, f, PersonalizationAnimationFragment.TAG)
-			.commitAllowingStateLoss();
-	}
-	*/
-	
-	public void showPersonalizationAnimation() {
-		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
-		getFragmentManager().beginTransaction()
-			.replace(R.id.slidingmenumain, f, PersonalizationAnimationFragment.TAG)
-			.addToBackStack(null)
-			.commitAllowingStateLoss();
 	}
 
 	private class FragmentHolder {

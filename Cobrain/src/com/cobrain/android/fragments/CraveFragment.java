@@ -47,7 +47,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	TextView rankForYouLabel;
 	HttpImageView itemImage;
 	ProgressBar progress;
-	RelativeLayout craveInfoHeader;
 	RelativeLayout itemInfoFooter;
 	TextView cravePopupLabel;
 	BaseCobrainFragment parent;
@@ -128,7 +127,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		itemImage = (HttpImageView) v.findViewById(R.id.item_image);
 		progress = (ProgressBar) v.findViewById(R.id.progress);
 		
-		craveInfoHeader = (RelativeLayout) v.findViewById(R.id.crave_info_header);
 		cravePopupLabel = (TextView) v.findViewById(R.id.crave_popup_label);
 		itemInfoFooter = (RelativeLayout) v.findViewById(R.id.item_info_footer);
 		bottomButtons = (LinearLayout) v.findViewById(R.id.bottom_buttons);
@@ -140,7 +138,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		shareButton.setOnClickListener(this);
 		if (dislikeButton != null) dislikeButton.setOnClickListener(this);
 		
-		HelperUtils.Graphics.setAlpha(craveInfoHeader, 0.5f);
 		HelperUtils.Graphics.setAlpha(bottomButtons, 0.5f);
 
 		itemImage.setOnClickListener(this);
@@ -151,7 +148,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		itemRegularPrice.setPaintFlags(itemRegularPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 		itemSalePercent = (TextView) v.findViewById(R.id.item_sale_pct);
 		
-		showCravePopup(false, null);
 		showProgress(true, false);
 		
 		return v;
@@ -309,28 +305,10 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	}
 	
 	private CharSequence getRaveInfoLabel(Sku item) {
-		boolean iRaved = iRavedThis(item);
 		int raves = item.getRaves().size();
-		
+
 		if (raves == 0) return null;
-		
-		String youAnd = null;
-		
-		if (iRaved) {
-			youAnd = "YOU & ";
-			raves--;
-		}
-		else youAnd = "";
-		
-		if (raves > 0) {
-			final String raveInfo = "%s%d FRIEND%s RAVED THIS";
-			return String.format(raveInfo, youAnd, raves, raves > 1 ? "S" : "");
-		}
-		else {
-			if (iRaved) return "YOU RAVED THIS";
-		}
-		
-		return null;
+		return raves + HelperUtils.Strings.plural(raves, " RAVE");
 	}
 
 	//TODO: make asynchronous
@@ -348,11 +326,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		return _iRavedThis;
 	}
 
-	void showCravePopup(boolean show, String message) {
-		craveInfoHeader.setVisibility((show) ? View.VISIBLE : View.GONE);
-		cravePopupLabel.setText(message);
-	}
-	
 	void showProgress(boolean show, boolean animate) {
 		if (show) {
 			progress.setVisibility(View.VISIBLE);
@@ -387,7 +360,6 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		recommendation = null;
 		progress = null;
 		cravePopupLabel = null;
-		craveInfoHeader = null;
 		itemInfoFooter = null;
 		bottomButtons = null;
 		saveButton = null;
@@ -676,7 +648,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 
 		if (isShowingWishList()) {
 			
-			raveIcon.setImageResource(iRavedThis(wishListItem) ? R.drawable.crave_rave_button_pressed : R.drawable.crave_rave_button);
+			raveIcon.setBackgroundResource(iRavedThis(wishListItem) ? R.drawable.crave_rave_button_pressed : R.drawable.crave_rave_button);
 
 			CharSequence raveInfo = getRaveInfoLabel(wishListItem);
 			if (raveInfo != null) {
@@ -702,7 +674,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			raveIcon.setImageResource(!isRaved ? R.drawable.ic_wishlist_raved : R.drawable.ic_wishlist_unraved);
+			raveIcon.setBackgroundColor(!isRaved ? getResources().getColor(R.color.Raved) : getResources().getColor(R.color.Unraved));
 		}
 		return false;
 	}

@@ -106,4 +106,9 @@ public class BaseCobrainListFragment extends SherlockListFragment implements OnC
 		return null;
 	}
 
+	@Override
+	public boolean onBackPressed() {
+		return false;
+	}
+
 }

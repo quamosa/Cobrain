@@ -309,4 +309,9 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		return silentMode;
 	}
 
+	@Override
+	public boolean onBackPressed() {
+		return false;
+	}
+
 }

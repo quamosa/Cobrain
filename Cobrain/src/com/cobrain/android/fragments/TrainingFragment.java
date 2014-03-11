@@ -11,6 +11,7 @@ import com.cobrain.android.utils.HelperUtils;
 import android.app.AlertDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,6 +77,14 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 		loadTrainings(refreshTrainings);
 	}
 
+	public void showPersonalizationAnimation() {
+		PersonalizationAnimationFragment f = new PersonalizationAnimationFragment();
+		getFragmentManager().beginTransaction()
+			.replace(R.id.slidingmenumain, f, PersonalizationAnimationFragment.TAG)
+			.addToBackStack(null)
+			.commitAllowingStateLoss();
+	}
+	
 	void addTrainingItem(View v, int id) {
 		trainingLoader.addTrainingItem(v, id);
 	}
@@ -142,7 +151,12 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 							@Override
 							protected void onPostExecute(Void result) {
 								if (saveChoicesThenGoHome) {
-									controller.showHome(HomeFragment.TAB_HOME_RACK, true);
+									showPersonalizationAnimation();
+									save.postDelayed(new Runnable() {
+										public void run() {
+											controller.showHome(HomeFragment.TAB_HOME_RACK, false);
+										}
+									}, 5 * 1000); 
 								}
 							}
 							
@@ -240,5 +254,15 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			controller.getCobrain().getSharedPrefs().edit().putBoolean("trainingCompletedShown", true).commit();
 		}
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		FragmentManager fm = getFragmentManager();
+		if (fm.findFragmentByTag(PersonalizationAnimationFragment.TAG) != null) {
+			return fm.findFragmentByTag(HomeFragment.TAG) != null;
+		}
+		return super.onBackPressed();
+	}
+
 
 }

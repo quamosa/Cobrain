@@ -46,6 +46,7 @@ import com.cobrain.android.fragments.LoadingFragment;
 import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
 import com.cobrain.android.fragments.NavigationMenuFragment;
+import com.cobrain.android.fragments.PersonalizationAnimationFragment;
 import com.cobrain.android.fragments.RaveUserListFragment;
 import com.cobrain.android.fragments.ResetPasswordFragment;
 import com.cobrain.android.fragments.SavedAndShareFragment;
@@ -208,6 +209,10 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
 	@Override
 	public void onBackPressed() {
+		if (cobrainView != null) {
+			if (cobrainView.onBackPressed()) return;
+		}
+		
 		if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
 			if (!getSlidingMenu().isMenuShowing()) {
 				showNavigationMenu();
@@ -614,15 +619,15 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	public void showHome(int initialTab, boolean showPersonalizationAnimation) {
 		FragmentManager fm = getSupportFragmentManager();
 		HomeFragment h = (HomeFragment) fm.findFragmentByTag(HomeFragment.TAG);
+		boolean showingPersonalizationAnimation = fm.findFragmentByTag(PersonalizationAnimationFragment.TAG) != null;
 		
 		if (h == null) {
 			HomeFragment home = HomeFragment.newInstance(initialTab, showPersonalizationAnimation);
-			showFragment(home, HomeFragment.TAG, true, false, true);
+			showFragment(home, HomeFragment.TAG, !showingPersonalizationAnimation, false, true);
 		}
 		else {
-			clearBackStack(fm);
+			if (!showingPersonalizationAnimation) clearBackStack(fm);
 			h.setTab(initialTab);
-			if (showPersonalizationAnimation) h.showPersonalizationAnimation();
 			closeMenu(true);
 		}
 	}

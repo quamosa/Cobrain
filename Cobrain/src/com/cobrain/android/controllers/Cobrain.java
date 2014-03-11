@@ -147,6 +147,7 @@ public class Cobrain {
 		public abstract CobrainController getCobrainController();
 
 		public boolean getSilentMode();
+		public boolean onBackPressed();
 
 		//public void showFilterMenu(View menuItem);
 	}
