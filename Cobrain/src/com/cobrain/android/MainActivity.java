@@ -73,6 +73,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
     static final String TAG = MainActivity.class.toString();
 	public static final String ACTION_SIGNUP = "com.cobrain.android.signup";
+	public static String environment;
 	Cobrain cobrain;
 	CobrainView cobrainView, cobrainMainView, cobrainMenuView;
 	Runnable showView;
@@ -96,6 +97,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         super.onCreate(savedInstanceState);
 
         Analytics.start(this);
+        
+        environment = getEnvironment();
         
         cobrain = new Cobrain(getApplicationContext());
 		cobrain.setOnLoggedInListener(this);
@@ -151,6 +154,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         //for performance!
         getWindow().setBackgroundDrawable(null);
         
+        BaseCobrainFragment.controller = this;
+        
 		if (!processIntents()) {
 			if (!cobrain.restoreLogin(new Runnable() {
 				public void run() {
@@ -165,6 +170,20 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		//register so we can receive push notifications
 		playServicesLoader.checkGoogleCloudMessaging(this, false);
     }
+	
+	String getEnvironment() {
+		String apiUrl = getString(R.string.url_cobrain_api);
+		
+		if (getString(R.string.url_cobrain_api_qa).equals(apiUrl)) {
+			return "QA";
+		}
+		else
+			if (getString(R.string.url_cobrain_api_prd).equals(apiUrl)) {
+				return "PROD";
+			}
+		
+		return null;
+	}
 	
 	@Override
 	public void showLogin(String loginUrl) {
@@ -443,6 +462,9 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		homeFragment = null;
 		isDestroying = true;
 		cobrain.logout(); //TODO: do we wait for this to finish or block and remove strict rules for network on ui thread
+
+        BaseCobrainFragment.controller = null;
+        environment = null;
 
 		Analytics.stop(this);
 	}

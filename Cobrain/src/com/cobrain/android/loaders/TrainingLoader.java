@@ -203,6 +203,8 @@ public class TrainingLoader {
 		currentRequest = new AsyncTask<Void, Void, Boolean>() {
 			@Override
 			protected Boolean doInBackground(Void... params) {
+				if (controller == null) return false;
+				
 				Cobrain c = controller.getCobrain();
 				UserInfo u = c.getUserInfo();
 				String signal;
@@ -214,7 +216,7 @@ public class TrainingLoader {
 						case 2: signal = "disliked"; break;
 						default: signal = "null";
 						}
-						u.saveOpinion(ti.opinion, signal);
+						if (ti.opinion != null) u.saveOpinion(ti.opinion, signal);
 					}
 					
 					return true;

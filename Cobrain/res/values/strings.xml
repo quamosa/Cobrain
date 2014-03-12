@@ -29,10 +29,8 @@
     <string name="friend_raves_mine"><![CDATA[<font color=\"#%2$x\">%1$s</font> raved your shared crave]]></string>
     
     <!-- urls for qa and prd -->
-    <string name="url_cobrain_api_dev">https://beaker.cobrain.com</string>
     <string name="url_cobrain_api_qa">https://qa.api.cobrain.com</string>
     <string name="url_cobrain_api_prd">https://beaker.cobrain.com</string>
-    <string name="url_cobrain_app_dev">https://bunsen.cobrain.com</string>
     <string name="url_cobrain_app_qa">https://qa.cobrain.com</string>
     <string name="url_cobrain_app_prd">https://cobrain.com</string>
     <string name="sms_invite_validation_number_dev">+1(202)4994992</string>
@@ -40,9 +38,9 @@
     <string name="sms_invite_validation_number_prd">+1(443)5397345</string>
     <!--  -->
     
-    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_prd</item>
-    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_prd</item>
-    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_prd</item>
+    <item type="string" name="url_cobrain_api">@string/url_cobrain_api_qa</item>
+    <item type="string" name="url_cobrain_app">@string/url_cobrain_app_qa</item>
+    <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_qa</item>
 
     <string name="url_about_us">%1$s/about-us</string>
 
@@ -53,6 +51,8 @@
     <string name="url_password_reset_post">%1$s/account/password</string>
     <string name="url_password_change_get">%1$s/account/edit</string>
     <string name="url_password_change_post">%1$s/account</string>
+    
+    <string name="url_settings_get">%1$s/settings</string>
     
     <!-- v 2.0 -->
     <string name="url_profile_get">%1$s/users/me</string>

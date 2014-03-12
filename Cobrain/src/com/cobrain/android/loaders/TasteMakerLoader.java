@@ -8,6 +8,7 @@ import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.controllers.Cobrain.CobrainSharedPreferences;
 import com.cobrain.android.fragments.FriendsListFragment;
+import com.cobrain.android.model.Settings;
 import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.utils.HelperUtils;
@@ -79,36 +80,39 @@ public class TasteMakerLoader {
 	static TasteMakerInfo checkNotificationType(CobrainController controller) {
 		Cobrain c = controller.getCobrain();
 		UserInfo ui = c.getUserInfo();
+		Settings settings = ui.getSettings();
 		ui.fetchUserInfo(); //refresh user notifications and all
 
 		TasteMakerInfo info = new TasteMakerInfo();
 		info.shown = getLastShown(c);
 
-		if (ui.hasNotification(User.NOTIFICATION_TRENDSETTER_WIN)) {
-			info.notification = User.NOTIFICATION_TRENDSETTER_WIN;
-			if (DEBUG || info.shown < TRENDSETTER_WIN) {
-				resetTimesShown(c);
-				info.shown = TRENDSETTER_WIN;
-			}
-		}
-		else 
-			if (ui.hasNotification(User.NOTIFICATION_TASTEMAKER_WIN)) {
-				info.notification = User.NOTIFICATION_TASTEMAKER_WIN;
-				info.remainingInvites = 5; //TODO: since we don't get this from API yet!
-				if (DEBUG || info.shown < TASTEMAKER_WIN) {
+		if (settings.isTastemakerCampaignEnabled()) {
+			if (ui.hasNotification(User.NOTIFICATION_TRENDSETTER_WIN)) {
+				info.notification = User.NOTIFICATION_TRENDSETTER_WIN;
+				if (DEBUG || info.shown < TRENDSETTER_WIN) {
 					resetTimesShown(c);
-					info.shown = TASTEMAKER_WIN;
+					info.shown = TRENDSETTER_WIN;
 				}
 			}
 			else 
-				if (ui.hasNotification(User.NOTIFICATION_TASTEMAKER)) {
-					info.notification = User.NOTIFICATION_TASTEMAKER;
-					if (DEBUG || info.shown < TASTEMAKER_BETA) {
+				if (ui.hasNotification(User.NOTIFICATION_TASTEMAKER_WIN)) {
+					info.notification = User.NOTIFICATION_TASTEMAKER_WIN;
+					info.remainingInvites = 5; //TODO: since we don't get this from API yet!
+					if (DEBUG || info.shown < TASTEMAKER_WIN) {
 						resetTimesShown(c);
-						info.shown = TASTEMAKER_BETA;
+						info.shown = TASTEMAKER_WIN;
 					}
 				}
-
+				else 
+					if (ui.hasNotification(User.NOTIFICATION_TASTEMAKER)) {
+						info.notification = User.NOTIFICATION_TASTEMAKER;
+						if (DEBUG || info.shown < TASTEMAKER_BETA) {
+							resetTimesShown(c);
+							info.shown = TASTEMAKER_BETA;
+						}
+					}
+		}
+		
 		info.timesShown = c.getSharedPrefs().getInt(PREF_NUM_TIMES_SHOWN, 0);
 
 		return info;

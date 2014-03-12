@@ -22,6 +22,7 @@ import com.cobrain.android.model.Feed;
 import com.cobrain.android.model.Feeds;
 import com.cobrain.android.model.Friendship;
 import com.cobrain.android.model.Friendships;
+import com.cobrain.android.model.Settings;
 import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.service.web.WebRequest;
@@ -79,6 +80,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		feeds = (ListView) v.findViewById(R.id.feeds_list);
 		verify = (Button) v.findViewById(R.id.verify_invite_button);
 		verify.setOnClickListener(this);
+		verify.setVisibility(View.GONE);
 		adapter = new FriendsListAdapter(container.getContext(), R.id.friend_name, loader.getItems(), this);
 		friends.setAdapter(adapter);
 		
@@ -351,7 +353,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 							//controller.getCobrain().getUserInfo().reportError("We had a problem creating your text message. Please try again.");
 							cobrainUrl = link;
 						}
-						cobrainUrl = link;
+						
+						//cobrainUrl = link;
 					}
 					
 					@Override
@@ -393,7 +396,12 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 	void sendSMSInvite(ContactInfo contact, String url) {
 		String subject = getString(R.string.invite_sms_subject);
-		String message = getString(R.string.invite_sms_body, url);
+		Settings settings = controller.getCobrain().getUserInfo().getSettings();
+		String message = settings.getSmsInvitationMessage();
+		
+		message = message.replace("[NAME]", controller.getCobrain().getUserInfo().getName());
+		message = message.replace("[URL]", url);
+
 		startSMSIntent(contact.number, subject, message);
 	}
 	
