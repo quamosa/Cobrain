@@ -118,6 +118,10 @@ public class AnimationStepper {
 		return this.step;
 	}
 	
+	public boolean isStepping() {
+		return running;
+	}
+	
 	public void start() {
 		running = true;
 		setStep(1);

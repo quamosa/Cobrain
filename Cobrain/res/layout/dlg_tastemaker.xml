@@ -243,7 +243,7 @@
 	    android:layout_marginBottom="20dp"
 	    android:paddingLeft="100dp"
 	    android:paddingRight="100dp"
-	    android:text="NEXT"
+	    android:text="OK"
 	    android:textColor="@drawable/sel_tastemaker_button_text"
 	    android:background="@drawable/sel_tastemaker_button_back"
 	    />

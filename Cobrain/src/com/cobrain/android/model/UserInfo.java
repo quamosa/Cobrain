@@ -2,8 +2,10 @@ package com.cobrain.android.model;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -95,6 +97,7 @@ public class UserInfo extends User {
 	
 	public UserInfo(Context c) {
 		context = c;
+		defaultSettings.sms_invitation_message = c.getString(R.string.invite_sms_body);
 	}
 
 	public boolean testBaseUrl(String url) {
@@ -155,18 +158,26 @@ public class UserInfo extends User {
 	
 	public Settings getSettings() {
 		if (apiKey != null) {
-			if (cachedSettings != null) return cachedSettings;
+			if (cachedSettings != null) {
+				Calendar now = Calendar.getInstance(Locale.US);
+				Calendar onehourlater = (Calendar) cachedSettings.updated.clone();
+				onehourlater.add(Calendar.HOUR, 1);
+				if (now.before(onehourlater)) {
+					return cachedSettings;
+				}
+			}
 			
 			String url = context.getString(R.string.url_settings_get, context.getString(R.string.url_cobrain_api));
 			WebRequest wr = new WebRequest().setHeaders(apiKeyHeader()).get(url);
 			
 			if (wr.go() == 200) {
 				Settings s = new Gson().fromJson(wr.getResponse(), Settings.class);
-				if (cachedSettings == null) cachedSettings = new Settings();
+				cachedSettings = new Settings();
 				cachedSettings.sms_invitation_message = s.sms_invitation_message;
 				cachedSettings.tastemaker_campaign = s.tastemaker_campaign;
 				return cachedSettings;
 			}
+			else if (cachedSettings != null) return cachedSettings;
 		}
 		return defaultSettings;
 	}
