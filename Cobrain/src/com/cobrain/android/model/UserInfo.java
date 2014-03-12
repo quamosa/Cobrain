@@ -25,7 +25,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class UserInfo extends User {
 	private static final String TAG = "UserInfo";
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 
 	public interface OnUserInfoChanged {
 		public void onUserInfoChanged(UserInfo ui);
@@ -75,6 +75,9 @@ public class UserInfo extends User {
 	ArrayList<Invitation> invites;
 	private String wishListId;
 
+	Settings defaultSettings = new Settings();
+	Settings cachedSettings;
+	
 	@SerializedName("hashed_phone_number")
 	private String hashedPhone;
 
@@ -149,6 +152,25 @@ public class UserInfo extends User {
 		
 		return false;
 	}
+	
+	public Settings getSettings() {
+		if (apiKey != null) {
+			if (cachedSettings != null) return cachedSettings;
+			
+			String url = context.getString(R.string.url_settings_get, context.getString(R.string.url_cobrain_api));
+			WebRequest wr = new WebRequest().setHeaders(apiKeyHeader()).get(url);
+			
+			if (wr.go() == 200) {
+				Settings s = new Gson().fromJson(wr.getResponse(), Settings.class);
+				if (cachedSettings == null) cachedSettings = new Settings();
+				cachedSettings.sms_invitation_message = s.sms_invitation_message;
+				cachedSettings.tastemaker_campaign = s.tastemaker_campaign;
+				return cachedSettings;
+			}
+		}
+		return defaultSettings;
+	}
+
 
 	private void onUserInfoChange(UserInfo userInfo) {
 		for (OnUserInfoChanged l : listeners) {
@@ -207,6 +229,8 @@ public class UserInfo extends User {
 	public void signIn(String apiKey) {
 		//isValidApiKey(apiKey, null);
 		this.apiKey = apiKey;
+		
+		getSettings();
 		
 		if (fetchUserInfo()) {
 			//fetchInvitations();

@@ -21,7 +21,7 @@ import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.utils.LoaderUtils;
 
 public class BaseCobrainFragment extends SherlockFragment implements OnClickListener, CobrainView {
-	public CobrainController controller;
+	public static CobrainController controller;
 	public LoaderUtils loaderUtils = new LoaderUtils();
 	ActionBar actionBar;
 	View abHide;
@@ -41,7 +41,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	    	e.printStackTrace();
 	    }
 	}
-
+	
 	public AsyncTask addAsyncTask(String key, AsyncTask asyncTask) {
 		asyncTasks.put(key, asyncTask);
 		return asyncTask;
@@ -143,7 +143,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 
 	@Override
 	public void onAttach(Activity activity) {
-		controller = (CobrainController) activity;
+		if (controller == null) controller = (CobrainController) activity;
 		controller.showOptionsMenu(true);
 		detached = false;
 		actionBar = controller.getSupportActionBar();
@@ -233,7 +233,6 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
 		controller.dispatchOnFragmentDetached(this);
 		abHide = null;
-		controller = null;
 		actionBar = null;
 		childFragmentManagerField = null;
 		parent = null;

@@ -168,11 +168,13 @@ public class CraveStripsFragment<T> extends BaseCobrainFragment implements OnIte
 		if (controller != null) {
 			controller.getCobrain().checkLogin();
 			loaderUtils.dismiss();
-			loader.clear();
-			if (!onSale) {
-				loader.addHeaderStrip();
+			if (loader != null) {
+				loader.clear();
+				if (!onSale) {
+					loader.addHeaderStrip();
+				}
+				loader.load();
 			}
-			loader.load();
 		}
 	}
 	

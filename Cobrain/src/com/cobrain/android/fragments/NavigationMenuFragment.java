@@ -2,6 +2,7 @@ package com.cobrain.android.fragments;
 
 import java.util.ArrayList;
 
+import com.cobrain.android.MainActivity;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.NavigationMenuAdapter;
 import com.cobrain.android.adapters.NavigationMenuItem;
@@ -13,6 +14,9 @@ import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.UserInfo.OnUserInfoChanged;
 import com.cobrain.android.utils.LoaderUtils;
 
+import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -135,7 +139,7 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements Cobra
 		
 		if (controller == null) return; 
 		UserInfo ui = controller.getCobrain().getUserInfo();
-		CharSequence cs;
+		String s = null;
 
 		/*
 		if (ui == null) {
@@ -147,28 +151,46 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements Cobra
 		if (ui != null) {
 			ui.registerUserInfoChangedListener(this);
 			if (ui.hasBadge(Badge.TASTEMAKER)) {
-				cs = Html.fromHtml(String.format("%s<br><i><font color=\"#%x\">Tastemaker</font></i>", 
+				s = String.format("%s<br><i><font color=\"#%x\">Tastemaker</font></i>", 
 						ui.getName(),
-						getActivity().getResources().getColor(R.color.Tastemaker) & 0xffffff));
+						getActivity().getResources().getColor(R.color.Tastemaker) & 0xffffff);
 				userbadge.setImageResource(R.drawable.ic_badge_tastemaker);
 				userbadge.setVisibility(View.VISIBLE);
-				username.setText(cs);
 			}
 			else
 				if (ui.hasBadge(Badge.TRENDSETTER)) {
-					cs = Html.fromHtml(String.format("%s<br><i><font color=\"#%x\">Trendsetter</font></i>", 
+					s = String.format("%s<br><i><font color=\"#%x\">Trendsetter</font></i>", 
 							ui.getName(),
-							getActivity().getResources().getColor(R.color.Trendsetter) & 0xffffff));
+							getActivity().getResources().getColor(R.color.Trendsetter) & 0xffffff);
 					userbadge.setImageResource(R.drawable.ic_badge_trendsetter);
 					userbadge.setVisibility(View.VISIBLE);
-					username.setText(cs);
 				}
 				else {
-					username.setText(ui.getName());
+					s = ui.getName();
 					userbadge.setVisibility(View.GONE);
 				}
 			
 			avatarLoader.load(ui.getAvatarUrl(), useravatar, listener) ;
+		}
+
+		if (username != null) {
+			if (MainActivity.environment != null && !MainActivity.environment.equals("PROD")) {
+				Activity a = getActivity();
+				PackageInfo pInfo;
+				String appInfo = MainActivity.environment;
+				
+				try {
+					pInfo = a.getPackageManager().getPackageInfo(a.getPackageName(), 0);
+					appInfo += " " + pInfo.versionName + " (" + pInfo.versionCode + ")";
+				} catch (NameNotFoundException e) {
+					e.printStackTrace();
+				}
+				
+				if (s == null) s = appInfo;
+				else s += "<br>" + appInfo;
+			}
+			
+			username.setText(Html.fromHtml(s));
 		}
 	}
 

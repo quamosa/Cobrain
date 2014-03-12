@@ -98,6 +98,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 		dialog = null;
 		trainingLoader.dispose();
 		setSubTitle(null);
+		save.setOnClickListener(null);
 		skip.setOnClickListener(null);
 		save = null;
 		question = null;
@@ -126,6 +127,7 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 
 			@Override
 			public void onLoadStarted() {
+				setButtonsEnabled(false);
 				loaderUtils.showLoading(null);
 			}
 
@@ -134,40 +136,40 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 				//if (r != null && r == true) {
 					//we ASSUME we saved our choices load new ones now!
 
-					if (saveChoicesThenGoHome || trainingLoader.getCravesRemaining() == 0) {
-						new AsyncTask<Void, Void, Void>() {
-			
-							@Override
-							protected Void doInBackground(Void... params) {
-								UserInfo ui = controller.getCobrain().getUserInfo();
-								if (ui != null) {
-									if (!ui.getChecklist().hasInitialTraining()) {
-										ui.updateProfile("{\"checklist\": {\"initial_training\": true}}");
-									}
-								}
-								return null;
-							}
+				boolean weRan = false;
+				
+				if (saveChoicesThenGoHome || trainingLoader.getCravesRemaining() == 0) {
+					new AsyncTask<Void, Void, Void>() {
 
-							@Override
-							protected void onPostExecute(Void result) {
-								if (saveChoicesThenGoHome) {
-									showPersonalizationAnimation();
-									save.postDelayed(new Runnable() {
-										public void run() {
-											controller.showHome(HomeFragment.TAB_HOME_RACK, false);
-										}
-									}, 5 * 1000); 
+						@Override
+						protected Void doInBackground(Void... params) {
+							UserInfo ui = controller.getCobrain().getUserInfo();
+							if (ui != null) {
+								if (!ui.getChecklist().hasInitialTraining()) {
+									ui.updateProfile("{\"checklist\": {\"initial_training\": true}}");
 								}
 							}
-							
-						}.execute();
-					}
+							return null;
+						}
 
-					if (!saveChoicesThenGoHome) {
-						//loaderUtils.dismissLoading();
-						update(true);
-					}
-				//}
+						@Override
+						protected void onPostExecute(Void result) {
+							if (saveChoicesThenGoHome) {
+								controller.showHome(HomeFragment.TAB_HOME_RACK, true);
+							}
+							setButtonsEnabled(true);
+						}
+						
+					}.execute();
+					weRan = true;
+				}
+
+				if (!saveChoicesThenGoHome) {
+					//loaderUtils.dismissLoading();
+					update(true);
+					if (!weRan) setButtonsEnabled(true);
+
+				}
 			}
 			
 		});
@@ -176,10 +178,13 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 	@Override
 	public void onLoadStarted() {
 		//loaderUtils.showLoading("Loading your training items...");
+		setButtonsEnabled(false);
 	}
 
 	@Override
 	public void onLoadCompleted(Skus tr) {
+		setButtonsEnabled(true);
+		
 		if (tr == null) {
 			trainingLoader.clear();
 			loaderUtils.showEmpty("We had a problem loading your training choices. Click here to try loading them again.");
@@ -195,6 +200,11 @@ public class TrainingFragment extends BaseCobrainFragment implements OnLoadListe
 			loaderUtils.dismiss();
 			updateUI();
 		}
+	}
+
+	private void setButtonsEnabled(boolean enabled) {
+		//save.setEnabled(enabled);
+		//skip.setEnabled(enabled);
 	}
 
 	void updateUI() {
