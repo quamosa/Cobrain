@@ -190,7 +190,7 @@ public class NavigationMenuFragment extends BaseCobrainFragment implements Cobra
 				else s += "<br>" + appInfo;
 			}
 			
-			username.setText(Html.fromHtml(s));
+			if (s != null) username.setText(Html.fromHtml(s));
 		}
 	}
 
