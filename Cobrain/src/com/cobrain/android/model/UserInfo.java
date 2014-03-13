@@ -425,20 +425,13 @@ public class UserInfo extends User {
 	
 	public Scenario getScenario(int id, boolean onSale, boolean refresh) {
 		String url = context.getString(R.string.url_scenario_get, context.getString(R.string.url_cobrain_api), id);
-		if (refresh) url += "?refresh=true";
+		url += "?signal=recommended";
+		if (onSale) url += "&onSale=true";
+		if (refresh) url += "&refresh=true";
 		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader());
 		
 		if (wr.setTimeout(60 * 1000).go() == 200) {
 			Scenario s = gson.fromJson(wr.getResponse(), Scenario.class);
-			if (s != null && onSale) {
-				int i = 0;
-				while(i < s.getSkus().size()) {
-					if (!s.getSkus().get(i).isOnSale()) {
-						s.getSkus().remove(i);
-					}
-					else i++;
-				}
-			}
 			return s;
 		}
 		else reportError("Could not get scenario");

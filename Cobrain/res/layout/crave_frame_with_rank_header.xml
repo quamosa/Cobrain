@@ -51,7 +51,7 @@
 	        android:background="@drawable/crave_border"
 			/>
 	    	    	    
-	    <RelativeLayout
+	    <!-- RelativeLayout
 	        android:id="@+id/crave_info_header"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
 	            android:textColor="@color/White"
 	            android:textStyle="bold" />
 
-	    </RelativeLayout>
+	    </RelativeLayout -->
 
    		<ImageView
    		    android:id="@+id/item_sale_icon"

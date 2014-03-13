@@ -108,7 +108,7 @@ public class SkuStripsLoader {
 		
 		SkusStripPagerAdapter adapter = new SkusStripPagerAdapter(parent.getActivity(), strip, parent);
 		SkuStripLoader loader = new SkuStripLoader();
-		loader.initialize(parent.controller, adapter);
+		loader.initialize(BaseCobrainFragment.controller, adapter);
 
 		strip.adapter = adapter;
 		strip.loader = loader;

@@ -48,7 +48,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	HttpImageView itemImage;
 	ProgressBar progress;
 	RelativeLayout itemInfoFooter;
-	TextView cravePopupLabel;
+	//TextView cravePopupLabel;
 	BaseCobrainFragment parent;
 	Skus results;
 	private LinearLayout bottomButtons;
@@ -127,7 +127,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		itemImage = (HttpImageView) v.findViewById(R.id.item_image);
 		progress = (ProgressBar) v.findViewById(R.id.progress);
 		
-		cravePopupLabel = (TextView) v.findViewById(R.id.crave_popup_label);
+		//cravePopupLabel = (TextView) v.findViewById(R.id.crave_popup_label);
 		itemInfoFooter = (RelativeLayout) v.findViewById(R.id.item_info_footer);
 		bottomButtons = (LinearLayout) v.findViewById(R.id.bottom_buttons);
 		saveButton = (ImageButton) v.findViewById(R.id.just_for_me_button);
@@ -359,7 +359,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		itemImage = null;
 		recommendation = null;
 		progress = null;
-		cravePopupLabel = null;
+		//cravePopupLabel = null;
 		itemInfoFooter = null;
 		bottomButtons = null;
 		saveButton = null;

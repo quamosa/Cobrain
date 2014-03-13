@@ -37,7 +37,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/crave_info_header"
                 android:src="@drawable/ic_noimage" />
 
             <ProgressBar
