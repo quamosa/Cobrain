@@ -1,5 +1,6 @@
 package com.cobrain.android.fragments;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.cobrain.android.loaders.SkuStripsLoader;
 import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.User;
+import com.google.gson.Gson;
 
 public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 	public static final String TAG = "FriendCraveStripsFragment";
@@ -113,7 +115,7 @@ public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState) {
 		
-		setHasOptionsMenu(true);
+		//setHasOptionsMenu(true);
 		
 		View v = inflater.inflate(R.layout.frg_friend_crave_strips_fragment, null);
 		craveStripList = (ListView) v.findViewById(R.id.crave_strip_list);
@@ -136,11 +138,20 @@ public class FriendCraveStripsFragment extends CraveStripsFragment<Skus> {
 	void setupCraveStrips(View v) {
 		loader.initialize(this, craveStripList, this);
 	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle inState) {
+		String ownerJson = inState.getString("owner", null);
+		owner = new Gson().fromJson(ownerJson, User.class);
+		skus = inState.getIntegerArrayList("skus");
+	}
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt("categoryId", savedState.categoryId);
-		outState.putInt("position", savedState.position);
+		outState.putString("owner", new Gson().toJson(owner, User.class));
+		if (skus != null) outState.putIntegerArrayList("skus", new ArrayList<Integer>(skus));
+		//outState.putInt("categoryId", savedState.categoryId);
+		//outState.putInt("position", savedState.position);
 		super.onSaveInstanceState(outState);
 	}
 

@@ -142,6 +142,12 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	}
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		if (savedInstanceState != null) onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
 	public void onAttach(Activity activity) {
 		if (controller == null) controller = (CobrainController) activity;
 		controller.showOptionsMenu(true);
@@ -306,6 +312,9 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	@Override
 	public boolean getSilentMode() {
 		return silentMode;
+	}
+
+	public void onRestoreInstanceState(Bundle inState) {
 	}
 
 }

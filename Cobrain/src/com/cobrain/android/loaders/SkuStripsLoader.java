@@ -13,6 +13,7 @@ import com.cobrain.android.adapters.SkusStripPagerAdapter;
 import com.cobrain.android.adapters.SkusStripPagerListAdapter;
 import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.controllers.SkuCraveStrip;
+import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.FriendCraveStripsFragment;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.User;
@@ -20,7 +21,7 @@ import com.cobrain.android.model.UserInfo;
 
 public class SkuStripsLoader {
 	CraveFilterLoader loader = new CraveFilterLoader();
-	FriendCraveStripsFragment parent;
+	public FriendCraveStripsFragment parent;
 	ListView craveStripList;
 	CraveStripListAdapter<Skus> craveStripListAdapter;
 	public ArrayList<CraveStrip<Skus>> craveStrips = new ArrayList<CraveStrip<Skus>>();
@@ -40,7 +41,7 @@ public class SkuStripsLoader {
 			strip.dispose();
 		}
 		craveStrips.clear();
-		craveStrips = null;
+		//craveStrips = null;
 		
 		if (craveStripList != null) {
 			craveStripList.setAdapter(null);
@@ -66,12 +67,12 @@ public class SkuStripsLoader {
 
 			@Override
 			protected Skus doInBackground(Object... params) {
-				UserInfo u = parent.controller.getCobrain().getUserInfo();
+				UserInfo u = BaseCobrainFragment.controller.getCobrain().getUserInfo();
 				Skus s;
 				
 				for (int i = 0; i < signal.length; i++) {
 					s = u.getSkus(owner, signal[i], null, null);
-					addSkuStrip( caption[i], s );
+					if (!addSkuStrip( caption[i], s )) break;
 				}
 				
 				return null;
@@ -94,10 +95,13 @@ public class SkuStripsLoader {
 		for (CraveStrip<Skus> strip : craveStrips) {
 			strip.load();
 		}
-		craveStripList.setAdapter(craveStripListAdapter);
+		if (craveStripList != null)
+			craveStripList.setAdapter(craveStripListAdapter);
 	}
 
-	void addSkuStrip(String caption, Skus skus) {
+	boolean addSkuStrip(String caption, Skus skus) {
+		if (parent == null) return false;
+		
 		SkuCraveStrip strip = new SkuCraveStrip(craveStripListAdapter, parent);
 		strip.skus = skus;
 		strip.caption = caption;
@@ -122,6 +126,7 @@ public class SkuStripsLoader {
 		//strip.container.addView(strip.list);
 
 		craveStrips.add(strip);
+		return true;
 	}
 
 }
