@@ -9,9 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.cobrain.android.MainActivity;
 import com.cobrain.android.R;
 import com.cobrain.android.adapters.FeedListAdapter;
 import com.cobrain.android.adapters.FriendsListAdapter;
+import com.cobrain.android.controllers.AnimationStepper;
+import com.cobrain.android.controllers.AnimationStepper.OnAnimationStep;
+import com.cobrain.android.controllers.AnimationStepper.Timer;
 import com.cobrain.android.dialogs.FriendAcceptDialog;
 import com.cobrain.android.loaders.ContactLoader;
 import com.cobrain.android.loaders.ContactLoader.ContactInfo;
@@ -66,9 +70,12 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	ProgressBar progress;
 	View invite;
 	Button verify;
+	View blinkButton;
 	ContactLoader contacts = new ContactLoader();
 	Timing.Timer timer = new Timing.Timer();
-	
+	boolean blinkRequested;
+	boolean blinkedVerifyButton;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -244,9 +251,11 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 			adapter.toggleEditMode();
 			break;
 		case R.id.verify_invite_button:
+			blinkInviteButton(false);
 			verifyInvites();
 			break;
 		case R.id.invite_button_layout:
+			blinkInviteButton(false);
 			showContactList();
 		}
 	}
@@ -268,6 +277,10 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 				verify.setEnabled(true);
 				verify.setPressed(false);
 				update();
+				if (blinkedVerifyButton) {
+					blinkedVerifyButton = false;
+					blinkInviteButton(true);
+				}
 			}
 			
 		}.execute();
@@ -338,6 +351,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 				.setOnResponseListener(new OnResponseListener() {
 
 					String cobrainUrl;
+					String message;
 					
 					@Override
 					public void onResponseInBackground(int responseCode, String response,
@@ -353,7 +367,12 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 							//controller.getCobrain().getUserInfo().reportError("We had a problem creating your text message. Please try again.");
 							cobrainUrl = link;
 						}
-						
+
+						Settings settings = controller.getCobrain().getUserInfo().getSettings();
+						message = settings.getSmsInvitationMessage();
+						message = message.replace("[NAME]", controller.getCobrain().getUserInfo().getName());
+						message = message.replace("[URL]", cobrainUrl);
+
 						//cobrainUrl = link;
 					}
 					
@@ -366,7 +385,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 						invite.setEnabled(true);
 						
 						if (cobrainUrl != null) {
-							sendSMSInvite(contact, cobrainUrl);
+							sendSMSInvite(contact, message);
 						}
 					}
 				}).go(true);
@@ -394,14 +413,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		}
 	}
 
-	void sendSMSInvite(ContactInfo contact, String url) {
+	void sendSMSInvite(ContactInfo contact, String message) {
 		String subject = getString(R.string.invite_sms_subject);
-		Settings settings = controller.getCobrain().getUserInfo().getSettings();
-		String message = settings.getSmsInvitationMessage();
-		
-		message = message.replace("[NAME]", controller.getCobrain().getUserInfo().getName());
-		message = message.replace("[URL]", url);
-
 		startSMSIntent(contact.number, subject, message);
 	}
 	
@@ -595,6 +608,10 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	@Override
 	public void onSlidingMenuOpened() {
 		startUpdateTimer(true);
+		if (blinkRequested) {
+			blinkRequested = false;
+			blinkInviteButton(true);
+		}
 	}
 
 	@Override
@@ -627,6 +644,70 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	public void onScrollStateChanged(AbsListView arg0, int arg1) {
 		feedLoader.pauseLoad(arg1 != SCROLL_STATE_IDLE);
 		loader.pauseLoad(arg1 != SCROLL_STATE_IDLE);
+	}
+
+	AnimationStepper blinkStepper = new AnimationStepper(new OnAnimationStep() {
+		int blinkTimes = 0;
+		
+		@Override
+		public void onAnimationStepStart(AnimationStepper stepper, int step) {
+		}
+		
+		@Override
+		public void onAnimationStepEnd(AnimationStepper stepper, int step) {
+		}
+		
+		@Override
+		public void onAnimationStep(AnimationStepper stepper, int step, int counter) {
+			switch(step) {
+			case 1:
+				blinkTimes = 0;
+				stepper.nextStep(500);
+				break;
+			case 2:
+				stepper.nextStep(250);
+				blinkButton.setPressed(true);
+				break;
+			case 3:
+				stepper.nextStep(250);
+				blinkButton.setPressed(false);
+				break;
+			case 4:
+				stepper.nextStep(250);
+				blinkButton.setPressed(true);
+				break;
+			case 5:
+				stepper.nextStep(1000);
+				blinkButton.setPressed(false);
+				break;
+			case 6:
+				if (++blinkTimes == 3) {
+					stepper.nextStep();
+				}
+				else stepper.setStep(2);
+			}
+		}
+	});
+	
+	public void blinkInviteButton(boolean blink) {
+		if (blink) {
+			if (controller.getSlidingMenu().isSecondaryMenuShowing()) {
+				blinkRequested = false;
+				if (!blinkStepper.isStepping()) {
+					if (verify.getVisibility() == View.VISIBLE) {
+						blinkButton = verify;
+						blinkedVerifyButton = true;
+					}
+					else blinkButton = invite;
+					blinkStepper.setStepCount(6);
+					blinkStepper.start();
+				}			
+			}
+			else {
+				blinkRequested = true;
+			}
+		}
+		else blinkStepper.stop();
 	}
 	
 	

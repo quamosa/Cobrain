@@ -7,6 +7,7 @@ import com.cobrain.android.R;
 import com.cobrain.android.controllers.Cobrain;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.controllers.Cobrain.CobrainSharedPreferences;
+import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.model.Settings;
 import com.cobrain.android.model.User;
@@ -18,6 +19,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -224,10 +226,12 @@ public class TasteMakerLoader {
 
 			Runnable r = new Runnable() {
 				public void run() {
+					CobrainController controller = BaseCobrainFragment.controller;
+					FragmentActivity activity = (FragmentActivity) controller;
 					controller.showFriendsMenu();
-					SherlockFragment f = (SherlockFragment) controller.getShown();
-					if (f instanceof FriendsListFragment) {
-						((FriendsListFragment) f).showContactList();
+					FriendsListFragment f = (FriendsListFragment) activity.getSupportFragmentManager().findFragmentByTag(FriendsListFragment.TAG);
+					if (f != null) {
+						f.blinkInviteButton(true);
 					}
 				}
 			};
