@@ -96,7 +96,7 @@ public class MainFragment extends BaseCobrainFragment {
 		}
 		else sm.showMenu(true);
 
-		NavigationMenuFragment f = (NavigationMenuFragment) getFragmentManager().findFragmentByTag(NavigationMenuFragment.TAG);
+		NavigationMenuFragment f = (NavigationMenuFragment) getActivity().getSupportFragmentManager().findFragmentByTag(NavigationMenuFragment.TAG);
 		return f;
 	}
 
@@ -109,7 +109,7 @@ public class MainFragment extends BaseCobrainFragment {
 			sm.showSecondaryMenu(true);
 		}
 
-		FriendsListFragment f = (FriendsListFragment) getFragmentManager().findFragmentByTag(FriendsListFragment.TAG);
+		FriendsListFragment f = (FriendsListFragment) getActivity().getSupportFragmentManager().findFragmentByTag(FriendsListFragment.TAG);
 		//if (f != null) f.update();
 		
 		return f;
