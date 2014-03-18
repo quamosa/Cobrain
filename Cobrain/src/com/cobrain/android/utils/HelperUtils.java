@@ -127,7 +127,13 @@ public class HelperUtils {
 
 		public static String plural(int count, String string) {
 			if (count != 1) {
-				string += "s";
+				if (string != null) {
+					char c = string.charAt(string.length() - 1);
+					if (c >= 'A' && c <= 'Z') {
+						string += "S";
+					}
+					else string += "s";
+				}
 			}
 			return string;
 		}

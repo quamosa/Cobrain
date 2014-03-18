@@ -68,6 +68,15 @@
                 android:layout_marginTop="20dp"
                 android:text="Password" />
 
+            <TextView
+                android:id="@+id/password_label_reqd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/password_label"
+                android:layout_toRightOf="@+id/password_label"
+                android:layout_marginLeft="10dp"
+                android:text="(Must be at least 8 characters)" />
+            
             <EditText
                 android:id="@+id/password"
                 style="@style/edit_text"
