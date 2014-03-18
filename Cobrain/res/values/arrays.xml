@@ -13,6 +13,22 @@
 	    <item>BOTH</item>
 	</array>
 	
+	<array name="push_notifications_caption">
+	    <item>A friend accepts my invite</item>
+	    <item>A friend Raves my Craves</item>
+	    <item>My Tastemaker status changes</item>
+	    <!-- item>My Cobrain finds new Craves for me</item -->
+	    <item>Craves I saved go on sale</item>
+	    <item>The Cobrain App is updated</item>
+	</array>
+	<array name="push_notifications_code">
+	    <item>friendship_accepted</item>
+	    <item>raved</item>
+	    <item>tastemaker_progress</item>
+	    <item>craves_on_sale</item>
+	    <item>app_updated</item>
+	</array>
+			
 	<array name="navigation_menu_items">
 
 	    <item type="string">Home Rack</item>

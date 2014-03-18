@@ -131,7 +131,7 @@ public class FeedListAdapter extends ArrayAdapter<Feed> {
 				vh.badge.setVisibility(View.GONE);
 			}
 
-		//vh.avatar.setImageDrawable(color);
+		vh.avatar.setImageDrawable(color);
 		avatarLoader.load(feed.getUser().getAvatarUrl(), vh.avatar, avatarSize, avatarSize, listener) ;
 		vh.feed.setText(Html.fromHtml(message));
 		vh.position = position;

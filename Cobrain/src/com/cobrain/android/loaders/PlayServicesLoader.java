@@ -82,7 +82,7 @@ public class PlayServicesLoader {
 	 * @return registration ID, or empty string if there is no existing
 	 *         registration ID.
 	 */
-	private String getRegistrationId(Context context) {
+	public String getRegistrationId(Context context) {
 	    CobrainSharedPreferences prefs = new Cobrain(context).getGlobalSharedPrefs();
 
 	    String registrationId = prefs.getString(PROPERTY_REG_ID, "");

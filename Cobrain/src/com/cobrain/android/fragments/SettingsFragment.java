@@ -37,6 +37,7 @@ public class SettingsFragment extends BaseCobrainFragment implements OnPageChang
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.addTab(actionBar.newTab().setText("Profile").setTabListener(this));
 		actionBar.addTab(actionBar.newTab().setText("Account").setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("Push Notifications").setTabListener(this));
 		actionBar.addTab(actionBar.newTab().setText("Forget Me").setTabListener(this));
 		
     	setTitle("Settings");

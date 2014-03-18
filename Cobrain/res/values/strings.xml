@@ -52,7 +52,12 @@
     <string name="url_password_change_get">%1$s/account/edit</string>
     <string name="url_password_change_post">%1$s/account</string>
     
+    <!-- v 2.1 (push notifications) -->
     <string name="url_settings_get">%1$s/settings</string>
+    <string name="url_devices_get">%1$s/devices</string>
+    <string name="url_device_post">%1$s/devices</string>
+    <string name="url_device_put">%1$s/devices/%2$s</string>
+    <string name="url_device_delete">%1$s/devices/%2$s</string>
     
     <!-- v 2.0 -->
     <string name="url_profile_get">%1$s/users/me</string>

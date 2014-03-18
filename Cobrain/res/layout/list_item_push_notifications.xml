@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/friends_list_item_padding" 
+    android:paddingBottom="@dimen/friends_list_item_padding" 
+    android:background="@drawable/navigation_menu_background_selector"
+    android:gravity="center_vertical"
+    android:clipChildren="false"
+     >
+
+	<TextView
+	    android:id="@+id/caption"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_toLeftOf="@+id/enabled"
+	    android:layout_margin="10dp"
+	    android:text="@string/blah"
+	    android:textColor="#000"
+        android:textSize="14sp"
+	    android:layout_centerVertical="true"
+	    />
+
+	<ToggleButton
+	    android:id="@+id/enabled"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_marginRight="10dp"
+	    android:layout_centerVertical="true"
+	     />
+	
+</RelativeLayout>

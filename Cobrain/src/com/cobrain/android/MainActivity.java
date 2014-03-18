@@ -61,6 +61,7 @@ import com.cobrain.android.model.Sku;
 import com.cobrain.android.model.Skus;
 import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.utils.Analytics;
 import com.cobrain.android.utils.HelperUtils;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -99,6 +100,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 
         Analytics.start(this);
         
+        WebRequest.enableCache(this, 0);
         environment = getEnvironment();
         
         cobrain = new Cobrain(getApplicationContext());
@@ -575,6 +577,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	protected void onStop() {
 	    super.onStop();
+	    WebRequest.flushCache();
 	    EasyTracker.getInstance(this).activityStop(this);
 	}
 	

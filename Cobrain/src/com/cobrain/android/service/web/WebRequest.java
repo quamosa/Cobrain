@@ -1,52 +1,41 @@
 package com.cobrain.android.service.web;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.http.conn.ConnectTimeoutException;
+import android.content.Context;
+import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.text.TextUtils;
+import android.util.Log;
 
 public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	private static final int GET = 0;
 	private static final int POST = 1;
 	private static final int PUT = 2;
 	private static final int DELETE = 3;
+	private static final String TAG = "WebRequest";
 
 	String url;
 	HashMap<String, String> formFields;
 	HashMap<String, String> headerFields;
 	private int action = GET;
 	private String response;
-	private Header[] headers;
-    static HttpClient httpclient = new DefaultHttpClient();
-    static {
-		httpclient.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
-    }
+	private Map<String, List<String>> headers;
     OnResponseListener responseListener;
     private String body;
     private String contentType;
@@ -58,7 +47,31 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
     	public void onResponse(int responseCode, String response, HashMap<String, String> headers);
 		public void onResponseInBackground(int responseCode, String response, HashMap<String, String> headers);    	
     }
-      
+
+    static {
+        HttpURLConnection.setFollowRedirects(true);
+    }
+    
+    public static void enableCache(Context c, long size) {
+    	final long httpCacheSize = (size == 0) ? (10 * 1024 * 1024) : size; // 10 MiB
+        final File httpCacheDir = new File(c.getCacheDir(), "http");
+
+        try {
+        	HttpResponseCache.install(httpCacheDir, httpCacheSize);
+            //Class.forName("android.net.http.HttpResponseCache")
+            //    .getMethod("install", File.class, long.class)
+            //    .invoke(null, httpCacheDir, httpCacheSize);
+            Log.v(TAG,"cache set up");
+        } catch (Exception httpResponseCacheNotAvailable) {
+            Log.v(TAG, "Failed to set up HttpResponseCache");
+        }    	
+    }
+
+    public static void flushCache() {
+    	HttpResponseCache cache = HttpResponseCache.getInstalled();
+    	cache.flush();
+    }
+    
 	public WebRequest post(String url) {
 		this.url = url;
 		this.action = POST;
@@ -141,63 +154,75 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	}
 	
 	public int doPost() {
-	    HttpPost httppost = new HttpPost(url);
+		HttpURLConnection conn = null;
+		int code = 0;
 
-	    try {
-	        httppost.setHeaders(headerFieldsToHeaders());
+        try {
+        	
+	        URL urlPath = new URL(url);
 
-	        setFormFields(httppost);
+	        conn = (HttpURLConnection) urlPath.openConnection();
+	        conn.setRequestMethod("POST");
+	    	//conn.setUseCaches(true);
+	        conn.setDoInput(true);
+	        conn.setDoOutput(true);
+        	setHeaders(conn, headerFieldsToHeaders());
 
         	if (timeout > 0) {
-	        	HttpParams params = new BasicHttpParams();
-	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
-	        	HttpConnectionParams.setSoTimeout(params, timeout);
-	        	httppost.setParams(params);
+	            conn.setConnectTimeout(timeout); 
+	            conn.setReadTimeout(timeout); 
         	}
 
-	        if (body != null && body.length() > 0) {
-	        	StringEntity se = new StringEntity(body);
-	        	if (contentType != null) se.setContentType(contentType);
-	        	httppost.setEntity(se);
-	        }
+	        setFormFields(conn);
 	        
-	        HttpResponse response = httpclient.execute(httppost);
+	        conn.connect();
+			code = conn.getResponseCode();
+			
+			if (code >= 400 && code <= 500) {
+	        	InputStream s = conn.getErrorStream();
+				this.response = streamToString(s);
+			}
+			else {
+	        	InputStream s = conn.getInputStream();
+				this.response = streamToString(s);
+			}
+			
+			this.headers = conn.getHeaderFields();
+			
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (conn != null) conn.disconnect();
+		}		
 
-			this.headers = response.getAllHeaders();
-
-	        this.response = streamToString( response.getEntity().getContent() );
-
-	        return response.getStatusLine().getStatusCode();
-	        
-	    } catch (ClientProtocolException e) {
-	    	e.printStackTrace();
-	    } catch (IOException e) {
-	    	e.printStackTrace();
-	    }
-	    
-	    return 0;
+	    return code;
 	}
 	
 	private int doGet() {
-	   	HttpUriRequest request = new HttpGet(url);
-
+		HttpURLConnection conn = null;
+		int code = 0;
+		
 	   	try {
-        	request.setHeaders(headerFieldsToHeaders());
+	        URL urlPath = new URL(url);
+
+	        conn = (HttpURLConnection) urlPath.openConnection();
+	        conn.setRequestMethod("GET");
+	        conn.setUseCaches(true);
+	        conn.setDoInput(true);
+        	setHeaders(conn, headerFieldsToHeaders());
         	
         	if (timeout > 0) {
-	        	HttpParams params = new BasicHttpParams();
-	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
-	        	HttpConnectionParams.setSoTimeout(params, timeout);
-	        	request.setParams(params);
+	            conn.setConnectTimeout(timeout); 
+	            conn.setReadTimeout(timeout); 
         	}
 
-        	HttpResponse response =  httpclient.execute(request);
-
-        	InputStream s = response.getEntity().getContent();
+        	InputStream s = conn.getInputStream();
 			this.response = streamToString(s);
-			this.headers = response.getAllHeaders();
+			this.headers = conn.getHeaderFields();
 			
-			return response.getStatusLine().getStatusCode();
+			code = conn.getResponseCode();
 		
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -205,100 +230,117 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (conn != null) conn.disconnect();
 		}
 		
-		return 0;
+		return code;
 	}
 
 	private int doDelete() {
-	   	HttpUriRequest request = new HttpDelete(url);
+		HttpURLConnection conn = null;
+		int code = 0;
 
         try {
-        	request.setHeaders(headerFieldsToHeaders());
+        	
+	        URL urlPath = new URL(url);
+
+	        conn = (HttpURLConnection) urlPath.openConnection();
+	        conn.setRequestMethod("DELETE");
+	    	//conn.setUseCaches(true);
+	        conn.setDoInput(true);
+        	setHeaders(conn, headerFieldsToHeaders());
         	
         	if (timeout > 0) {
-	        	HttpParams params = new BasicHttpParams();
-	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
-	        	HttpConnectionParams.setSoTimeout(params, timeout);
-	        	request.setParams(params);
+	            conn.setConnectTimeout(timeout); 
+	            conn.setReadTimeout(timeout); 
         	}
-        	
-        	HttpResponse response =  httpclient.execute(request);
 
-        	InputStream s = response.getEntity().getContent();
+        	InputStream s = conn.getInputStream();
 			this.response = streamToString(s);
-			this.headers = response.getAllHeaders();
+			this.headers = conn.getHeaderFields();
 			
-			return response.getStatusLine().getStatusCode();
+			code = conn.getResponseCode();
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (conn != null) conn.disconnect();
 		}
 		
-		return 0;
+		return code;
 	}
 
 	private int doPut() {
-	   	HttpPut request = new HttpPut(url);
+		HttpURLConnection conn = null;
+		int code = 0;
 
         try {
-        	setFormFields(request);
         	
-        	request.setHeaders(headerFieldsToHeaders());
+	        URL urlPath = new URL(url);
+
+	        conn = (HttpURLConnection) urlPath.openConnection();
+	        conn.setRequestMethod("PUT");
+	    	//conn.setUseCaches(true);
+	        conn.setDoInput(true);
+	        conn.setDoOutput(true);
+        	setHeaders(conn, headerFieldsToHeaders());
 
         	if (timeout > 0) {
-	        	HttpParams params = new BasicHttpParams();
-	        	HttpConnectionParams.setConnectionTimeout(params, timeout);
-	        	HttpConnectionParams.setSoTimeout(params, timeout);
-	        	request.setParams(params);
+	            conn.setConnectTimeout(timeout); 
+	            conn.setReadTimeout(timeout); 
         	}
 
-	        if (body != null && body.length() > 0) {
-	        	StringEntity se = new StringEntity(body);
-	        	if (contentType != null) se.setContentType(contentType);
-	        	request.setEntity(se);
-	        }
+        	setFormFields(conn);
         	
-        	HttpResponse response =  httpclient.execute(request);
-
-        	InputStream s = response.getEntity().getContent();
+        	InputStream s = conn.getInputStream();
 			this.response = streamToString(s);
-			this.headers = response.getAllHeaders();
+			this.headers = conn.getHeaderFields();
 			
-			return response.getStatusLine().getStatusCode();
-	    				
+			code = conn.getResponseCode();
+			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		} finally {
+			if (conn != null) conn.disconnect();
+		}		
 		
-		return 0;
+		return code;
 	}
 
-	void setFormFields(Object request) {
-		if (formFields == null) return;
-		
-        ArrayList<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>();
-
-        for (String key : formFields.keySet()) {
-	        nameValuePairs.add(new BasicNameValuePair(key, formFields.get(key) ));
-        }
-
-        try {
-
-        	UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs);
-        
-        	if (request instanceof HttpPost)
-        		((HttpPost) request).setEntity(entity);
-        	else if (request instanceof HttpPut) 
-        		((HttpPut) request).setEntity(entity);
-        	
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+	void setFormFields(HttpURLConnection conn) {
+		if (formFields != null) {
+	        for (String key : formFields.keySet()) {
+	        	if (body == null) body = "";
+	        	if (body.length() > 0) body += "&";
+	        	body += key + "=" + formFields.get(key);
+	        }
 		}
+		
+        if (body != null && body.length() > 0) {
+        	OutputStream os = null;
+        	
+			try {
+				os = conn.getOutputStream();
+				String encodedBody = URLEncoder.encode(body, "UTF-8");
+	        	os.write(encodedBody.getBytes("UTF-8"));
+	        	os.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (os != null)
+					try {
+						os.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+			}
+        }
+		
 	}
 
 	String streamToString(InputStream is) {
@@ -319,23 +361,30 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		return builder.toString();
 	}
 
-	Header[] headerFieldsToHeaders() {
-		ArrayList<Header> h = new ArrayList<Header>();
+	Map<String, List<String>> headerFieldsToHeaders() {
+		Map<String, List<String>> headers = new HashMap<String, List<String>>();
 
         if (contentType != null) {
-			h.add(new BasicHeader("Content-Type", contentType));
+        	ArrayList<String> s = new ArrayList<String>();
+        	s.add(contentType);
+        	headers.put("Content-Type", s);
         }
 
         if (headerFields != null) {
 			for (String key : headerFields.keySet()) {
-				BasicHeader hd = new BasicHeader(key, headerFields.get(key));
-				h.add(hd);
+	        	ArrayList<String> s = new ArrayList<String>();
+	        	s.add(headerFields.get(key));
+	        	headers.put(key, s);
 			}
 		}
 
-        h.add(new BasicHeader("x-cobrain-client", "android, " + Build.VERSION.RELEASE + ", phone"));
-
-		return h.toArray(new Header[h.size()]);
+    	ArrayList<String> s = new ArrayList<String>();
+    	s.add("android");
+    	s.add(Build.VERSION.RELEASE);
+    	s.add("phone");
+    	headers.put("x-cobrain-client", s);
+    	
+		return headers;
 	}
 	
 	@Override
@@ -358,22 +407,34 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		}
 		onResponse(result, response, map);
 	}
-	
-	public HashMap<String, String> getHeaders() {
-		HashMap<String, String> map = new HashMap<String, String>();
-		if (headers != null) {
-			for (int i = 0; i < headers.length; i++) {
-				map.put(headers[i].getName(), headers[i].getValue());
-			}
-		}
-		return map;
-	}
-	
+
 	public void onResponse(int responseCode, String response, HashMap<String, String> headers) {}
 
 	public void setFormField(String field, String value) {
 		if (formFields == null) formFields = new HashMap<String, String>();
 		formFields.put(field, value);
+	}
+
+	private void setHeaders(HttpURLConnection conn, Map<String, List<String>> headerFieldsToHeaders) {
+		for (String key : headerFieldsToHeaders.keySet()) {
+			List<String> value = headerFieldsToHeaders.get(key);
+			String[] values = value.toArray(new String[value.size()]);
+			String val = TextUtils.join(", " , values);
+			conn.setRequestProperty(key, val);
+		}
+	}
+	
+	public HashMap<String, String> getHeaders() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		if (headers != null) {
+			for (String key : headers.keySet()) {
+				List<String> value = headers.get(key);
+				String[] values = value.toArray(new String[value.size()]);
+				String val = TextUtils.join("," , values);
+				map.put(key, val);
+			}
+		}
+		return map;
 	}
 
 }

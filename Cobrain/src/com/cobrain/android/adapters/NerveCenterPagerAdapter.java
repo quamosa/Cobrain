@@ -3,6 +3,7 @@ package com.cobrain.android.adapters;
 import com.cobrain.android.fragments.AccountFragment;
 import com.cobrain.android.fragments.ForgetMeFragment;
 import com.cobrain.android.fragments.ProfileFragment;
+import com.cobrain.android.fragments.PushNotificationsFragment;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,6 +23,8 @@ public class NerveCenterPagerAdapter extends FragmentPagerAdapter {
         case 1:
         	return "Account";
         case 2:
+        	return "Push Notifications";
+        case 3:
         	return "Forget Me";
         }
 		return null;
@@ -36,6 +39,8 @@ public class NerveCenterPagerAdapter extends FragmentPagerAdapter {
         case 1:
             return new AccountFragment();
         case 2:
+        	return new PushNotificationsFragment();
+        case 3:
             return new ForgetMeFragment();
         }
  
@@ -44,7 +49,7 @@ public class NerveCenterPagerAdapter extends FragmentPagerAdapter {
  
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
  
 }

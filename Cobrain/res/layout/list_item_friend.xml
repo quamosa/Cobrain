@@ -31,8 +31,12 @@
        android:layout_toLeftOf="@+id/friend_updates_layout"
        android:layout_toRightOf="@+id/friend_avatar"
        android:layout_marginLeft="10dp"
-       android:ellipsize="end"
-       android:maxLines="1"
+
+android:ellipsize="end"
+android:maxLines="1"
+android:scrollHorizontally="true"
+android:singleLine="true"       
+       
        android:text="@string/blah" />
 
    <RelativeLayout 
@@ -42,6 +46,7 @@
        android:layout_height="20dp"
        android:layout_toLeftOf="@+id/friend_delete"
        android:background="#5097d4"
+       android:visibility="gone"
        android:layout_marginRight="15dp"
        >
 	   <TextView

@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.cobrain.android.R;
 import com.cobrain.android.controllers.Cobrain;
+import com.cobrain.android.loaders.PlayServicesLoader;
 import com.cobrain.android.model.v1.CategoryTree;
 import com.cobrain.android.model.v1.Invitation;
 import com.cobrain.android.model.v1.RecommendationsResults;
@@ -82,6 +84,7 @@ public class UserInfo extends User {
 	
 	@SerializedName("hashed_phone_number")
 	private String hashedPhone;
+	private Preferences preferences;
 
 	public interface OnSignedInListener {
 		public void onSignedIn(boolean success);
@@ -146,6 +149,7 @@ public class UserInfo extends User {
 			me.notifications = ui.notifications;
 			me.badges = ui.badges;
 			me.checklist = ui.checklist;
+			me.preferences = ui.preferences;
 			onUserInfoChange(this);
 			//notifications?
 
@@ -241,9 +245,9 @@ public class UserInfo extends User {
 		//isValidApiKey(apiKey, null);
 		this.apiKey = apiKey;
 		
-		getSettings();
-		
 		if (fetchUserInfo()) {
+			getSettings();
+			storeDeviceNotificationToken();
 			//fetchInvitations();
 			//fetchWishList();
 		}
@@ -332,6 +336,34 @@ public class UserInfo extends User {
 			else reportError("Could not save notifications");
 		}
 		
+		return false;
+	}
+
+	public boolean savePreferences() {
+		String json = new Gson().toJson(preferences, Preferences.class);
+		return updateProfile("{\"preferences\": " + json + "}");
+	}
+	
+	public boolean storeDeviceNotificationToken() {
+		if (apiKey != null) {
+			String notificationToken = new PlayServicesLoader().getRegistrationId(context);
+
+			if (!TextUtils.isEmpty(notificationToken)) {
+				Devices d = new Devices();
+				d.os_version = Build.VERSION.RELEASE;
+				d.platform = "android";
+				d.notification_token = notificationToken;
+	
+				String json = new Gson().toJson(d, Devices.class);
+				String url = context.getString(R.string.url_device_post, context.getString(R.string.url_cobrain_api));
+				WebRequest wr = new WebRequest().post(url).setHeaders(apiKeyHeader()).setContentType("application/json")
+						.setBody(json);
+	
+				if (wr.go() == 200) {
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
@@ -547,6 +579,10 @@ public class UserInfo extends User {
 			else reportError("Could not unrave product");
 		}
 		return false;
+	}
+
+	public Preferences getPreferences() {
+		return preferences;
 	}
 
 	/*
@@ -913,6 +949,7 @@ public class UserInfo extends User {
 	public HashMap<String, String> getApiKeyHeader() {
 		return apiKeyHeader();
 	}
+
 
 /*
  * 	 * 

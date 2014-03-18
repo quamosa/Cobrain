@@ -20,11 +20,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class FriendsListAdapter extends ArrayAdapter<Friendship> implements DialogInterface.OnClickListener {
+public class FriendsListAdapter extends ArrayAdapter<Friendship> implements DialogInterface.OnClickListener, AnimationListener {
 	LoaderUtils loader = new LoaderUtils();
 	FriendsListFragment parent;
 	List<Friendship> items;
@@ -78,7 +81,7 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 			FriendsListAdapter.this.dialog = null;
 		}
 	}
-
+	
 	public void toggleEditMode() {
 		editMode = !editMode;
 		notifyDataSetChanged();
@@ -118,6 +121,7 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 			vh.badge = (ImageView) v.findViewById(R.id.friend_badge);
 			vh.friend = (TextView) v.findViewById(R.id.friend_name);
 			vh.delete = (ImageView) v.findViewById(R.id.friend_delete);
+			vh.delete.setVisibility(View.GONE);
 			vh.delete.setOnClickListener(vh);
 			vh.updates = (TextView) v.findViewById(R.id.friend_updates);
 			vh.updatesLayout = (View) vh.updates.getParent();
@@ -127,7 +131,7 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 			v.setTag(vh);
 		}
 		else vh = (ViewHolder) v.getTag();
-		
+
 		Friendship friend = getItem(position);
 		int updates = 0 ;//list.getUpdates();
 
@@ -153,13 +157,59 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 		vh.friend.setTypeface(null, (!friend.isAccepted()) ? Typeface.ITALIC : Typeface.NORMAL);
 		vh.friend.setText(friend.getUser().getName());
 		vh.position = position;
-		vh.delete.setVisibility(editMode ? View.VISIBLE : View.INVISIBLE);
-		vh.updatesLayout.setVisibility((updates > 0) ? View.VISIBLE : View.INVISIBLE);
+		/*if (editMode) {
+			if (vh.delete.getVisibility() != View.VISIBLE) {
+				if (vh.delete.getAnimation() == null) {
+					TranslateAnimation a = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 1, Animation.RELATIVE_TO_PARENT, 0, 0, 0, 0, 0);
+					a.setDuration(2000);
+					a.setAnimationListener(new AnimListener(vh.delete, View.VISIBLE));
+					vh.delete.startAnimation(a);
+				}
+			}
+		}
+		else {
+			if (vh.delete.getVisibility() == View.VISIBLE) {
+				if (vh.delete.getAnimation() == null) {
+					TranslateAnimation a = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 1, 0, 0, 0, 0);
+					a.setAnimationListener(new AnimListener(vh.delete, View.GONE));
+					a.setDuration(2000);
+					vh.delete.startAnimation(a);
+				}
+			}
+		}*/
+		vh.delete.setVisibility(editMode ? View.VISIBLE : View.GONE);
+		vh.updatesLayout.setVisibility((updates > 0) ? View.VISIBLE : View.GONE);
 		if (updates > 0) vh.updates.setText(String.valueOf(updates));
 		
 		return v;
 	}
 
+	class AnimListener implements AnimationListener {
+		View v;
+		int endVisibility;
+		
+		public AnimListener(View v, int endVisibility) {
+			this.v = v;
+			this.endVisibility = endVisibility;
+		}
+		
+		@Override
+		public void onAnimationStart(Animation animation) {
+		}
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			v.setVisibility(endVisibility);
+			v.setAnimation(null);
+			v = null;
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+		}
+		
+	};
+	
 	OnImageLoadListener listener = new OnImageLoadListener() {
 
 		@Override
@@ -179,6 +229,18 @@ public class FriendsListAdapter extends ArrayAdapter<Friendship> implements Dial
 		setNotifyOnChange(false);
 		this.remove(items.get(position));
 		setNotifyOnChange(true);
+	}
+
+	@Override
+	public void onAnimationStart(Animation animation) {
+	}
+
+	@Override
+	public void onAnimationEnd(Animation animation) {
+	}
+
+	@Override
+	public void onAnimationRepeat(Animation animation) {
 	}
 
 }

@@ -2,6 +2,7 @@ package com.cobrain.android.loaders;
 
 import com.cobrain.android.MainActivity;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Mobile;
 import com.cobrain.android.service.web.WebRequest;
 
 import android.app.Activity;
@@ -28,6 +29,8 @@ public class IntentLoader {
 		if (i != null) {
 			String action = i.getAction();
 			
+			if (processNotifications(action)) return true;
+			
 			if (MainActivity.ACTION_SIGNUP.equals(action)) {
 				controller.showSignup(null);
 				return true;
@@ -45,6 +48,27 @@ public class IntentLoader {
 			}
 		}
 		return false;
+	}
+	
+	private boolean processNotifications(String code) {
+		if (Mobile.FRIENDSHIP_ACCEPTED.equals(code)) {
+			//go to most recent friend's shared page
+		}
+		else if (Mobile.RAVED.equals(code)) {
+			//go to users shared rack. If friends have only raved Cobrain recommended items, it should just go to the user’s home rack.
+		}
+		else if (Mobile.TASTEMAKER_PROGRES.equals(code)) {
+			//Go to home rack with Tastemaker popup opened.  If user has jumped directly to Trendsetter Tastemaker, show just the Trendsetter popup.
+		}
+		else if (Mobile.CRAVES_ON_SALE.equals(code)) {
+			//go to sale rack ???
+		}
+		else if (Mobile.APP_UPDATED.equals(code)) {
+			//go to play store???
+		}
+		else return false;
+			
+		return true;
 	}
 	
 	public boolean processAnyIntents(Activity activity) {
