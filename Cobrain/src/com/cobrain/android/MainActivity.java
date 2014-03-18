@@ -209,6 +209,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		//getSupportFragmentManager().executePendingTransactions();
 		t = getSupportFragmentManager().beginTransaction();
 		
+		homeFragment = null;
+		
 		Bundle args = new Bundle();
 		args.putString("loginUrl", loginUrl);
 		
@@ -228,13 +230,15 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	public void onBackPressed() {
 		if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-			if (!getSlidingMenu().isMenuShowing()) {
-				showNavigationMenu();
-				return;
-			}
-			if (getSlidingMenu().isSecondaryMenuShowing()) {
-				showContent();
-				return;
+			if (homeFragment != null) {
+				if (!getSlidingMenu().isMenuShowing()) {
+					showNavigationMenu();
+					return;
+				}
+				if (getSlidingMenu().isSecondaryMenuShowing()) {
+					showContent();
+					return;
+				}
 			}
 			if (!letMeLeave) {
 				AlertDialog.Builder b = new AlertDialog.Builder(this);
