@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import android.content.Context;
@@ -158,12 +161,10 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		int code = 0;
 
         try {
-        	
 	        URL urlPath = new URL(url);
-
+	        
 	        conn = (HttpURLConnection) urlPath.openConnection();
 	        conn.setRequestMethod("POST");
-	    	//conn.setUseCaches(true);
 	        conn.setDoInput(true);
 	        conn.setDoOutput(true);
         	setHeaders(conn, headerFieldsToHeaders());
@@ -175,19 +176,11 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
 	        setFormFields(conn);
 	        
-	        conn.connect();
-			code = conn.getResponseCode();
-			
-			if (code >= 400 && code <= 500) {
-	        	InputStream s = conn.getErrorStream();
-				this.response = streamToString(s);
-			}
-			else {
-	        	InputStream s = conn.getInputStream();
-				this.response = streamToString(s);
-			}
-			
+	        //conn.connect();
+        	InputStream s = getInputStream(conn);
+			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
+			code = conn.getResponseCode();
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -199,6 +192,17 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
 	    return code;
 	}
+
+	InputStream getInputStream(HttpURLConnection conn) {
+		InputStream s = null;     
+        try {
+	       s = conn.getInputStream();
+	    }
+	    catch(IOException exception) {           
+	       s = conn.getErrorStream();
+	    }
+        return s;
+	}
 	
 	private int doGet() {
 		HttpURLConnection conn = null;
@@ -208,7 +212,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	        URL urlPath = new URL(url);
 
 	        conn = (HttpURLConnection) urlPath.openConnection();
-	        conn.setRequestMethod("GET");
+	        //conn.setRequestMethod("GET");
 	        conn.setUseCaches(true);
 	        conn.setDoInput(true);
         	setHeaders(conn, headerFieldsToHeaders());
@@ -218,7 +222,8 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	            conn.setReadTimeout(timeout); 
         	}
 
-        	InputStream s = conn.getInputStream();
+        	conn.connect();
+        	InputStream s = getInputStream(conn);
 			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
 			
@@ -247,7 +252,6 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
 	        conn = (HttpURLConnection) urlPath.openConnection();
 	        conn.setRequestMethod("DELETE");
-	    	//conn.setUseCaches(true);
 	        conn.setDoInput(true);
         	setHeaders(conn, headerFieldsToHeaders());
         	
@@ -256,7 +260,8 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	            conn.setReadTimeout(timeout); 
         	}
 
-        	InputStream s = conn.getInputStream();
+        	conn.connect();
+        	InputStream s = getInputStream(conn);
 			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
 			
@@ -278,12 +283,10 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		int code = 0;
 
         try {
-        	
 	        URL urlPath = new URL(url);
 
 	        conn = (HttpURLConnection) urlPath.openConnection();
 	        conn.setRequestMethod("PUT");
-	    	//conn.setUseCaches(true);
 	        conn.setDoInput(true);
 	        conn.setDoOutput(true);
         	setHeaders(conn, headerFieldsToHeaders());
@@ -295,10 +298,10 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
         	setFormFields(conn);
         	
-        	InputStream s = conn.getInputStream();
+        	conn.connect();
+        	InputStream s = getInputStream(conn);
 			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
-			
 			code = conn.getResponseCode();
 			
 		} catch (MalformedURLException e) {
@@ -313,21 +316,37 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	}
 
 	void setFormFields(HttpURLConnection conn) {
-		if (formFields != null) {
-	        for (String key : formFields.keySet()) {
-	        	if (body == null) body = "";
-	        	if (body.length() > 0) body += "&";
-	        	body += key + "=" + formFields.get(key);
-	        }
-		}
+		String body = this.body;
 		
+		if (formFields != null) {
+			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+			try {
+
+				for (String key : formFields.keySet()) {
+		        	if (body == null) body = "";
+		        	if (body.length() > 0) body += "&";
+		        	//body += key + "=" + formFields.get(key);
+		        	String value = formFields.get(key);
+		        	body += URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(value, "UTF-8");
+		        }
+			
+				//body = URLEncoder.encode(body, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+
         if (body != null && body.length() > 0) {
         	OutputStream os = null;
-        	
+
 			try {
+				byte[] bytes = body.getBytes("UTF-8");
+				int contentLength = bytes.length;
+				conn.setFixedLengthStreamingMode(contentLength);
+	            conn.setRequestProperty("Content-Length", Integer.toString(contentLength));
 				os = conn.getOutputStream();
-				String encodedBody = URLEncoder.encode(body, "UTF-8");
-	        	os.write(encodedBody.getBytes("UTF-8"));
+	        	os.write(bytes);
 	        	os.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -347,12 +366,14 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		StringBuilder builder = new StringBuilder();
 
 		try {
-        	BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-			for (String line = null; (line = reader.readLine()) != null; ) {
-			    builder.append(line).append("\n");
+			if (is != null) {
+	        	BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+				for (String line = null; (line = reader.readLine()) != null; ) {
+				    builder.append(line).append("\n");
+				}
+				reader.close();
+				is.close();
 			}
-			reader.close();
-			is.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

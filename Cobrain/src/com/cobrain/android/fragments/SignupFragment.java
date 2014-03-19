@@ -1,5 +1,7 @@
 package com.cobrain.android.fragments;
 
+import java.util.regex.Pattern;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,6 +116,16 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 			}
 			else
 				onError("Please enter your password");					
+			return false;
+		}
+		
+		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+			onError("Please enter a valid email address");
+			return false;
+		}
+		
+		if (password.length() < 8) {
+			onError("Your password must be at least 8 characters");
 			return false;
 		}
 		

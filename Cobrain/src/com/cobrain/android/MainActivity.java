@@ -218,6 +218,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
         LoginFragment login = new LoginFragment();
         login.setArguments(args);
         
+        homeFragment = null;
+        
         //int id = (homeFragment == null) ? android.R.id.content : R.id.content_frame;
         int id = android.R.id.content;
         

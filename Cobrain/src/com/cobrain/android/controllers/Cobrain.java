@@ -296,7 +296,8 @@ public class Cobrain {
     	};
 
     	String url = context.getString(R.string.url_logout_get, context.getString(R.string.url_cobrain_app));
-		wr.get(url).execute();
+		//wr.get(url).execute();
+		wr.get(url).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		return true;
 	}
 
