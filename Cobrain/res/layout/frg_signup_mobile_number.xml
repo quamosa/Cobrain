@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White" >
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f7f7f7"
+        android:gravity="center_horizontal"
+        android:padding="15dp" >
+
+        <TextView
+            android:id="@+id/name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:text="Enter your mobile number"
+            android:textColor="#000"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/name_label"
+            android:layout_centerHorizontal="true"
+            android:text="so you can connect with your friends"
+            android:textColor="#000"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/header"
+        android:padding="30dp" >
+
+        <EditText
+            android:id="@+id/phone"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView3"
+            android:layout_centerHorizontal="true"
+            android:ems="10"
+            android:hint="Mobile #"
+            android:inputType="phone" >
+        </EditText>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/phone"
+            android:layout_alignLeft="@+id/phone"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:text="We will never share your mobile number or contacts."
+            android:textColor="#000"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/next"
+            style="@style/signup_button"
+            android:background="@drawable/btn_signup_green_gradient"
+            android:layout_below="@+id/textView1"
+            android:layout_marginTop="20dp" />
+    </RelativeLayout>
+
+</RelativeLayout>

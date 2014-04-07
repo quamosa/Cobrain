@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:background="#24282b"
+    android:padding="@dimen/friends_list_item_marginLeft"
+    >
+
+	<TextView
+	    android:id="@+id/textView1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentTop="true"
+	    android:layout_centerHorizontal="true"
+        android:paddingBottom="6dp"
+	    android:gravity="center"
+	    android:textColor="#fff"
+        android:textSize="22sp"
+	    android:text="Enter your mobile number" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textView1"
+        android:gravity="center"
+        android:textColor="#898a8a"
+        android:textSize="15sp"
+        android:text="so you can connect with your friends" />
+
+    <View android:id="@+id/divider" android:background="#4d5051" android:layout_height="1dp" android:layout_width="match_parent"
+        android:layout_below="@+id/textView2"
+        android:layout_margin="20dp" />
+
+    <EditText
+	    android:id="@+id/phone"
+        style="@style/edit_text"
+  	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/divider"
+	    android:layout_centerHorizontal="true"
+        android:hint="Mobile #"
+        android:textColorHint="#858585"
+	    android:ems="10"
+	    android:inputType="phone" >
+	</EditText>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/phone"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:gravity="center"
+        android:textColor="#898a8a"
+        android:layout_margin="10dp"
+        android:textSize="13sp"
+        android:text="We will never share your mobile number or contacts." />
+
+    <Button
+	    android:id="@+id/send_phone_button"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+	    android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+	    android:layout_marginTop="20dp"
+	    android:paddingLeft="60dp"
+	    android:paddingRight="60dp"
+        android:background="@drawable/btn_submit_green_gradient"
+        android:textStyle="bold"
+        android:textColor="#fff"
+	    android:text="Submit" />
+				    
+</RelativeLayout>

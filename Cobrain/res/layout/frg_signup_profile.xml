@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+         >
+
+        <RelativeLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:background="#f7f7f7" 
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_centerHorizontal="true"
+                android:text="Introduce yourself to your Cobrain"
+                android:textColor="#000"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@null"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/name_label"
+                android:layout_centerHorizontal="true"
+                android:text="so it can give you better, personalized results."
+                android:textColor="#000"
+                android:textSize="12sp" />
+            
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/header"
+            android:padding="30dp">
+
+            <include android:id="@+id/profile_layout" layout="@layout/inc_profile" />
+
+	        <Button
+	            android:id="@+id/save_account_button"
+	            style="@style/signup_button"
+                android:background="@drawable/btn_signup_green_gradient"
+	            android:layout_below="@+id/profile_layout" />
+            
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>
