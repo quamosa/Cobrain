@@ -1,7 +1,5 @@
 package com.cobrain.android.fragments;
 
-import com.cobrain.android.R;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -12,22 +10,27 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.cobrain.android.R;
+
 public class ResetPasswordFragment extends BaseCobrainFragment {
 	public static final String TAG = "ResetPasswordFragment";
 	Button reset;
-	Button cancel;
 	TextView email;
-	
+    TextView signupButton;
+    TextView loginButton;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.login_forgot_password, null);
+		View v = inflater.inflate(R.layout.frg_forgot_password, null);
 		
 		email = (TextView) v.findViewById(R.id.email);
 		reset = (Button) v.findViewById(R.id.reset_button);
-		cancel = (Button) v.findViewById(R.id.cancel_button);
+        signupButton = (TextView) v.findViewById(R.id.signup_link);
+        loginButton = (TextView) v.findViewById(R.id.cancel_link);
+        signupButton.setOnClickListener(this);
+        loginButton.setOnClickListener(this);
 		reset.setOnClickListener(this);
-		cancel.setOnClickListener(this);
 		loaderUtils.initialize((ViewGroup)(getActivity().findViewById(android.R.id.content)));
 		
 		Bundle args = getArguments();
@@ -36,7 +39,6 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 		}
 		
 		controller.showOptionsMenu(false);
-		actionBar.setCustomView(R.layout.actionbar_login_frame);
 		//hideActionBar();
 		
 		return v;
@@ -46,12 +48,14 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 	public void onDestroyView() {
 		
 		//restoreActionBar();
-		
 		reset.setOnClickListener(null);
 		reset = null;
-		cancel.setOnClickListener(null);
-		cancel = null;
 		email = null;
+        signupButton.setOnClickListener(null);
+        signupButton = null;
+        loginButton.setOnClickListener(null);
+        loginButton = null;
+
 		super.onDestroyView();
 	}
 
@@ -60,8 +64,11 @@ public class ResetPasswordFragment extends BaseCobrainFragment {
 		super.onClick(v);
 		
 		switch(v.getId()) {
-		case R.id.cancel_button:
-			controller.showLogin(null);
+        case R.id.cancel_link:
+            controller.showLogin(null);
+            break;
+		case R.id.signup_link:
+			controller.showSignup(null);
 			break;
 		case R.id.reset_button:
 

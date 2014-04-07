@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@color/CraveDislikeButtonPressed" android:state_pressed="true"></item>
-    <item android:drawable="@color/CraveDislikeButtonNormal"></item>
+    <item android:drawable="@drawable/ic_crave_dislike_selected" android:state_pressed="true"></item>
+    <item android:drawable="@drawable/ic_crave_dislike"></item>
     
 </selector>

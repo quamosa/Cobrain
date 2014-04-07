@@ -5,8 +5,8 @@
     android:versionName="1.2" >
 
     <uses-sdk
-        android:minSdkVersion="11"
-        android:targetSdkVersion="18" />
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
     
     <uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.SEND_SMS"/>
@@ -22,6 +22,7 @@
         android:protectionLevel="signature" />
     <uses-permission android:name="com.cobrain.android.permission.C2D_MESSAGE" />
  	
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
          
     <application
 		android:screenOrientation="portrait"
@@ -42,8 +43,7 @@
             </intent-filter>
         </receiver>
         <service android:name="com.cobrain.android.service.GcmIntentService" />
-        <service android:name=".GcmIntentService" />
-        
+
         <activity
             android:name="com.cobrain.android.SplashActivity"
 			android:screenOrientation="portrait"
@@ -59,18 +59,25 @@
             android:name="com.cobrain.android.MainActivity"
 			android:screenOrientation="portrait"
             android:label="@string/app_name" >
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-   				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
-				<data android:host="www.cobrain.com" android:scheme="http" android:pathPrefix="/mobile/" />
-				<data android:host="www.cobrain.com" android:scheme="https" android:pathPrefix="/mobile/" />
-				<data android:host="cobrain.com" android:scheme="http" android:pathPrefix="/mobile/" />
-				<data android:host="cobrain.com" android:scheme="https" android:pathPrefix="/mobile/" />
-				<data android:host="qa.cobrain.com" android:scheme="http" android:pathPrefix="/mobile/" />
-				<data android:host="qa.cobrain.com" android:scheme="https" android:pathPrefix="/mobile/" />
-			</intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="www.cobrain.com" android:scheme="http" android:pathPrefix="/mobile/" />
+                <data android:host="www.cobrain.com" android:scheme="https" android:pathPrefix="/mobile/" />
+                <data android:host="cobrain.com" android:scheme="http" android:pathPrefix="/mobile/" />
+                <data android:host="cobrain.com" android:scheme="https" android:pathPrefix="/mobile/" />
+                <data android:host="qa.cobrain.com" android:scheme="http" android:pathPrefix="/mobile/" />
+                <data android:host="qa.cobrain.com" android:scheme="https" android:pathPrefix="/mobile/" />
+            </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.cobrain.android.LoginActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
+        </activity>
+
     </application>
 
 </manifest>

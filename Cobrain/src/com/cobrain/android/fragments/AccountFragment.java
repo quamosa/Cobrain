@@ -88,7 +88,7 @@ public class AccountFragment extends BaseCobrainFragment implements OnClickListe
 						protected void onPostExecute(Boolean result) {
 							controller.dismissDialog();
 							if (result) {
-								controller.showDialog("Your password was changed.");
+								controller.showDialog(null, "Your password was changed.");
 							}
 							else onError("We had a problem changing your password. Please check your current password and try again.");
 						}

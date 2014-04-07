@@ -259,5 +259,7 @@
         android:text="Invite friends to see their Shared Craves and Rave about the ones you think are best for them. The more you interact with your friends, the smarter your Cobrain becomes!"
         />
     </ScrollView>
-    
+
+    <include android:id="@+id/phone_popup" android:visibility="visible" layout="@layout/frg_friends_list_phone_popup_fragment"/>
+   
 </RelativeLayout>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/croppednav_bg"
+    >
+
+    <RelativeLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:padding="40dp"
+            >
+
+            <TextView
+                android:id="@+id/message_label2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Sign Up" />
+
+            <TextView
+                android:id="@+id/message_label"
+                android:gravity="center"
+                android:layout_below="@+id/message_label2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:visibility="gone"
+                android:text="" />
+
+            <RelativeLayout
+                android:id="@+id/login_fields"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/message_label"
+                android:background="@drawable/border"
+                android:padding="10dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                >
+                <include layout="@layout/inc_login_fields" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/message"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/login_fields"
+                android:shadowColor="#000"
+                android:shadowDx="2.5"
+                android:shadowDy="2.5"
+                android:shadowRadius="5"
+                android:textColor="#fff"
+                android:text="Must be at least 8 characters" />
+
+            <Button
+                android:id="@+id/create_account_button"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/btn_signup_green_gradient"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/message"
+                android:textColor="#fff"
+                android:text="Create My Cobrain" />
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
+        android:id="@+id/relativeLayout">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:text="Already a member?"
+            android:textColor="#FFF"
+            android:layout_alignTop="@+id/login_link"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/login_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/textView1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:textSize="17sp"
+            android:text="Log in"
+            android:textColor="@color/LtPurple" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

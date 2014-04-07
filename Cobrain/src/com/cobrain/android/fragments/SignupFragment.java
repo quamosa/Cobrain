@@ -1,7 +1,5 @@
 package com.cobrain.android.fragments;
 
-import java.util.regex.Pattern;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +16,10 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 
 	public static final String TAG = "SignupFragment";
 	private Button createButton;
-	private Button cancelButton;
+	private TextView cancelButton;
 	private EditText email;
 	private EditText password;
+	private EditText phone;
 	private boolean loggingIn;
 	private String signupUrl;
 
@@ -28,7 +27,7 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View v = inflater.inflate(R.layout.login_new_account, null);
+		View v = inflater.inflate(R.layout.frg_create_account, null);
 		return v;
 	}
 
@@ -38,9 +37,10 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 		
 		signupUrl = getArguments().getString("signupUrl");
 		createButton = (Button) v.findViewById(R.id.create_account_button);
-		cancelButton = (Button) v.findViewById(R.id.cancel_button);
+		cancelButton = (TextView) v.findViewById(R.id.login_link);
 		email = (EditText) v.findViewById(R.id.email);
 		password = (EditText) v.findViewById(R.id.password);
+		//phone = (EditText) v.findViewById(R.id.phone);
 		
 		createButton.setOnClickListener(this);
 		cancelButton.setOnClickListener(this);
@@ -52,10 +52,12 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 		}
 
 		controller.showOptionsMenu(false);
-		actionBar.setCustomView(R.layout.actionbar_login_frame);
 
-		//hideActionBar();
-
+		/*String mobile = getPhoneNumber();
+		phone.setText(mobile);
+		phone.setEnabled(false);
+		 */
+		
 		super.onActivityCreated(savedInstanceState);
 	}
 
@@ -66,12 +68,23 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 		cancelButton = null;
 		email = null;
 		password = null;
+		phone = null;
 
 		//restoreActionBar();
 
 		super.onDestroyView();
 	}
 
+	/*String mobile = getPhoneNumber();
+	phone.setText(mobile);
+	phone.setEnabled(false);
+
+	String getPhoneNumber() {
+		TelephonyManager tm = (TelephonyManager)getActivity().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE); 
+		return tm.getLine1Number();
+	}
+	 */
+	
 	@Override
 	public void onClick(View v) {
 
@@ -89,7 +102,7 @@ public class SignupFragment extends BaseCobrainFragment implements OnClickListen
 			}
 			break;
 
-		case R.id.cancel_button:
+		case R.id.login_link:
 			controller.showLogin(signupUrl);
 			break;
 		}

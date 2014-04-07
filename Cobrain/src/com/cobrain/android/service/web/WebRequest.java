@@ -1,5 +1,16 @@
 package com.cobrain.android.service.web;
 
+import android.content.Context;
+import android.net.http.HttpResponseCache;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.text.TextUtils;
+import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+
+import org.apache.http.conn.ConnectTimeoutException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -15,16 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.http.conn.ConnectTimeoutException;
-import android.content.Context;
-import android.net.http.HttpResponseCache;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.text.TextUtils;
-import android.util.Log;
 
 public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	private static final int GET = 0;
@@ -42,8 +43,9 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
     OnResponseListener responseListener;
     private String body;
     private String contentType;
-	private int timeout = 10 * 1000; //default time out will be 10 secs...
-    
+	private int timeout = 20 * 1000; //default time out will be 20 secs...
+	private static CookieManager cookieManager = CookieManager.getInstance();
+
     //504 Gateway Timeout
     
     public interface OnResponseListener {
@@ -68,6 +70,8 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
         } catch (Exception httpResponseCacheNotAvailable) {
             Log.v(TAG, "Failed to set up HttpResponseCache");
         }    	
+
+        CookieSyncManager.createInstance(c);
     }
 
     public static void flushCache() {
@@ -156,14 +160,36 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		return responseCode;
 	}
 	
+	private void setRequestCookie(HttpURLConnection conn) {
+		// Set cookies in requests
+	    String cookie = cookieManager.getCookie(conn.getURL().toString());
+	    if (cookie != null) {
+	        conn.setRequestProperty("Cookie", cookie);
+	    }
+	}
+	private void storeResponseCookie(HttpURLConnection conn) {
+	    // Get cookies from responses and save into the cookie manager
+		Map<String, List<String>> headers = conn.getHeaderFields();
+		if (headers != null) {
+		    List<String> cookieList = headers.get("Set-Cookie");
+		    if (cookieList != null) {
+		        for (String cookieTemp : cookieList) {
+		            cookieManager.setCookie(conn.getURL().toString(), cookieTemp);
+		        }
+		    }	
+		}
+	}
+ 
 	public int doPost() {
 		HttpURLConnection conn = null;
 		int code = 0;
 
         try {
 	        URL urlPath = new URL(url);
-	        
+
 	        conn = (HttpURLConnection) urlPath.openConnection();
+	        setRequestCookie(conn);
+	        conn.setInstanceFollowRedirects(false);
 	        conn.setRequestMethod("POST");
 	        conn.setDoInput(true);
 	        conn.setDoOutput(true);
@@ -176,12 +202,23 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
 	        setFormFields(conn);
 	        
-	        //conn.connect();
-        	InputStream s = getInputStream(conn);
+	        conn.connect();
+	        storeResponseCookie(conn);
+
+			InputStream s = getInputStream(conn);
 			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
 			code = conn.getResponseCode();
-			
+
+			if (code >= 300 && code < 400) {
+	        	WebRequest wr = createWebRequestFromRedirect(conn);
+	        	conn.disconnect();
+	        	conn = null;
+				code = wr.go();
+				this.response = wr.response;
+				this.headers = wr.headers;
+	        }
+
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -193,12 +230,31 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	    return code;
 	}
 
+	boolean wasRedirected(HttpURLConnection conn, String url) {
+		return !conn.getURL().toString().equals(url);
+	}
+	
+	WebRequest createWebRequestFromRedirect(HttpURLConnection conn) {
+		String url = conn.getHeaderField("Location");
+		/*HashMap<String, String> headers = new HashMap<String, String>();
+
+		for (String key : conn.getHeaderFields().keySet()) {
+			if (key != null && !key.equalsIgnoreCase("Content-Type")) {
+				String value = conn.getHeaderField(key);
+				headers.put(key, value);
+			}
+		}*/
+		
+		WebRequest wr = new WebRequest().get(url).setTimeout(timeout);
+		return wr;
+	}
+
 	InputStream getInputStream(HttpURLConnection conn) {
 		InputStream s = null;     
         try {
 	       s = conn.getInputStream();
 	    }
-	    catch(IOException exception) {           
+	    catch(IOException exception) { 
 	       s = conn.getErrorStream();
 	    }
         return s;
@@ -213,6 +269,8 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
 	        conn = (HttpURLConnection) urlPath.openConnection();
 	        //conn.setRequestMethod("GET");
+	        conn.setInstanceFollowRedirects(false);
+	        setRequestCookie(conn);
 	        conn.setUseCaches(true);
 	        conn.setDoInput(true);
         	setHeaders(conn, headerFieldsToHeaders());
@@ -223,12 +281,22 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
         	}
 
         	conn.connect();
+	        storeResponseCookie(conn);
         	InputStream s = getInputStream(conn);
 			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
 			
 			code = conn.getResponseCode();
-		
+
+			if (code >= 300 && code < 400) {
+	        	WebRequest wr = createWebRequestFromRedirect(conn);
+	        	conn.disconnect();
+	        	conn = null;
+				code = wr.go();
+				this.response = wr.response;
+				this.headers = wr.headers;
+	        }
+
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (ConnectTimeoutException e) {
@@ -251,6 +319,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	        URL urlPath = new URL(url);
 
 	        conn = (HttpURLConnection) urlPath.openConnection();
+	        setRequestCookie(conn);
 	        conn.setRequestMethod("DELETE");
 	        conn.setDoInput(true);
         	setHeaders(conn, headerFieldsToHeaders());
@@ -261,6 +330,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
         	}
 
         	conn.connect();
+	        storeResponseCookie(conn);
         	InputStream s = getInputStream(conn);
 			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
@@ -286,6 +356,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 	        URL urlPath = new URL(url);
 
 	        conn = (HttpURLConnection) urlPath.openConnection();
+	        setRequestCookie(conn);
 	        conn.setRequestMethod("PUT");
 	        conn.setDoInput(true);
 	        conn.setDoOutput(true);
@@ -299,6 +370,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
         	setFormFields(conn);
         	
         	conn.connect();
+	        storeResponseCookie(conn);
         	InputStream s = getInputStream(conn);
 			this.response = streamToString(s);
 			this.headers = conn.getHeaderFields();
@@ -319,10 +391,10 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 		String body = this.body;
 		
 		if (formFields != null) {
-			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
 			try {
 
+				conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+				
 				for (String key : formFields.keySet()) {
 		        	if (body == null) body = "";
 		        	if (body.length() > 0) body += "&";
@@ -339,13 +411,15 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 
         if (body != null && body.length() > 0) {
         	OutputStream os = null;
+        	//PrintWriter os = null;
 
 			try {
-				byte[] bytes = body.getBytes("UTF-8");
-				int contentLength = bytes.length;
-				conn.setFixedLengthStreamingMode(contentLength);
-	            conn.setRequestProperty("Content-Length", Integer.toString(contentLength));
-				os = conn.getOutputStream();
+				byte[] bytes = body.getBytes();
+	            //conn.setRequestProperty("Content-Length", Integer.toString(body.length()));
+	            conn.setFixedLengthStreamingMode(bytes.length);
+	            //os = new PrintWriter(conn.getOutputStream());
+	            //os.print(body);
+	            os = conn.getOutputStream();
 	        	os.write(bytes);
 	        	os.flush();
 			} catch (IOException e) {
@@ -355,6 +429,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
 					try {
 						os.close();
 					} catch (IOException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 			}
@@ -404,7 +479,7 @@ public class WebRequest extends AsyncTask<Void, Void, Integer> {
     	s.add(Build.VERSION.RELEASE);
     	s.add("phone");
     	headers.put("x-cobrain-client", s);
-    	
+
 		return headers;
 	}
 	

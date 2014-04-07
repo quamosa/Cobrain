@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" >
+        <layer-list>
+            <item>
+                <shape>
+                    <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+                    <gradient android:startColor="#a14999"
+                        android:endColor="#fac4f0"
+                        android:angle="90"
+                        />
+                    <corners android:radius="6dp" />
+                </shape>
+            </item>
+            <item>
+                <shape>
+                    <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+                    <gradient android:startColor="#d079c8"
+                        android:endColor="#ea93e2"
+                        android:angle="90"
+                        />
+                    <corners android:radius="6dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item>
+        <layer-list>
+            <item>
+                <shape>
+                    <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+                    <gradient android:startColor="#711969"
+                        android:endColor="#fa94f0"
+                        android:angle="90"
+                        />
+                    <corners android:radius="6dp" />
+                </shape>
+            </item>
+            <item>
+                <shape>
+                    <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+                    <gradient android:startColor="#a04998"
+                        android:endColor="#ba63b2"
+                        android:angle="90"
+                        />
+                    <corners android:radius="6dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

@@ -20,7 +20,7 @@ public class ForgetMeFragment extends BaseCobrainFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.main_nerve_center_forget_me_frame, null);
+		View v = inflater.inflate(R.layout.frg_settings_forgetme, null);
 		
 		forget = (Button) v.findViewById(R.id.forgetme);
 		forget.setOnClickListener(this);
@@ -46,7 +46,6 @@ public class ForgetMeFragment extends BaseCobrainFragment {
 			builder = new AlertDialog.Builder(c);
 
 			View vw = View.inflate(c, R.layout.dlg_error, null);
-			vw.findViewById(R.id.uh_oh).setVisibility(View.GONE);
 			TextView tv = (TextView) vw.findViewById(R.id.error_message);
 			String mymessage = "Are you sure you want to delete your Cobrain account?\n\nAll your information and recommendations will be forgotten. This action cannot be undone.";
 			tv.setText(mymessage);

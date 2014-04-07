@@ -1,10 +1,5 @@
 package com.cobrain.android.controllers;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -29,6 +24,11 @@ import com.cobrain.android.service.web.ResponseListener;
 import com.cobrain.android.service.web.WebRequest;
 import com.google.gson.Gson;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
 
 public class Cobrain {
 	private String email;
@@ -81,7 +81,7 @@ public class Cobrain {
 		public static final int VIEW_FRIENDS_MENU = 2;
 		
 		public Cobrain getCobrain();
-		public void showDialog(String message);
+		public void showDialog(String title, String message);
 		public void showProgressDialog(String title, String message);
 		public void dismissDialog();
 		public void showHome();
@@ -102,8 +102,10 @@ public class Cobrain {
 		public void showLogin(String loginUrl);
 		void hideSoftKeyBoard();
 		public void showWishList(User owner, boolean showPrivateItems, List<Integer> skuIds, boolean addToBackStack);
-		public void showWishList(Skus list, boolean showPrivateItems, boolean addToBackStack);
+
+        public void showWishList(Skus list, boolean showPrivateItems, boolean addToBackStack);
 		public void showWishList(Skus skus, Sku sku, boolean showPrivateItems, int containerId, boolean addToBackStack);
+		public void showErrorDialog(CharSequence title, CharSequence message);
 		public void showErrorDialog(CharSequence message);
 		public void showBrowser(String url, int containerId, String merchant, boolean addToBackStack);
 		public void showContactList(ContactSelectedListener listener);
@@ -122,6 +124,9 @@ public class Cobrain {
 		public void dispatchOnFragmentDetached(BaseCobrainFragment f);
 		public void setCurrentCobrainView(CobrainView cv);
 		public void showFriendsSharedRack(User owner, List<Integer> skuIds);
+
+		public void showPage(BaseCobrainFragment f, String tag, boolean addToBackStack);
+        public void showContentPage(BaseCobrainFragment f, String tag, boolean addToBackStack);
 	}
 	
 	public interface CobrainMenuView {
@@ -414,7 +419,7 @@ public class Cobrain {
 		    response = nil;
 		    error = nil;
 		    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-		    if ([[response.URL lastPathComponent] isEqualToString:@"login"]) {
+		    if ([[response.URL lastPathComponent] isEqualToString:@"frg_login"]) {
 		        return YES;
 		    } else {
 		        return NO;
@@ -464,7 +469,7 @@ public class Cobrain {
 
     	if (url == null) {
     		url = context.getString(R.string.url_login_post, context.getString(R.string.url_cobrain_app));
-    		wr = new WebRequest().post(url);
+    		wr = new WebRequest().get(url);
     	}
     	else wr = new WebRequest().get(url);
     	
@@ -482,7 +487,11 @@ public class Cobrain {
 						onAuthTokenReceived(token);
 					}
 					else {
-						//login page has changed! uh oh!
+						if (headers != null) apiKey = headers.get("api-key");
+						else apiKey = null;
+						
+						onLogin(apiKey != null, null);
+						//frg_login page has changed! uh oh!
 					}
 					break;
 				default:
@@ -544,7 +553,7 @@ public class Cobrain {
 
 					}
 					else {
-						//login page has changed! uh oh!
+						//frg_login page has changed! uh oh!
 					}
 					break;
 				default:
@@ -610,7 +619,7 @@ public class Cobrain {
 				onLogin(false, null);
 		}
 		
-		//lets logout after the login so we can clear out our session
+		//lets logout after the frg_login so we can clear out our session
 		//for changing passwords and any other stuff we need to do repeatedly against the app
 		quickLogout();
     	

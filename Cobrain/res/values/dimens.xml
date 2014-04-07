@@ -48,4 +48,6 @@
 	<dimen name="home_pager_margin_size">27dp</dimen>
 	
 	<dimen name="category_count_width">30dp</dimen>
+	
+	<dimen name="border_radius">4dp</dimen>
 </resources>

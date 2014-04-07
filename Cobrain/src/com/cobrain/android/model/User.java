@@ -1,11 +1,11 @@
 package com.cobrain.android.model;
 
+import com.cobrain.android.model.v1.Member;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import com.cobrain.android.model.v1.Member;
 
 public class User extends Member {
 	public static final String NOTIFICATION_TASTEMAKER = "tastemaker";
@@ -16,8 +16,9 @@ public class User extends Member {
 	List<Badge> badges;
 	List<String> notifications;
 	Checklist checklist;
+    List<String> hashed_phone_numbers;
 
-	public List<Badge> getBadges() {
+    public List<Badge> getBadges() {
 		return badges;
 	}
 
@@ -31,7 +32,7 @@ public class User extends Member {
 	        return Integer.compare(a.priority, b.priority);
 	    }
 	}
-	
+
 	public boolean hasNotification(String name) {
 		if (notifications == null) return false;
 		return notifications.contains(name);
@@ -57,4 +58,20 @@ public class User extends Member {
 	public Checklist getChecklist() {
 		return checklist;
 	}
+    public List<String> getHashedPhoneNumbers() { return hashed_phone_numbers; }
+
+    public boolean addHashedPhoneNumber(String hashedPhone) {
+        if (!hasHashedPhoneNumber(hashedPhone)) {
+            hashed_phone_numbers.add(hashedPhone);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasHashedPhoneNumber(String hashedPhone) {
+        if (hashed_phone_numbers != null) {
+            return hashed_phone_numbers.contains(hashedPhone);
+        }
+        return false;
+    }
 }

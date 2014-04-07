@@ -3,6 +3,7 @@ package com.cobrain.android.fragments;
 import com.cobrain.android.R;
 import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.utils.HelperUtils;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,6 +13,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,6 +32,7 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 	private Spinner gender;
 	private boolean loggingIn;
 	private boolean doInviteValidation;
+	private EditText phone;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,8 +43,13 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 		name = (EditText) v.findViewById(R.id.name);
 		zipcode = (EditText) v.findViewById(R.id.zipcode);
 		gender = (Spinner) v.findViewById(R.id.gender);
+		phone = (EditText) v.findViewById(R.id.phone);
 
 		saveButton.setOnClickListener(this);
+
+		/*String mobile = HelperUtils.SMS.getPhoneNumber(getActivity().getApplicationContext());
+		phone.setText(mobile);
+		phone.setEnabled(false);*/
 
 		return v;
 	}
@@ -74,7 +82,8 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 		gender = null;
 		name = null;
 		zipcode = null;
-
+		phone = null;
+		
 		super.onDestroyView();
 	}
 
@@ -90,7 +99,6 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 			builder = new AlertDialog.Builder(c);
 
 			View vw = View.inflate(c, R.layout.dlg_error, null);
-			vw.findViewById(R.id.uh_oh).setVisibility(View.GONE);
 			TextView tv = (TextView) vw.findViewById(R.id.error_message);
 			String mymessage = "Are you sure you want to save the changes to your Cobrain account?\n\nThis action cannot be undone.";
 			tv.setText(mymessage);
@@ -127,7 +135,7 @@ public class ProfileFragment extends BaseCobrainFragment implements OnClickListe
 								if (result) {
 									NavigationMenuFragment f = (NavigationMenuFragment) getActivity().getSupportFragmentManager().findFragmentByTag(NavigationMenuFragment.TAG);
 									if (f != null) f.update();
-									controller.showDialog("Your profile was saved.");
+									controller.showDialog(null, "Your profile was saved.");
 								}
 								else onError("We had a problem updating your profile. Please try again later.");
 							}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+     >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/croppednav_bg"
+        android:scaleType="fitXY"
+        android:id="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:textSize="16sp"
+        android:lineSpacingExtra="3dp"
+        android:text="Your Cobrain will find apparel you love from 300+ online stores"
+        android:textColor="#000"
+        android:textStyle="normal"
+        android:layout_marginTop="153dp"
+        android:layout_marginLeft="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/swipe_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_landing_1_swipe"
+        android:scaleType="center"
+        android:layout_centerHorizontal="true"
+        android:textColor="#fff"
+        android:text="Swipe to learn more"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="50dp" />
+
+</RelativeLayout>

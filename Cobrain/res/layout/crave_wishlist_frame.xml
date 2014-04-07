@@ -32,11 +32,24 @@
                 android:layout_marginBottom="10dp"
                 android:visibility="invisible" />
 
+            <TextView
+                android:id="@+id/buy_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:textSize="14.5sp"
+                android:layout_alignParentRight="true"
+                android:text="Buy at Nordstrom"
+                android:drawableRight="@drawable/ic_buy_at"
+                android:drawablePadding="10dp"
+                />
+
             <com.cobrain.android.views.HttpImageView
                 android:id="@+id/item_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
+                android:layout_below="@+id/buy_link"
                 android:src="@drawable/ic_noimage" />
 
             <ProgressBar
@@ -92,7 +105,7 @@
                 android:src="@drawable/ic_onsale"
                 android:visibility="invisible" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/bottom_buttons"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
@@ -118,7 +131,7 @@
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:background="#000" />
-            </LinearLayout>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/rave_info"
@@ -128,6 +141,7 @@
                 android:layout_height="35dp"
                 android:background="#6ba8dd"
                 android:gravity="center"
+                android:layout_alignTop="@+id/item_image"
                 android:text="5 RAVES"
                 android:textSize="16sp"
                 android:drawablePadding="5dp"
@@ -170,18 +184,6 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/item_rave_icon"
             android:padding="@dimen/crave_padding" >
-
-            <TextView
-                android:id="@+id/item_retailer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/item_price"
-                android:ellipsize="end"
-                android:text="MACY&apos;S"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#000"
-                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/item_description"

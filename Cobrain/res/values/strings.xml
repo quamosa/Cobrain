@@ -9,7 +9,8 @@
     <string name="blah">My friend what are you doing i am not feeeling it because of this long blah string!</string>
     <!-- string name="username">walter@cobrain.com</string>
     <string name="password">walterwalter</string-->
-    <string name="forgot_password_link"><small><u><B>Forgot Password?</B></u></small></string>
+    <string name="forgot_password_link"><small><u><B>Forgot your password?</B></u></small></string>
+    <string name="forgot_password_cancel_link"><small><u><B>Cancel</B></u></small></string>
     <string name="rank_for_you"><![CDATA[<small>#%1$d of %2$d Craves]]></string>
     <string name="rank_for_you_empty"><![CDATA[<small>0 Craves]]></string>
     <string name="item_out_of_num_items">out of %1$,d apparel items</string>
@@ -29,6 +30,8 @@
     <string name="friend_raves_mine"><![CDATA[<font color=\"#%2$x\">%1$s</font> raved your shared crave]]></string>
     
     <!-- urls for qa and prd -->
+    <string name="cobrain_api_version_qa">*</string> <!-- 1.3.0 -->
+    <string name="cobrain_api_version_prd">*</string>
     <string name="url_cobrain_api_qa">https://qa.api.cobrain.com</string>
     <string name="url_cobrain_api_prd">https://beaker.cobrain.com</string>
     <string name="url_cobrain_app_qa">https://qa.cobrain.com</string>
@@ -37,7 +40,8 @@
     <string name="sms_invite_validation_number_qa">+1(202)4994992</string>
     <string name="sms_invite_validation_number_prd">+1(443)5397345</string>
     <!--  -->
-    
+
+    <item type="string" name="cobrain_api_version">@string/cobrain_api_version_qa</item>
     <item type="string" name="url_cobrain_api">@string/url_cobrain_api_qa</item>
     <item type="string" name="url_cobrain_app">@string/url_cobrain_app_qa</item>
     <item type="string" name="sms_invite_validation_number">@string/sms_invite_validation_number_qa</item>

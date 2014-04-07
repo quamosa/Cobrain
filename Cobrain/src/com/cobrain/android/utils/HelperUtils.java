@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -23,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -38,11 +42,41 @@ public class HelperUtils {
 	}
 
 	public static class SMS {
+		public static String getPhoneNumber(Context c) {
+			TelephonyManager tm = (TelephonyManager)c.getSystemService(Context.TELEPHONY_SERVICE); 
+			return tm.getLine1Number();
+		}
+
 		public static void sendSMS(String toPhoneNumber, String message) {
 			SmsManager sms = SmsManager.getDefault();
 			sms.sendTextMessage(toPhoneNumber, null, message, null, null);
-		}		
+		}
+        public static byte[] getPhoneHash(String phone) {
+            phone = phone.replaceAll("[^0-9]", "");
+            if (phone.getBytes()[0] == '1') {
+                phone = "+" + phone;
+            }
+            else phone = "+1" + phone;
+            return Bytes.getHash(phone);
+        }
 	}
+
+    public static class Bytes {
+        public static byte[] getHash(String password) {
+            MessageDigest digest = null;
+            try {
+                digest = MessageDigest.getInstance("SHA-256");
+            } catch (NoSuchAlgorithmException e1) {
+                e1.printStackTrace();
+            }
+            digest.reset();
+            return digest.digest(password.getBytes());
+        }
+
+        public static String bin2hex(byte[] data) {
+            return String.format("%0" + (data.length * 2) + 'x', new BigInteger(1, data));
+        }
+    }
 	
 	public static class Streams {
 		public static String ToString(InputStream is) {

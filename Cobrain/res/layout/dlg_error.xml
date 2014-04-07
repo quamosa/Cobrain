@@ -6,24 +6,11 @@
      >
 
     <TextView
-        android:id="@+id/uh_oh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/imageView1"
-        android:layout_marginTop="7dp"
-        android:layout_marginBottom="7dp"
-        android:text="Uh Oh!"
-        android:textColor="#000"
-        android:textStyle="bold"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
         android:id="@+id/error_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/uh_oh"
+        android:layout_below="@+id/imageView1"
         android:gravity="center"
         android:text="Your Cobrain synapses aren't firing properly."
         android:textAppearance="?android:attr/textAppearanceMedium" 
@@ -34,6 +21,7 @@
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:src="@drawable/ic_error" />

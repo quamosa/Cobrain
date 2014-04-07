@@ -1,12 +1,6 @@
 package com.cobrain.android.fragments;
 
-import com.cobrain.android.R;
-import com.cobrain.android.controllers.Cobrain.CobrainView;
-
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,11 +9,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain.CobrainView;
+
 public class LoginFragment extends BaseCobrainFragment implements OnClickListener, CobrainView {
 
 	public static final String TAG = "LoginFragment";
 	private Button loginButton;
-	private Button signupButton;
+	private TextView signupButton;
 	private EditText email;
 	private EditText password;
 	private boolean loggingIn;
@@ -30,7 +27,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View v = inflater.inflate(R.layout.login, null);
+		View v = inflater.inflate(R.layout.frg_login, null);
 		return v;
 	}
 
@@ -41,7 +38,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 		loginUrl = getArguments().getString("loginUrl");
 		
 		loginButton = (Button) v.findViewById(R.id.login_button);
-		signupButton = (Button) v.findViewById(R.id.signup_button);
+		signupButton = (TextView) v.findViewById(R.id.signup_link);
 		email = (EditText) v.findViewById(R.id.email);
 		password = (EditText) v.findViewById(R.id.password);
 		forgotPassword = (TextView) v.findViewById(R.id.forgot_password);
@@ -49,18 +46,7 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 		email.setText(this.getResources().getString(R.string.username));
 		password.setText(this.getResources().getString(R.string.password));
 		
-		forgotPassword.setMovementMethod(LinkMovementMethod.getInstance());
-		  Spannable spans = (Spannable) forgotPassword.getText();
-		  ClickableSpan clickSpan = new ClickableSpan() {
-
-		     @Override
-		     public void onClick(View widget)
-		     {
-		    	 controller.showForgotPassword(email.getText().toString());
-		     }
-		  };
-		  spans.setSpan(clickSpan, 0, spans.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);		
-		
+        forgotPassword.setOnClickListener(this);
 		loginButton.setOnClickListener(this);
 		signupButton.setOnClickListener(this);
 
@@ -79,7 +65,6 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 		*/
 		//hideActionBar();
 		controller.showOptionsMenu(false);
-		actionBar.setCustomView(R.layout.actionbar_login_frame);
 
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -87,11 +72,14 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 	@Override
 	public void onDestroyView() {
 		controller.hideSoftKeyBoard();
-		
+
+        loginButton.setOnClickListener(null);
+        signupButton.setOnClickListener(null);
 		loginButton = null;
 		signupButton = null;
 		email = null;
 		password = null;
+        forgotPassword.setOnClickListener(null);
 		forgotPassword.setText(null);
 		forgotPassword = null;
 
@@ -124,8 +112,10 @@ public class LoginFragment extends BaseCobrainFragment implements OnClickListene
 				loggingIn = false;
 			}
 			break;
-
-		case R.id.signup_button:
+        case R.id.forgot_password:
+            controller.showForgotPassword(email.getText().toString());
+            break;
+		case R.id.signup_link:
 			controller.showSignup(loginUrl);
 			break;
 		}

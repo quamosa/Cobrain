@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.cobrain.android.R;
 import com.cobrain.android.model.Mobile;
+import com.cobrain.android.model.UserInfo;
 
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -16,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.widget.Switch;
 
 public class PushNotificationsFragment extends BaseCobrainFragment {
 	ListView list;
@@ -46,11 +47,11 @@ public class PushNotificationsFragment extends BaseCobrainFragment {
 		adapter = new ArrayAdapter<PushNotification>(getActivity().getApplicationContext(), R.layout.list_item_push_notifications, R.id.caption, pushNotifications) {
 
 			class ViewHolder implements OnClickListener {
-				ToggleButton enabled;
+				Switch enabled;
 				int position;
 				TextView caption;
 
-				public void setEnabled( ToggleButton button) {
+				public void setEnabled( Switch button) {
 					enabled = button;
 					enabled.setOnClickListener(this);
 				}
@@ -58,7 +59,7 @@ public class PushNotificationsFragment extends BaseCobrainFragment {
 				@Override
 				public void onClick(View v) {
 					PushNotification n = getItem(position);
-					n.enabled = ((ToggleButton)v).isChecked();
+					n.enabled = ((Switch)v).isChecked();
 					saveNotifications();
 				}
 			}
@@ -70,7 +71,7 @@ public class PushNotificationsFragment extends BaseCobrainFragment {
 				ViewHolder vh = (ViewHolder) v.getTag();
 				if (vh == null) {
 					vh = new ViewHolder();
-					vh.setEnabled( (ToggleButton) v.findViewById(R.id.enabled) );
+					vh.setEnabled( (Switch) v.findViewById(R.id.enabled) );
 					vh.caption = (TextView) v.findViewById(R.id.caption);
 					v.setTag(vh);
 				}
@@ -91,12 +92,15 @@ public class PushNotificationsFragment extends BaseCobrainFragment {
 
 		pushNotifications.clear();
 		
-		for (int i = 0; i < captions.length(); i++) {
-			PushNotification n = new PushNotification();
-			n.caption = captions.getString(i);
-			n.code = codes.getString(i);
-			n.enabled = controller.getCobrain().getUserInfo().getPreferences().getNotification().getMobile().get(n.code);
-			pushNotifications.add(n);
+		UserInfo ui = controller.getCobrain().getUserInfo();
+		if (ui != null) {
+			for (int i = 0; i < captions.length(); i++) {
+				PushNotification n = new PushNotification();
+				n.caption = captions.getString(i);
+				n.code = codes.getString(i);
+				n.enabled = ui.getPreferences().getNotification().getMobile().get(n.code);
+				pushNotifications.add(n);
+			}
 		}
 		
 		list.setAdapter(adapter);

@@ -1,8 +1,5 @@
 package com.cobrain.android.fragments;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -42,6 +39,9 @@ import com.cobrain.android.model.User;
 import com.cobrain.android.model.UserInfo;
 import com.cobrain.android.model.v1.CategoryTree;
 import com.cobrain.android.utils.HelperUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WishListFragment extends BaseCobrainFragment implements OnLoadListener<List<Sku>>, OnPageChangeListener, OnItemClickListener, OnNavigationListener {
 	public static final String TAG = "WishListFragment";
@@ -494,4 +494,9 @@ public class WishListFragment extends BaseCobrainFragment implements OnLoadListe
 		}
 		return false;
 	}
-}	
+
+    public void showBrowser(String url, String merchant) {
+        //cravePager.setId(View.NO_ID); //so we don't save the pager state automatically; i want to do this myself
+        controller.showBrowser(url, R.id.main_layout, merchant, true);
+    }
+}

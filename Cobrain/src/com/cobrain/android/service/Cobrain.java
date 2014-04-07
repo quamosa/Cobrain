@@ -228,7 +228,7 @@ public class Cobrain {
 		    response = nil;
 		    error = nil;
 		    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-		    if ([[response.URL lastPathComponent] isEqualToString:@"login"]) {
+		    if ([[response.URL lastPathComponent] isEqualToString:@"frg_login"]) {
 		        return YES;
 		    } else {
 		        return NO;
@@ -273,7 +273,7 @@ public class Cobrain {
 						onAuthTokenReceived(token);
 					}
 					else {
-						//login page has changed! uh oh!
+						//frg_login page has changed! uh oh!
 					}
 					break;
 				default:
@@ -335,7 +335,7 @@ public class Cobrain {
 
 					}
 					else {
-						//login page has changed! uh oh!
+						//frg_login page has changed! uh oh!
 					}
 					break;
 				default:

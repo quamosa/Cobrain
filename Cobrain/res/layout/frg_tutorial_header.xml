@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+    android:id="@+id/header"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="15dp"
+    android:layout_centerHorizontal="true"
+    android:textSize="23sp"
+    android:textColor="#ab499b"
+    android:text="Teach"/>
+
+    <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/header"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingLeft="50dp"
+    android:paddingRight="50dp"
+    android:layout_centerHorizontal="true"
+    android:textSize="14sp"
+    android:gravity="center"
+    android:textColor="#4a4a4a"
+    android:text="Tell your Cobrain what you love so it can find things you’ll want to buy"
+    android:id="@+id/caption" />
+
+</RelativeLayout>

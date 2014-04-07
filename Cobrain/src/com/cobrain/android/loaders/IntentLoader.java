@@ -1,14 +1,14 @@
 package com.cobrain.android.loaders;
 
-import com.cobrain.android.MainActivity;
-import com.cobrain.android.controllers.Cobrain.CobrainController;
-import com.cobrain.android.model.Mobile;
-import com.cobrain.android.service.web.WebRequest;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+
+import com.cobrain.android.MainActivity;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.model.Mobile;
+import com.cobrain.android.service.web.WebRequest;
 
 public class IntentLoader {
 
@@ -55,7 +55,7 @@ public class IntentLoader {
 			//go to most recent friend's shared page
 		}
 		else if (Mobile.RAVED.equals(code)) {
-			//go to users shared rack. If friends have only raved Cobrain recommended items, it should just go to the user’s home rack.
+			//go to users shared rack. If friends have only raved Cobrain recommended items, it should just go to the user's home rack.
 		}
 		else if (Mobile.TASTEMAKER_PROGRES.equals(code)) {
 			//Go to home rack with Tastemaker popup opened.  If user has jumped directly to Trendsetter Tastemaker, show just the Trendsetter popup.

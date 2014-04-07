@@ -1,40 +1,5 @@
 package com.cobrain.android.fragments;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import com.cobrain.android.MainActivity;
-import com.cobrain.android.R;
-import com.cobrain.android.adapters.FeedListAdapter;
-import com.cobrain.android.adapters.FriendsListAdapter;
-import com.cobrain.android.controllers.AnimationStepper;
-import com.cobrain.android.controllers.AnimationStepper.OnAnimationStep;
-import com.cobrain.android.controllers.AnimationStepper.Timer;
-import com.cobrain.android.dialogs.FriendAcceptDialog;
-import com.cobrain.android.loaders.ContactLoader;
-import com.cobrain.android.loaders.ContactLoader.ContactInfo;
-import com.cobrain.android.loaders.FeedLoader;
-import com.cobrain.android.loaders.FriendsListLoader;
-import com.cobrain.android.loaders.OnLoadListener;
-import com.cobrain.android.model.Feed;
-import com.cobrain.android.model.Feeds;
-import com.cobrain.android.model.Friendship;
-import com.cobrain.android.model.Friendships;
-import com.cobrain.android.model.Settings;
-import com.cobrain.android.model.User;
-import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.service.web.WebRequest;
-import com.cobrain.android.service.web.WebRequest.OnResponseListener;
-import com.cobrain.android.utils.HelperUtils.Storage.TempStore;
-import com.cobrain.android.utils.HelperUtils.Timing;
-import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
-import com.fortysevendeg.swipelistview.SwipeListView;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -44,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,11 +18,40 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.cobrain.android.R;
+import com.cobrain.android.adapters.FeedListAdapter;
+import com.cobrain.android.adapters.FriendsListAdapter;
+import com.cobrain.android.controllers.AnimationStepper;
+import com.cobrain.android.controllers.AnimationStepper.OnAnimationStep;
+import com.cobrain.android.dialogs.FriendAcceptDialog;
+import com.cobrain.android.loaders.ContactLoader;
+import com.cobrain.android.loaders.ContactLoader.ContactInfo;
+import com.cobrain.android.loaders.FeedLoader;
+import com.cobrain.android.loaders.FriendsListLoader;
+import com.cobrain.android.loaders.OnLoadListener;
+import com.cobrain.android.model.*;
+import com.cobrain.android.model.Error;
+import com.cobrain.android.service.web.WebRequest;
+import com.cobrain.android.service.web.WebRequest.OnResponseListener;
+import com.cobrain.android.utils.HelperUtils;
+import com.cobrain.android.utils.HelperUtils.Storage.TempStore;
+import com.cobrain.android.utils.HelperUtils.Timing;
+import com.cobrain.android.utils.LoaderUtils;
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class FriendsListFragment extends BaseCobrainFragment implements OnItemClickListener, OnLoadListener<Friendships>, OnScrollListener {
 	public static final String TAG = FriendsListFragment.class.toString();
@@ -75,6 +70,9 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	Timing.Timer timer = new Timing.Timer();
 	boolean blinkRequested;
 	boolean blinkedVerifyButton;
+	private RelativeLayout phonePopup;
+	private Button sendPhone;
+	private EditText phone;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,6 +84,11 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		progress = (ProgressBar) v.findViewById(R.id.friends_list_progress);
 		feeds = (ListView) v.findViewById(R.id.feeds_list);
 		verify = (Button) v.findViewById(R.id.verify_invite_button);
+		phonePopup = (RelativeLayout) v.findViewById(R.id.phone_popup);
+		phone = (EditText) v.findViewById(R.id.phone);
+		sendPhone = (Button) v.findViewById(R.id.send_phone_button);
+
+		sendPhone.setOnClickListener(this);
 		verify.setOnClickListener(this);
 		verify.setVisibility(View.GONE);
 		adapter = new FriendsListAdapter(container.getContext(), R.id.friend_name, loader.getItems(), this);
@@ -166,6 +169,9 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
         setupMyFeedsList(feeds);
 
+		String mobile = HelperUtils.SMS.getPhoneNumber(getActivity().getApplicationContext());
+		phone.setText(mobile);
+
 		return v;
 	}
 
@@ -177,6 +183,12 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	public void update() {
 		if (controller != null && controller.getCobrain().getUserInfo() != null) {
 			verify.setVisibility((!controller.getCobrain().getUserInfo().areInvitesVerified()) ? View.VISIBLE : View.GONE);
+			if (!controller.getCobrain().getUserInfo().areInvitesVerified()) {
+				LoaderUtils.show(phonePopup);
+			}
+			else {
+				LoaderUtils.hide(phonePopup, true, true);	
+			}
 			loader.loadFriendList();
 			feedLoader.loadFeedList();
 		}
@@ -239,6 +251,9 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		feedsAdapter = null;
 		adapter.clear();
 		adapter = null;
+		phonePopup = null;
+		sendPhone = null;
+		phone = null;
 		//FIXME: friends.setAdapter(null);
 		friends = null;
 		super.onDestroyView();
@@ -250,6 +265,7 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		case R.id.friend_edit:
 			adapter.toggleEditMode();
 			break;
+		case R.id.send_phone_button:
 		case R.id.verify_invite_button:
 			blinkInviteButton(false);
 			verifyInvites();
@@ -263,19 +279,34 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 	void verifyInvites() {
 		verify.setEnabled(false);
 		verify.setPressed(true);
+		sendPhone.setEnabled(false);
+		sendPhone.setPressed(true);
 		
 		new AsyncTask<Void, Void, Boolean>() {
 
 			@Override
 			protected Boolean doInBackground(Void... params) {
-				controller.getCobrain().getUserInfo().validateInvitation();
-				return true;
+                String phone = FriendsListFragment.this.phone.getText().toString();
+                if (TextUtils.isEmpty(phone)) return true;
+                return (controller.getCobrain().getUserInfo().savePhoneNumber(phone));
 			}
 
 			@Override
 			protected void onPostExecute(Boolean result) {
+                if (!result) {
+                    UserInfo ui = controller.getCobrain().getUserInfo();
+                    Error error = ui.getLastError();
+                    if (Error.Codes.INVALID_PHONE_NUMBER.equals(error.code)) {
+                        controller.showErrorDialog("Unable to save your information", "Please enter a valid phone number");
+                    } else if (Error.Codes.INVALID_ARGUMENT.equals(error.code)) {
+                        controller.showErrorDialog("Unable to save your information", "Phone number is already registered to another user");
+                    }
+                    else controller.showErrorDialog("Unable to save your information", error.message);
+                }
 				verify.setEnabled(true);
 				verify.setPressed(false);
+				sendPhone.setEnabled(true);
+				sendPhone.setPressed(false);
 				update();
 				if (blinkedVerifyButton) {
 					blinkedVerifyButton = false;
@@ -318,14 +349,8 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 
 			String phone = contact.number;
 
-			phone = phone.replaceAll("[^0-9]", "");
-			if (phone.getBytes()[0] == '1') {
-				phone = "+" + phone;
-			}
-			else phone = "+1" + phone;
-			
-			byte[] hash = getHash(phone);
-			String hashedPhone = bin2hex(hash);
+			byte[] hash = HelperUtils.SMS.getPhoneHash(phone);
+			String hashedPhone = HelperUtils.Bytes.bin2hex(hash);
 
 			final String link = getString(R.string.url_invite,
 					getString(R.string.url_cobrain_app),
@@ -418,21 +443,6 @@ public class FriendsListFragment extends BaseCobrainFragment implements OnItemCl
 		startSMSIntent(contact.number, subject, message);
 	}
 	
-	public byte[] getHash(String password) {
-		MessageDigest digest = null;
-		try {
-			digest = MessageDigest.getInstance("SHA-256");
-		} catch (NoSuchAlgorithmException e1) {
-			e1.printStackTrace();
-		}
-		digest.reset();
-		return digest.digest(password.getBytes());
-	}
-	
-	static String bin2hex(byte[] data) {
-		  return String.format("%0" + (data.length * 2) + 'x', new BigInteger(1, data));
-		}
-
 	void sendSMS(String toPhoneNumber, String message) {
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(toPhoneNumber, null, message, null, null);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<array name="profile_gender_names">
-	    <item></item>
+	    <item>Select one</item>
 	    <item>Men</item>
 	    <item>Women</item>
 	    <item>Both</item>

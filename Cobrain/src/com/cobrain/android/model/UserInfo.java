@@ -1,16 +1,10 @@
 package com.cobrain.android.model;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 
 import com.cobrain.android.R;
 import com.cobrain.android.controllers.Cobrain;
@@ -24,14 +18,22 @@ import com.cobrain.android.service.web.WebRequest;
 import com.cobrain.android.service.web.WebRequest.OnResponseListener;
 import com.cobrain.android.utils.HelperUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class UserInfo extends User {
 	private static final String TAG = "UserInfo";
 	private static boolean DEBUG = false;
 
-	public interface OnUserInfoChanged {
+    public interface OnUserInfoChanged {
 		public void onUserInfoChanged(UserInfo ui);
 	}
 	
@@ -47,6 +49,7 @@ public class UserInfo extends User {
 	}*/
 
 	public String apiKey; //FIXME: only public for testing
+    private String apiVersion;
 
 	private String email;
 
@@ -82,10 +85,10 @@ public class UserInfo extends User {
 	Settings defaultSettings = new Settings();
 	Settings cachedSettings;
 	
-	@SerializedName("hashed_phone_number")
-	private String hashedPhone;
 	private Preferences preferences;
 
+	private ArrayList<Device> devices = null;
+	
 	public interface OnSignedInListener {
 		public void onSignedIn(boolean success);
 	}
@@ -101,6 +104,7 @@ public class UserInfo extends User {
 	public UserInfo(Context c) {
 		context = c;
 		defaultSettings.sms_invitation_message = c.getString(R.string.invite_sms_body);
+        apiVersion = c.getResources().getString(R.string.cobrain_api_version);
 	}
 
 	public boolean testBaseUrl(String url) {
@@ -145,7 +149,7 @@ public class UserInfo extends User {
 			me.genderPreference = ui.genderPreference;
 			me.zipcode = ui.zipcode;
 			me.signInCount = ui.signInCount;
-			me.hashedPhone = ui.hashedPhone;
+			me.hashed_phone_numbers = ui.hashed_phone_numbers;
 			me.notifications = ui.notifications;
 			me.badges = ui.badges;
 			me.checklist = ui.checklist;
@@ -233,8 +237,9 @@ public class UserInfo extends User {
 	
 	HashMap<String, String> apiKeyHeader() {
 		HashMap<String, String> fields = new HashMap<String, String>();
-		fields.put("api-key", apiKey);	
-		return fields;
+		fields.put("api-key", apiKey);
+        fields.put("Accept-Version", apiVersion);
+        return fields;
 	}
 
 	/**
@@ -247,7 +252,11 @@ public class UserInfo extends User {
 		
 		if (fetchUserInfo()) {
 			getSettings();
-			storeDeviceNotificationToken();
+			fetchDevices();
+            if (devices.size() == 0) {
+                Device d = getCurrentDevice();
+                storeDevice(d);
+            }
 			//fetchInvitations();
 			//fetchWishList();
 		}
@@ -343,21 +352,64 @@ public class UserInfo extends User {
 		String json = new Gson().toJson(preferences, Preferences.class);
 		return updateProfile("{\"preferences\": " + json + "}");
 	}
-	
-	public boolean storeDeviceNotificationToken() {
-		if (apiKey != null) {
-			String notificationToken = new PlayServicesLoader().getRegistrationId(context);
 
-			if (!TextUtils.isEmpty(notificationToken)) {
-				Devices d = new Devices();
-				d.os_version = Build.VERSION.RELEASE;
-				d.platform = "android";
-				d.notification_token = notificationToken;
+	public void fetchDevices() {
+		String url = context.getString(R.string.url_devices_get, context.getString(R.string.url_cobrain_api));
+		WebRequest wr = new WebRequest().get(url).setHeaders(apiKeyHeader()).setContentType("application/json");
+
+		if (wr.go() == 200) {
+			try {
+				Type type = new TypeToken<List<Device>>(){}.getType();
+				devices = new Gson().fromJson(wr.getResponse(), type);
+                return;
+			} catch (JsonSyntaxException e) {
+				//empty array returned
+			}
+		}
+		
+		devices = new ArrayList<Device>();
+	}
 	
-				String json = new Gson().toJson(d, Devices.class);
-				String url = context.getString(R.string.url_device_post, context.getString(R.string.url_cobrain_api));
-				WebRequest wr = new WebRequest().post(url).setHeaders(apiKeyHeader()).setContentType("application/json")
-						.setBody(json);
+	public Device getCurrentDevice() {
+		String notificationToken = new PlayServicesLoader().getRegistrationId(context);
+
+		if (devices != null) {
+			for (Device d : devices) {
+				if (d.os_version == Build.VERSION.RELEASE &&
+					"android".equals(d.platform) &&
+					d.notification_token.equals(notificationToken)) {
+					return d;
+				}
+			}
+		}
+
+		Device d = new Device();
+		d.os_version = Build.VERSION.RELEASE;
+		d.platform = "android";
+		d.notification_token = notificationToken;
+		devices.add(d);
+
+		return d;
+	}
+
+	public boolean storeDevice(Device d) {
+		if (apiKey != null) {
+			if (!TextUtils.isEmpty(d.notification_token)) {
+	
+				String json = new Gson().toJson(d, Device.class);
+				WebRequest wr = new WebRequest();
+				
+				if (d._id == null) {
+					String url = context.getString(R.string.url_device_post, context.getString(R.string.url_cobrain_api));
+					wr = new WebRequest().post(url);
+				}
+				else {
+					String url = context.getString(R.string.url_device_put, context.getString(R.string.url_cobrain_api), d._id);
+					wr = new WebRequest().put(url);
+				}
+
+				wr.setHeaders(apiKeyHeader()).setContentType("application/json");
+				wr.setBody(json);
 	
 				if (wr.go() == 200) {
 					return true;
@@ -366,6 +418,35 @@ public class UserInfo extends User {
 		}
 		return false;
 	}
+
+    public boolean savePhoneNumber(String phone) {
+        if (Patterns.PHONE.matcher(phone).matches()) {
+
+            byte[] hash = HelperUtils.SMS.getPhoneHash(phone);
+            String hashedPhone = HelperUtils.Bytes.bin2hex(hash);
+
+            if (!hasHashedPhoneNumber(hashedPhone)) {
+                ArrayList<String> numbers = new ArrayList<String>(hashed_phone_numbers);
+                numbers.add(hashedPhone);
+                String json = new Gson().toJson(numbers);
+                if (updateProfile("{\"hashed_phone_numbers\": " + json + "}")) {
+                    addHashedPhoneNumber(hashedPhone);
+                    return true;
+                }
+            }
+        }
+        else {
+            createError(Error.Codes.INVALID_PHONE_NUMBER, null);
+        }
+        return false;
+    }
+
+    void createError(String code, String message) {
+        if (_error == null) _error = new Error();
+        _error.code = code;
+        _error.message = message;
+        _error.request = null;
+    }
 
 	public boolean updateProfile(String json) {
 		if (apiKey != null) {
@@ -376,9 +457,17 @@ public class UserInfo extends User {
 			if (wr.go() == 200) {
 				return true;
 			}
+            else {
+                _error = new Gson().fromJson(wr.getResponse(), Error.class);
+                _error.request = wr;
+            }
 		}
 		return false;
 	}
+
+    private transient Error _error; //Errors reference to webrequest crashes GSON (circular reference?)
+    public Error getLastError() {return _error;}
+
 
 	public boolean saveProfile(String name, String zipcode, String gender) {
 		if (updateProfile("{\"name\": \"" + name + "\", \"zip\": \"" + zipcode + "\", \"gender\": \"" + gender + "\"}")) {
@@ -523,6 +612,9 @@ public class UserInfo extends User {
 	public boolean addToSharedRack(Sku recommendation) {
 		return saveOpinion(recommendation.getOpinion(), "shared", (String[])null);
 	}
+    public boolean likeProduct(Sku recommendation) {
+        return saveOpinion(recommendation.getOpinion(), "liked", (String[])null);
+    }
 	public boolean dislikeProduct(Sku recommendation) {
 		return saveOpinion(recommendation.getOpinion(), "disliked", (String[])null);
 	}
@@ -537,15 +629,23 @@ public class UserInfo extends User {
 		if (apiKey != null) {
 			String url = context.getString(R.string.url_opinions_put, context.getString(R.string.url_cobrain_api), opinion.getId());
 			String sreasons = "";
-			String json = String.format("{\"signal\":\"%s\",\"reasons\":[%s]}",
-					signal, sreasons);
+            String sentiment = opinion.sentiment;
+            String operation = opinion.operation;
+
+            if (signal.equals("liked") || signal.equals("disliked")) sentiment = signal;
+            else operation = signal;
+
+			String json = String.format("{\"signal\":\"%s\", \"sentiment\":\"%s\", \"operation\":\"%s\", \"reasons\":[%s]}",
+					signal, sentiment, operation, sreasons);
 
 			if (reasons != null) {
 				//TODO: not sure what reasons should look like yet!
 			}
 			WebRequest wr = new WebRequest().put(url).setContentType("application/json").setHeaders(apiKeyHeader());
 			if (wr.setBody(json).go() == 200) {
-				opinion.setSignal(signal);
+				opinion.signal = signal;
+                opinion.sentiment = sentiment;
+                opinion.operation = operation;
 				return true;
 			}
 			else reportError("Could not save opinion");
@@ -938,7 +1038,7 @@ public class UserInfo extends User {
 	}
 
 	public boolean areInvitesVerified() {
-		return (validationSent || !TextUtils.isEmpty(hashedPhone));
+		return (validationSent || (hashed_phone_numbers != null && hashed_phone_numbers.size() > 0));
 		//if (hashedPhone != null) return true;
 		
 		//Cobrain c = new Cobrain(context);

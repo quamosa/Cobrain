@@ -1,10 +1,8 @@
 package com.cobrain.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -14,6 +12,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -28,23 +27,23 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.cobrain.android.controllers.Cobrain;
-import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.controllers.Cobrain.CobrainMenuView;
 import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.controllers.Cobrain.OnLoggedInListener;
+import com.cobrain.android.controllers.CraveStrip;
 import com.cobrain.android.fragments.AccountSaveFragment;
 import com.cobrain.android.fragments.BaseCobrainFragment;
 import com.cobrain.android.fragments.BrowserFragment;
-import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.fragments.ContactListFragment;
+import com.cobrain.android.fragments.ContactListFragment.ContactSelectedListener;
 import com.cobrain.android.fragments.CravesFragment;
 import com.cobrain.android.fragments.FriendCraveStripsFragment;
 import com.cobrain.android.fragments.FriendsListFragment;
 import com.cobrain.android.fragments.HomeFragment;
 import com.cobrain.android.fragments.LoadingFragment;
-import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.LoginFragment;
+import com.cobrain.android.fragments.MainFragment;
 import com.cobrain.android.fragments.NavigationMenuFragment;
 import com.cobrain.android.fragments.PersonalizationAnimationFragment;
 import com.cobrain.android.fragments.RaveUserListFragment;
@@ -71,6 +70,9 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends SlidingSherlockFragmentActivity implements OnLoggedInListener, CobrainController, OnOpenedListener, OnClosedListener, View.OnClickListener {
 
     static final String TAG = MainActivity.class.toString();
@@ -93,7 +95,14 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	private View actionBarView;
 	private View actionBarMenuOpenerView;
 	PlayServicesLoader playServicesLoader = new PlayServicesLoader();
-	
+    boolean logOutOfCobrainOnDestroy = true;
+
+    public static void start(Context c, String action) {
+        Intent intent = new Intent(c, MainActivity.class);
+        intent.setAction(action);
+        c.startActivity(intent);
+    }
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,9 +196,16 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		
 		return null;
 	}
-	
-	@Override
-	public void showLogin(String loginUrl) {
+
+    @Override
+    public void showLogin(String loginUrl) {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+	//@Override
+	public void showLoginOld(String loginUrl) {
 		//getSupportActionBar().hide();
 		
 		FragmentTransaction t = getSupportFragmentManager().beginTransaction();
@@ -201,10 +217,10 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 					t.remove(f);
 		*/
 		
-		//if I remove it now, then click home on the login screen, then android tries to save the state of it
+		//if I remove it now, then click home on the frg_login screen, then android tries to save the state of it
 		//and crashes because its no longer attached.
-		//me be related to me replacing the entire content view with login
-		//instead of creating a login activity and starting that instead
+		//me be related to me replacing the entire content view with frg_login
+		//instead of creating a frg_login activity and starting that instead
 		//so whatever is currently in the content frame replace it with a 
 		//lightweight loading frame..loading seems a bit of a hack but oh well its clean one
 		t.replace(R.id.content_frame, new LoadingFragment(), LoadingFragment.TAG);
@@ -323,7 +339,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	
 	@Override
 	public void showDefaultActionBar() {
-		ActionBar ab = (ActionBar) getSupportActionBar();
+		ActionBar ab = getSupportActionBar();
 		
 		if (ab.getCustomView() == actionBarView && actionBarView != null) return;
 
@@ -432,7 +448,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	public void onFailure(CharSequence message) {
 		if (cobrainView != null) cobrainView.onError(message);
 		checkForDestroy();
-		//show a message asking user to login or request new password
+		//show a message asking user to frg_login or request new password
 	}
 
 	private boolean checkForDestroy() {
@@ -458,7 +474,8 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		getSupportActionBar().setCustomView(null);
+        ActionBar actionBar = getSupportActionBar();
+		if (actionBar != null) actionBar.setCustomView(null);
 		actionBarView = null;
 		actionBarTitle = null;
 		actionBarSubTitle = null;
@@ -470,10 +487,10 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		cobrainView = null;
 		homeFragment = null;
 		isDestroying = true;
-		cobrain.logout(); //TODO: do we wait for this to finish or block and remove strict rules for network on ui thread
+		if (logOutOfCobrainOnDestroy) cobrain.logout(); //TODO: do we wait for this to finish or block and remove strict rules for network on ui thread
 
-        BaseCobrainFragment.controller = null;
-        environment = null;
+        //BaseCobrainFragment.controller = null;
+        //environment = null;
 
 		Analytics.stop(this);
 	}
@@ -484,7 +501,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 	}
 
 	@Override
-	public void showDialog(final String message) {
+	public void showDialog(final String title, final String message) {
 		runOnUiThread(new Runnable () {
 			public void run() {
 				//show dialog
@@ -492,6 +509,7 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 				dismissDialog();
 				
 				AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+				if (title != null) builder1.setTitle(title);
 		        builder1.setMessage(message);
 		        builder1.setCancelable(true);
 		        builder1.setPositiveButton("OK",
@@ -513,6 +531,44 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		});
 	}
 
+
+	@Override
+	public void showErrorDialog(final CharSequence title, final CharSequence message) {
+		
+		runOnUiThread(new Runnable () {
+			public void run() {
+				//show dialog
+				
+				dismissDialog();
+				
+				AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+				View v = View.inflate(getApplicationContext(), R.layout.dlg_error, null);
+				TextView tv = (TextView) v.findViewById(R.id.error_message);
+				CharSequence mymessage = message;
+				tv.setText(mymessage);
+				//builder1.setIcon(R.drawable.ic_error);
+				builder1.setView(v);
+				if (title != null) builder1.setTitle(Html.fromHtml("<b><font color='#000'>" + title + "</font></b>"));
+		        //builder1.setMessage(message);
+		        builder1.setCancelable(true);
+		        builder1.setPositiveButton("OK",
+		                new DialogInterface.OnClickListener() {
+		            public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		            }
+		        });
+		        /*builder1.setNegativeButton("No",
+		                new DialogInterface.OnClickListener() {
+		            public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		            }
+		        });*/
+		
+		        AlertDialog alert11 = builder1.create();
+		        alert11.show();		
+			}
+		});
+	}
 
 	@Override
 	public void showErrorDialog(final CharSequence message) {
@@ -729,8 +785,19 @@ public class MainActivity extends SlidingSherlockFragmentActivity implements OnL
 		String uniqueTag = FriendCraveStripsFragment.TAG + owner.getId();
 		showFragment(f, uniqueTag, true, false, true);
 	}
-	
-	void showFragment(BaseCobrainFragment f, String tag, boolean clearBackStackFirst, boolean addToBackStack, boolean closeMenu) {
+
+
+	@Override
+	public void showPage(BaseCobrainFragment f, String tag, boolean addToBackStack) {
+		showFragment(f, tag, !addToBackStack, addToBackStack, true);
+	}
+
+    @Override
+    public void showContentPage(BaseCobrainFragment f, String tag, boolean addToBackStack) {
+        showFragment(f, android.R.id.content, tag, !addToBackStack, addToBackStack, true);
+    }
+
+    void showFragment(BaseCobrainFragment f, String tag, boolean clearBackStackFirst, boolean addToBackStack, boolean closeMenu) {
 		showFragment(f, R.id.content_frame, tag, clearBackStackFirst, addToBackStack, closeMenu);
 	}
 	

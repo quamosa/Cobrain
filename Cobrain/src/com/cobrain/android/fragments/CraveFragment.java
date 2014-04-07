@@ -1,20 +1,5 @@
 package com.cobrain.android.fragments;
 
-import java.util.List;
-import java.util.Locale;
-
-import com.cobrain.android.R;
-import com.cobrain.android.controllers.Cobrain.CobrainController;
-import com.cobrain.android.loaders.ImageLoader;
-import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
-import com.cobrain.android.model.Sku;
-import com.cobrain.android.model.Skus;
-import com.cobrain.android.model.UserInfo;
-import com.cobrain.android.model.Rave;
-import com.cobrain.android.utils.HelperUtils;
-import com.cobrain.android.utils.LoaderUtils;
-import com.cobrain.android.views.HttpImageView;
-
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -33,15 +18,27 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cobrain.android.R;
+import com.cobrain.android.controllers.Cobrain.CobrainController;
+import com.cobrain.android.loaders.ImageLoader;
+import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
+import com.cobrain.android.model.Rave;
+import com.cobrain.android.model.Sku;
+import com.cobrain.android.model.Skus;
+import com.cobrain.android.model.UserInfo;
+import com.cobrain.android.utils.HelperUtils;
+import com.cobrain.android.utils.LoaderUtils;
+import com.cobrain.android.views.HttpImageView;
+
+import java.util.List;
+
 public class CraveFragment extends Fragment implements OnClickListener, OnTouchListener {
 
 	private Sku recommendation;
-	TextView itemRetailer;
 	TextView itemDescription;
 	TextView itemPrice;
 	TextView rankForYouLabel;
@@ -51,9 +48,10 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	//TextView cravePopupLabel;
 	BaseCobrainFragment parent;
 	Skus results;
-	private LinearLayout bottomButtons;
+	private RelativeLayout bottomButtons;
 	private ImageButton saveButton;
 	private ImageButton shareButton;
+    private ImageButton likeButton;
 	private ImageButton dislikeButton;
 	boolean isSaved;
 	boolean isPublished;
@@ -77,8 +75,11 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	private int totalCraves;
 	private List<Sku> wishListItems;
 	private boolean isDisliked;
+    private boolean isLiked;
+    private TextView buyLink;
+    private String buyAtText;
 
-	public CraveFragment() {
+    public CraveFragment() {
 	}
 	
 	public CraveFragment(BaseCobrainFragment parent) {
@@ -108,7 +109,8 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		if (isShowingWishList()) {
 			v = inflater.inflate(R.layout.crave_wishlist_frame, null);
 			//craveIndexLabel = (TextView) v.findViewById(R.id.shared_craves_index_label);
-			raveIcon = (ImageView) v.findViewById(R.id.item_rave_icon);
+            buyAtText = "View at <b>%s</b>";
+            raveIcon = (ImageView) v.findViewById(R.id.item_rave_icon);
 			raveInfoLabel = (TextView) v.findViewById(R.id.rave_info);
 			raveIcon.setOnClickListener(this);
 			raveIcon.setOnTouchListener(this);
@@ -118,9 +120,9 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		}
 		else {
 			v = inflater.inflate(R.layout.crave_frame_with_rank_header, null);
+            buyAtText = "Buy at <b>%s</b>";
 		}
 
-		itemRetailer = (TextView) v.findViewById(R.id.item_retailer);
 		itemDescription = (TextView) v.findViewById(R.id.item_description);
 		itemPrice = (TextView) v.findViewById(R.id.item_price);
 		rankForYouLabel = (TextView) v.findViewById(R.id.rank_for_you_label);
@@ -129,18 +131,22 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		
 		//cravePopupLabel = (TextView) v.findViewById(R.id.crave_popup_label);
 		itemInfoFooter = (RelativeLayout) v.findViewById(R.id.item_info_footer);
-		bottomButtons = (LinearLayout) v.findViewById(R.id.bottom_buttons);
+		bottomButtons = (RelativeLayout) v.findViewById(R.id.bottom_buttons);
 		saveButton = (ImageButton) v.findViewById(R.id.just_for_me_button);
 		shareButton = (ImageButton) v.findViewById(R.id.friends_can_see_button);
+        likeButton = (ImageButton) v.findViewById(R.id.like_button);
 		dislikeButton = (ImageButton) v.findViewById(R.id.dislike_button);
-		
+        buyLink = (TextView) v.findViewById(R.id.buy_link);
+
 		saveButton.setOnClickListener(this);
 		shareButton.setOnClickListener(this);
+        if (likeButton != null) likeButton.setOnClickListener(this);
 		if (dislikeButton != null) dislikeButton.setOnClickListener(this);
-		
-		HelperUtils.Graphics.setAlpha(bottomButtons, 0.5f);
+        if (buyLink != null) buyLink.setOnClickListener(this);
 
-		itemImage.setOnClickListener(this);
+		//HelperUtils.Graphics.setAlpha(bottomButtons, 0.5f);
+
+		//itemImage.setOnClickListener(this);
 		
 		saleLayout = (RelativeLayout) v.findViewById(R.id.item_sale_layout);
 		itemSaleIcon = (ImageView) v.findViewById(R.id.item_sale_icon);
@@ -190,6 +196,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		isSaved = false;
 		isPublished = false;
 		isDisliked = false;
+        isLiked = false;
 		isOnSale = false;
 		isRaved = false;
 
@@ -202,11 +209,13 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			itemId = wishListItem.getId();
 			isPublished = wishListItem.getOpinion().is("shared");
 			isDisliked = wishListItem.getOpinion().is("disliked");
+            isLiked = wishListItem.getOpinion().is("liked");
 			isRaved = iRavedThis(wishListItem);
 		}
 		else {
 			isSaved = recommendation.getOpinion().is("saved");
 			isPublished = recommendation.getOpinion().is("shared");
+            isLiked = recommendation.getOpinion().is("liked");
 			isDisliked = recommendation.getOpinion().is("disliked");
 
 			//FIXME: uncomment when we have racks api endpoint available
@@ -233,9 +242,9 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			
 			if (recommendation != null) {
 				if (recommendation.getMerchant() != null) {
-					itemRetailer.setText(recommendation.getMerchant().getName().toUpperCase(Locale.US));
+                    buyLink.setText(Html.fromHtml(String.format(buyAtText, recommendation.getMerchant().getName())));
 				}
-				else itemRetailer.setText(null);
+				else buyLink.setText(Html.fromHtml(String.format(buyAtText, "Merchant")));
 				itemDescription.setText(recommendation.getName());
 				itemPrice.setText(recommendation.getPriceFormatted());
 
@@ -347,12 +356,16 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	@Override
 	public void onDestroyView() {
 		ImageLoader.get.cancel(itemImage);
-		itemRetailer = null;
 		itemDescription = null;
 		itemPrice = null;
 		rankForYouLabel = null;
 		saveButton.setOnClickListener(null);
 		shareButton.setOnClickListener(null);
+        if (buyLink != null) {
+            buyLink.setOnClickListener(null);
+            buyLink = null;
+        }
+        if (likeButton != null) likeButton.setOnClickListener(null);
 		if (dislikeButton != null) dislikeButton.setOnClickListener(null);
 		itemImage.setOnClickListener(null);
 		itemImage.setImageDrawable(null);
@@ -364,9 +377,11 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		bottomButtons = null;
 		saveButton = null;
 		shareButton = null;
+        likeButton = null;
 		dislikeButton = null;
 		parent = null;
 		results = null;
+        buyLink = null;
 		
 		wishList = null;
 		wishListItem = null;
@@ -395,6 +410,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()) {
+        case R.id.buy_link:
 		case R.id.item_image:
 			if (parent != null) {
 				if (parent instanceof CravesFragment) {
@@ -402,7 +418,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 				}
 			}
 			else if (wishListParent != null) {
-				//wishListParent.showBrowser(recommendation.getBuyURL(), recommendation.getMerchant().getName());
+				wishListParent.showBrowser(recommendation.getBuyURL(), recommendation.getMerchant().getName());
 			}
 			break;
 		case R.id.just_for_me_button: 
@@ -411,12 +427,16 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		case R.id.friends_can_see_button: 
 			shareRecommendation(recommendation, !isPublished);
 			break;
-		case R.id.dislike_button: 
+        case R.id.like_button:
+            likeRecommendation(recommendation, !isLiked);
+            break;
+		case R.id.dislike_button:
 			dislikeRecommendation(recommendation, !isDisliked);
 			break;
 		case R.id.item_rave_icon:
 			//rave toggle
 			raveItem(!isRaved, raveId);
+            break;
 		}
 	}
 	
@@ -603,10 +623,46 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		}.execute(recommendation, dislike);
 	}
 
+    public void likeRecommendation(Sku recommendation, boolean like) {
+        parent.loaderUtils.showLoading((like) ? "Liking your crave..." : "Removing your like...");
+
+        new AsyncTask<Object, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Object... params) {
+
+                UserInfo ui = parent.controller.getCobrain().getUserInfo();
+                Sku recommendation = (Sku)params[0];
+                Boolean isLiked = (Boolean)params[1];
+
+                if (isLiked) {
+                    if (ui.likeProduct(recommendation)) {
+                        return true;
+                    }
+                }
+                else {
+                    if (ui.removeProduct(recommendation)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                //show result of is published change
+                parent.loaderUtils.dismissLoading();
+                if (result) updateSaveAndShareState(true);
+            }
+
+        }.execute(recommendation, like);
+    }
+
 	void updateFooterButtons(boolean animate) {
 		boolean saved = isSaved;
 		boolean published = isPublished;
 		boolean disliked = isDisliked;
+        boolean liked = isLiked;
 
 		if (published) {
 			saved = false;
@@ -615,12 +671,15 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 		int saveId = (!saved) ? R.drawable.crave_save_button : R.drawable.crave_save_button_pressed;
 		int shareId = (!published) ? R.drawable.crave_share_button : R.drawable.crave_share_button_pressed;
 		int dislikeId = (!disliked) ? R.drawable.crave_dislike_button : R.drawable.crave_dislike_button_pressed;
+        int likeId = (!liked) ? R.drawable.crave_like_button : R.drawable.crave_like_button_pressed;
 		Drawable save = getActivity().getResources().getDrawable(saveId);
 		Drawable share = getActivity().getResources().getDrawable(shareId);
 		Drawable dislike = getActivity().getResources().getDrawable(dislikeId);
-		saveButton.setBackground(save);
-		shareButton.setBackground(share);
-		if (dislikeButton != null) dislikeButton.setBackground(dislike);
+        Drawable like = getActivity().getResources().getDrawable(likeId);
+		saveButton.setImageDrawable(save);
+		shareButton.setImageDrawable(share);
+        if (likeButton != null) likeButton.setImageDrawable(like);
+		if (dislikeButton != null) dislikeButton.setImageDrawable(dislike);
 
 		if (isOnSale) {
 			if (!isShowingWishList()) {
@@ -630,7 +689,7 @@ public class CraveFragment extends Fragment implements OnClickListener, OnTouchL
 			itemRegularPrice.setVisibility(View.VISIBLE);
 			//saleLayout.setVisibility(View.VISIBLE);
 			//itemPrice.setVisibility(View.GONE);
-			itemPrice.setTextColor(0xfff4a427);
+			itemPrice.setTextColor(0xff000000);
 			itemRegularPrice.setText(recommendation.getPriceFormatted());
 			itemPrice.setText(recommendation.getSalePriceFormatted());
 			float pct = 1-((float)recommendation.getSalePrice() / recommendation.getPrice());

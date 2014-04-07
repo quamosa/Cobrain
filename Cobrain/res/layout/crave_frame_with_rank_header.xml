@@ -24,12 +24,25 @@
         android:paddingRight="@dimen/crave_padding"
         android:paddingBottom="0dp" >
 
-	
+
+        <TextView
+            android:id="@+id/buy_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="14.5sp"
+            android:layout_alignParentRight="true"
+            android:text="Buy at Nordstrom"
+            android:drawableRight="@drawable/ic_buy_at"
+            android:drawablePadding="10dp"
+            />
+
 	    <com.cobrain.android.views.HttpImageView
 	        android:id="@+id/item_image"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
 	        android:layout_alignParentLeft="true"
+            android:layout_below="@+id/buy_link"
 	        android:src="@drawable/ic_noimage" />
 
 	        <ProgressBar
@@ -50,31 +63,53 @@
 	        android:layout_alignBottom="@+id/item_image"
 	        android:background="@drawable/crave_border"
 			/>
-	    	    	    
-	    <!-- RelativeLayout
-	        android:id="@+id/crave_info_header"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_alignLeft="@+id/item_image"
-	        android:layout_alignTop="@+id/item_image"
-	        android:background="@color/DarkPurple"
-	        android:gravity="center"
-	        android:padding="@dimen/crave_padding" >
 
-	        <TextView
-	            android:id="@+id/crave_popup_label"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentLeft="true"
-	            android:layout_alignParentTop="true"
-	            android:layout_gravity="center"
-	            android:gravity="center"
-	            android:text="ADDED TO\nFRIENDS CAN SEE"
-	            android:textAppearance="?android:attr/textAppearanceMedium"
-	            android:textColor="@color/White"
-	            android:textStyle="bold" />
+            <ImageButton
+                android:id="@+id/just_for_me_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/friends_can_see_button"
+                android:layout_alignLeft="@+id/friends_can_see_button"
+                android:layout_marginRight="@dimen/crave_padding"
+                android:layout_marginBottom="@dimen/crave_padding"
+                style="@style/crave_save_button"
+                />
 
-	    </RelativeLayout -->
+            <ImageButton
+                android:id="@+id/friends_can_see_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="@dimen/crave_padding"
+                android:layout_marginBottom="@dimen/crave_padding"
+                style="@style/crave_share_button"
+                />
+
+        <!-- RelativeLayout
+            android:id="@+id/crave_info_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/item_image"
+            android:layout_alignTop="@+id/item_image"
+            android:background="@color/DarkPurple"
+            android:gravity="center"
+            android:padding="@dimen/crave_padding" >
+
+            <TextView
+                android:id="@+id/crave_popup_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="ADDED TO\nFRIENDS CAN SEE"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/White"
+                android:textStyle="bold" />
+
+        </RelativeLayout -->
 
    		<ImageView
    		    android:id="@+id/item_sale_icon"
@@ -124,19 +159,7 @@
 	        android:layout_height="wrap_content"
 	        android:padding="@dimen/crave_padding" >
 
-	        <TextView
-	            android:id="@+id/item_retailer"
-	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentLeft="true"
-	            android:layout_toLeftOf="@+id/item_price"
-  	            android:ellipsize="end"
-	            android:text="MACY&apos;S"
-	            android:textAppearance="?android:attr/textAppearanceSmall"
-	            android:textColor="#000"
-	            android:textStyle="bold" />
-
-  	          		        <TextView
+                <TextView
 		            android:id="@+id/item_sale_regular_price"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -188,7 +211,7 @@
   	            android:id="@+id/item_description"
   	            android:layout_width="match_parent"
   	            android:layout_height="wrap_content"
-  	            android:layout_alignTop="@+id/item_price"
+  	            android:layout_alignTop="@+id/item_sale_price"
   	            android:layout_toLeftOf="@+id/item_price"
   	            android:ellipsize="end"
   	            android:lines="2"
@@ -200,48 +223,32 @@
 	        
 	    </RelativeLayout>
     
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/bottom_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" >
-        
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="10dp"
+        >
+
         <ImageButton
-            android:id="@+id/just_for_me_button"
-            style="@style/crave_save_button"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:id="@+id/like_button"
+            style="@style/crave_like_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
             />
 
-        <View 
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#fff"/>
-        
-        <ImageButton
-            android:id="@+id/friends_can_see_button"
-            style="@style/crave_share_button"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-             />
-
-        <View 
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#fff"/>
-        
         <ImageButton
             android:id="@+id/dislike_button"
             style="@style/crave_dislike_button"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_toRightOf="@+id/like_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
              />
         
-    </LinearLayout>
+    </RelativeLayout>
     	    
    </RelativeLayout>    
     

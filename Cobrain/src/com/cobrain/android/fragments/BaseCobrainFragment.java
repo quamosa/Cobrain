@@ -1,9 +1,5 @@
 package com.cobrain.android.fragments;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
@@ -14,11 +10,16 @@ import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cobrain.android.controllers.Cobrain.CobrainController;
 import com.cobrain.android.controllers.Cobrain.CobrainView;
 import com.cobrain.android.utils.LoaderUtils;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
 
 public class BaseCobrainFragment extends SherlockFragment implements OnClickListener, CobrainView {
 	public static CobrainController controller;
@@ -236,7 +237,7 @@ public class BaseCobrainFragment extends SherlockFragment implements OnClickList
 	public void onDetach() {
 		detached = true;
 		handler = null;
-		if (actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
+		if (actionBar != null && actionBar.getCustomView() == abHide) actionBar.setCustomView(null);
 		controller.dispatchOnFragmentDetached(this);
 		abHide = null;
 		actionBar = null;

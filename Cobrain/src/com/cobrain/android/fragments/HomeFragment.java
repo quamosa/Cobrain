@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.cobrain.android.R;
+import com.cobrain.android.loaders.ImageLoader;
+import com.cobrain.android.loaders.ImageLoader.OnImageLoadListener;
 import com.cobrain.android.views.RepeatingTabHost;
 
 import android.graphics.Bitmap;
@@ -20,9 +22,11 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TabHost.OnTabChangeListener;
 
 public class HomeFragment extends BaseCobrainFragment implements OnPageChangeListener {
@@ -108,8 +112,6 @@ public class HomeFragment extends BaseCobrainFragment implements OnPageChangeLis
 						onPageSelected(0);
 				    }
 				});*/
-		
-		
 		
 		return v;
 	}

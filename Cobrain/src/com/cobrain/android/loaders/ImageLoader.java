@@ -1,12 +1,5 @@
 package com.cobrain.android.loaders;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import com.cobrain.android.utils.HelperUtils;
-import com.cobrain.android.utils.LoaderUtils;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -15,8 +8,14 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
-import android.view.animation.Animation;
 import android.widget.ImageView;
+
+import com.cobrain.android.utils.HelperUtils;
+import com.cobrain.android.utils.LoaderUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 public class ImageLoader {
     private static final boolean DISK_CACHE_ENABLED = false;
@@ -30,7 +29,7 @@ public class ImageLoader {
 	public static final int CACHE_DISK = 2;
 
     public static ImageLoader get = new ImageLoader();
-    
+
 	public ImageLoader newInstance() {
     	return new ImageLoader();
     }
@@ -158,7 +157,9 @@ public class ImageLoader {
 
         try {
             URL url = new URL(urlString);
-            InputStream is = url.openStream(); 
+            //HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            //conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+            InputStream is = url.openStream(); //conn.getInputStream(); 
             
             asyncLoader.stream = is;
             BitmapFactory.Options opts = new BitmapFactory.Options();
